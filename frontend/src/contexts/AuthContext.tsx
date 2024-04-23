@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../firebase-auth'; // Asegúrate de que esta ruta sea correcta para tu configuración de Firebase
+import { auth } from '../firebase-auth';
 
 interface AuthContextType {
     currentUser: User | null;
@@ -25,12 +25,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setLoading(false);
         });
 
-        // Detach the listener when the component is unmounted
         return unsubscribe;
     }, []);
 
     if (loading) {
-        return <div>Cargando...</div>; // O cualquier otro indicador de carga que prefieras
+        return <div>Cargando...</div>;
     }
 
     return (
