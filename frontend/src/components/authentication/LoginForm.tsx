@@ -102,7 +102,7 @@ const LoginForm: React.FC = () => {
                                 <hr className="my-4"/>
 
                                 <div className="text-center">
-                                    <p>O prefieres inciciar sesión con...</p>
+                                    <p>O prefieres iniciar sesión con...</p>
 
                                     <button
                                         type="button"
