@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { auth } from '../../firebase-auth';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import {createUserWithEmailAndPassword, GithubAuthProvider, GoogleAuthProvider, signInWithPopup} from 'firebase/auth';
 import logo3 from '../../assets/logo3.png';
+import { useNavigate } from 'react-router-dom';
 
 const RegisterForm: React.FC = () => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [confirmPassword, setConfirmPassword] = useState<string>('');
     const [error, setError] = useState<string>('');
+    const navigate = useNavigate();  // Hook para la navegación
 
     const handleRegister = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -31,6 +33,29 @@ const RegisterForm: React.FC = () => {
             setError(error.message);
         }
     };
+
+    const signInWithGoogle = async () => {
+        const provider = new GoogleAuthProvider();
+        try {
+            const result = await signInWithPopup(auth, provider);
+            console.log('Usuario logueado con Google:', result.user);
+            navigate('/board');
+        } catch (error) {
+            console.error('Error al iniciar sesión con Google:', error);
+        }
+    };
+
+    const signInWithGithub = async () => {
+        const provider = new GithubAuthProvider();
+        try {
+            const result = await signInWithPopup(auth, provider);
+            console.log("Usuario logueado con GitHub:", result.user);
+            navigate('/board');
+        } catch (error) {
+            console.error("Error al iniciar sesión con GitHub:", error);
+        }
+    };
+
 
     return (
         <section className="vw-100 vh-100">
@@ -86,7 +111,7 @@ const RegisterForm: React.FC = () => {
                                         <label className="form-label visually-hidden">Confirmar Contraseña</label>
                                     </div>
 
-                                    {error && <p style={{ color: 'red' }}>{error}</p>}
+                                    {error && <p style={{color: 'red'}}>{error}</p>}
 
                                     <button
                                         type="submit"
@@ -95,12 +120,35 @@ const RegisterForm: React.FC = () => {
                                         Registrarse
                                     </button>
                                 </form>
+                                <hr className="my-4"/>
+
+                                <div className="text-center">
+                                    <p>O prefieres registrarte con...</p>
+
+                                    <button
+                                        type="button"
+                                        className="btn btn-link btn-floating mx-1"
+                                        onClick={signInWithGoogle}
+                                    >
+                                        <i className="bi bi-google"></i>
+                                    </button>
+
+
+                                    <button
+                                        type="button"
+                                        className="btn btn-link btn-floating mx-1"
+                                        onClick={signInWithGithub}
+                                    >
+                                        <i className="bi bi-github"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div className="full-width d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 bg-primary">
+            <div
+                className="full-width d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 bg-primary">
                 <div className="text-white mb-3 mb-md-0">
                     Copyright © 2024. All rights reserved.
                 </div>
