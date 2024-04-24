@@ -19,7 +19,8 @@ const Welcome: React.FC = () => {
                                 <Link to="" className="btn btn-secondary mx-2">¿Qué es Partner UP!?</Link>
                             </div>
                             <div className="text-start mt-2">
-                                <p className="letraPeq">¿Ya tienes una cuenta? <Link to="/login" className="text-primary">Haz clic
+                                <p className="letraPeq">¿Ya tienes una cuenta? <Link to="/login"
+                                                                                     className="text-primary">Haz clic
                                     aquí</Link> para iniciar sesión.</p>
                             </div>
                         </div>
@@ -29,7 +30,7 @@ const Welcome: React.FC = () => {
             <div
                 className="full-width d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 bg-custom">
                 <div className="text-white mb-3 mb-md-0">
-                    Copyright © 2024. All rights reserved.
+                    Copyright © 2024. Partner UP! - Todos los derechos reservados.
                 </div>
             </div>
         </section>
