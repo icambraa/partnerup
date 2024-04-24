@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import logo3blanco from '../../assets/logo3blanco.png';
+import logo3blanco from '../../assets/logo3-blanco.png';
 import { auth } from '../../firebase-auth.ts';
 
 const Navbar: React.FC = () => {
@@ -30,7 +30,7 @@ const Navbar: React.FC = () => {
             <nav className="navbar navbar-expand-sm navbar-dark bg-dark fixed-top">
                 <div className="container-fluid">
                     <Link className="navbar-brand" to="/board">
-                        <img src={logo3blanco} alt="Logo" style={{ maxWidth: '110px' }}/>
+                        <img src={logo3blanco} alt="Logo" style={{ maxWidth: '100px' }}/>
                     </Link>
                     <form className="d-flex align-items-center">
                         <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
