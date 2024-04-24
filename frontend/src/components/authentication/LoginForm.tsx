@@ -10,7 +10,7 @@ import { GoogleAuthProvider, signInWithPopup, GithubAuthProvider } from 'firebas
 const LoginForm: React.FC = () => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
-    const [error, setError] = useState<string>('');  // Estado para manejar los mensajes de error
+    const [error, setError] = useState<string>('');
     const navigate = useNavigate();  // Hook para la navegación
 
     const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {

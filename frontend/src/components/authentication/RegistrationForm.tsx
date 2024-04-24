@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { auth } from '../../firebase-auth';
-import {createUserWithEmailAndPassword, GithubAuthProvider, GoogleAuthProvider, signInWithPopup} from 'firebase/auth';
+import {createUserWithEmailAndPassword, GithubAuthProvider, GoogleAuthProvider, signInWithPopup, getAdditionalUserInfo} from 'firebase/auth';
 import logo3 from '../../assets/logo3.png';
 import { useNavigate } from 'react-router-dom';
 
-const RegisterForm: React.FC = () => {
+const RegistrationForm: React.FC = () => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [confirmPassword, setConfirmPassword] = useState<string>('');
@@ -28,8 +28,11 @@ const RegisterForm: React.FC = () => {
             setPassword('');
             setConfirmPassword('');
             setError('');
+
+            navigate('/create-profile', { state: { email: userCredential.user.email } });
         } catch (error) {
             console.error("Error en el registro:", error);
+            // @ts-expect-error
             setError(error.message);
         }
     };
@@ -38,8 +41,16 @@ const RegisterForm: React.FC = () => {
         const provider = new GoogleAuthProvider();
         try {
             const result = await signInWithPopup(auth, provider);
-            console.log('Usuario logueado con Google:', result.user);
-            navigate('/board');
+            const details = getAdditionalUserInfo(result);
+
+            if (details && details.isNewUser) {
+                console.log('Nuevo usuario registrado con Google:', result.user);
+                // Redirigir al usuario a la página de creación de perfil
+                navigate('/create-profile', { state: { email: result.user.email } });
+            } else {
+                console.log('Usuario existente logueado con Google:', result.user);
+                navigate('/board');
+            }
         } catch (error) {
             console.error('Error al iniciar sesión con Google:', error);
         }
@@ -49,8 +60,16 @@ const RegisterForm: React.FC = () => {
         const provider = new GithubAuthProvider();
         try {
             const result = await signInWithPopup(auth, provider);
-            console.log("Usuario logueado con GitHub:", result.user);
-            navigate('/board');
+            const details = getAdditionalUserInfo(result);
+
+            if (details && details.isNewUser) {
+                console.log("Nuevo usuario registrado con GitHub:", result.user);
+                // Redirigir al usuario a la página de creación de perfil
+                navigate('/create-profile', { state: { email: result.user.email } });
+            } else {
+                console.log("Usuario existente logueado con GitHub:", result.user);
+                navigate('/board');
+            }
         } catch (error) {
             console.error("Error al iniciar sesión con GitHub:", error);
         }
@@ -157,4 +176,4 @@ const RegisterForm: React.FC = () => {
     );
 }
 
-export default RegisterForm;
+export default RegistrationForm;

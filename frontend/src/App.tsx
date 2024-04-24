@@ -1,9 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Welcome from './components/Welcome/Welcome.tsx';
-import Board from './components/Board/Board.tsx';
+import Welcome from './components/welcome/Welcome.tsx';
+import Board from './components/board/Board.tsx';
 import LoginForm from './components/authentication/LoginForm';
-import RegisterForm from './components/authentication/RegisterForm';
+import RegistrationForm from './components/authentication/RegistrationForm.tsx';
+import ProfileRegistration from './components/authentication/ProfileRegistration.tsx';
 import { AuthProvider } from './contexts/AuthContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -15,8 +16,9 @@ const App: React.FC = () => {
                 <Routes>
                     <Route path="/" element={<Welcome />} />
                     <Route path="/login" element={<LoginForm />} />
-                    <Route path="/register" element={<RegisterForm />} />
+                    <Route path="/registration" element={<RegistrationForm />} />
                     <Route path="/board" element={<Board />} />
+                    <Route path="/create-profile" element={<ProfileRegistration />} />
                 </Routes>
             </AuthProvider>
         </Router>

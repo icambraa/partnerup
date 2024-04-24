@@ -22,8 +22,8 @@ const Welcome: React.FC = () => {
                     <div className="col-md-6 col-lg-4 col-xl-3">
                         <div className="container mt-5">
                             <div className=" flex-row justify-content-center">
-                                <Link to="/register" className="btn btn-primary">Registrarse</Link>
-                                <Link to="/register" className="btn btn-secondary mx-2">¿Qué es Partner UP!?</Link>
+                                <Link to="/registration" className="btn btn-primary">Registrarse</Link>
+                                <Link to="/registration" className="btn btn-secondary mx-2">¿Qué es Partner UP!?</Link>
                             </div>
                             <div className="text-start mt-2">
                                 <p className="letraPeq">¿Ya tienes una cuenta? <Link to="/login" className="text-primary">Haz clic
