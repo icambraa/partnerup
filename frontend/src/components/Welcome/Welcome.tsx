@@ -1,17 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './Welcome.css';
-import logo from '../../assets/logo2.png';
+import logo from '../../assets/logo2-naranja.png';
 
 const Welcome: React.FC = () => {
     return (
-        // <div className="container mt-5">
-        //     <h1 className="mb-3">Bienvenido a la página principal</h1>
-        //     <div className="d-flex flex-column">
-        //         <Link to="/login" className="btn btn-primary mb-2">Login</Link>
-        //         <Link to="/register" className="btn btn-secondary">Registro</Link>
-        //     </div>
-        // </div>
 
         <section className="vw-100 vh-100">
             <div className="container-fluid h-custom">
@@ -23,7 +16,7 @@ const Welcome: React.FC = () => {
                         <div className="container mt-5">
                             <div className=" flex-row justify-content-center">
                                 <Link to="/registration" className="btn btn-primary">Registrarse</Link>
-                                <Link to="/registration" className="btn btn-secondary mx-2">¿Qué es Partner UP!?</Link>
+                                <Link to="" className="btn btn-secondary mx-2">¿Qué es Partner UP!?</Link>
                             </div>
                             <div className="text-start mt-2">
                                 <p className="letraPeq">¿Ya tienes una cuenta? <Link to="/login" className="text-primary">Haz clic
@@ -34,7 +27,7 @@ const Welcome: React.FC = () => {
                 </div>
             </div>
             <div
-                className="full-width d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 bg-primary">
+                className="full-width d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 bg-custom">
                 <div className="text-white mb-3 mb-md-0">
                     Copyright © 2024. All rights reserved.
                 </div>

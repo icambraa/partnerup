@@ -25,4 +25,10 @@ public class UserProfileController {
         return userProfile != null ? ResponseEntity.ok(userProfile) : ResponseEntity.notFound().build();
     }
 
+    @GetMapping("/by-email")
+    public ResponseEntity<UserProfile> getUserProfileByEmail(@RequestParam String email) {
+        UserProfile userProfile = profileService.getUserProfileByEmail(email);
+        return userProfile != null ? ResponseEntity.ok(userProfile) : ResponseEntity.notFound().build();
+    }
+
 }

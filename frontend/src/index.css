@@ -28,6 +28,7 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background-color: #E1E2E2;
 }
 
 h1 {
@@ -66,3 +67,18 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+.btn-primary {
+  background-color: #FB8122;
+  border-color: #FB8122;
+}
+
+.bg-custom {
+  background-color: #FB8122;
+  border-color: #FB8122;
+}
+
+.card.border-primary {
+  border-color: #b0c4de !important;
+}
+

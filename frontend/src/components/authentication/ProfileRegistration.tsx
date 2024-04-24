@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { UserProfile as UserProfileInterface } from '../../interfaces/UserProfileInterface.ts';
+import logo from "../../assets/logo2-naranja.png";
 
 const ProfileRegistration: React.FC = () => {
     const navigate = useNavigate();
@@ -29,15 +30,15 @@ const ProfileRegistration: React.FC = () => {
         e.preventDefault();
         try {
             const savedProfile = await saveProfile(profile);
-            console.log("Perfil guardado exitosamente:", savedProfile);
-            navigate('/dashboard');
+            console.log("perfil guardado exitosamente:", savedProfile);
+            navigate('/board');
         } catch (error) {
-            console.error("Error al guardar el perfil:", error);
+            console.error("error al guardar el perfil:", error);
         }
     };
 
     const saveProfile = async (profileData: UserProfileInterface): Promise<UserProfileInterface> => {
-        console.log("Enviando perfil al servidor:", JSON.stringify(profileData));
+        console.log("enviando perfil al servidor:", JSON.stringify(profileData));
 
         const response = await fetch('http://localhost:8080/api/profiles', {
             method: 'POST',
@@ -48,7 +49,7 @@ const ProfileRegistration: React.FC = () => {
         });
 
         if (!response.ok) {
-            throw new Error('Error al guardar el perfil: ' + response.statusText);
+            throw new Error('error al guardar el perfil: ' + response.statusText);
         }
 
         return await response.json();
@@ -58,7 +59,11 @@ const ProfileRegistration: React.FC = () => {
             <div className="container-fluid h-custom">
                 <div className="row d-flex justify-content-center align-items-center h-100">
                     <div className="col-12 col-md-8 col-lg-6 col-xl-4">
-                        <div className="card shadow-2-strong">
+                        <div className="text-center">
+                            <img src={logo} className="img-fluid w-75"/>
+                        </div>
+
+                        <div className="card shadow-2-strong border border-primary">
                             <div className="card-body p-5 text-center">
                                 <h3 className="mb-3">Completar perfil de usuario</h3>
                                 <form onSubmit={handleSubmit}>
@@ -149,9 +154,9 @@ const ProfileRegistration: React.FC = () => {
                 </div>
             </div>
             <div
-                className="full-width d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 bg-primary">
+                className="full-width d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 bg-custom">
                 <div className="text-white mb-3 mb-md-0">
-                    Copyright © 2024. All rights reserved.
+                    Copyright © 2024. Partner UP! - Todos los derechos reservados.
                 </div>
             </div>
         </section>

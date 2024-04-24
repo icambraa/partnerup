@@ -20,4 +20,10 @@ public class UserProfileService {
         return userRepository.findById(id).orElse(null);
     }
 
+    public UserProfile getUserProfileByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+
+
 }

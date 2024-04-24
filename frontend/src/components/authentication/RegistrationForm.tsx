@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { auth } from '../../firebase-auth';
 import {createUserWithEmailAndPassword, GithubAuthProvider, GoogleAuthProvider, signInWithPopup, getAdditionalUserInfo} from 'firebase/auth';
-import logo3 from '../../assets/logo3.png';
+import logo from '../../assets/logo2-naranja.png';
 import { useNavigate } from 'react-router-dom';
 
 const RegistrationForm: React.FC = () => {
@@ -14,7 +14,6 @@ const RegistrationForm: React.FC = () => {
     const handleRegister = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        // Validar si las contraseñas coinciden
         if (password !== confirmPassword) {
             setError("Las contraseñas no coinciden.");
             return;
@@ -22,8 +21,7 @@ const RegistrationForm: React.FC = () => {
 
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            console.log("Usuario registrado:", userCredential.user);
-            // Limpiar los campos y errores después de un registro exitoso
+            console.log("usuario registrado:", userCredential.user);
             setEmail('');
             setPassword('');
             setConfirmPassword('');
@@ -31,9 +29,13 @@ const RegistrationForm: React.FC = () => {
 
             navigate('/create-profile', { state: { email: userCredential.user.email } });
         } catch (error) {
-            console.error("Error en el registro:", error);
-            // @ts-expect-error
-            setError(error.message);
+            if (error instanceof Error) {
+                console.error("error en el registro:", error);
+                setError(error.message);
+            } else {
+                console.error("Error en el registro:", error);
+                setError("Error desconocido ocurrió durante el registro");
+            }
         }
     };
 
@@ -44,15 +46,14 @@ const RegistrationForm: React.FC = () => {
             const details = getAdditionalUserInfo(result);
 
             if (details && details.isNewUser) {
-                console.log('Nuevo usuario registrado con Google:', result.user);
-                // Redirigir al usuario a la página de creación de perfil
+                console.log('nuevo usuario registrado con Google:', result.user);
                 navigate('/create-profile', { state: { email: result.user.email } });
             } else {
-                console.log('Usuario existente logueado con Google:', result.user);
+                console.log('usuario existente logueado con Google:', result.user);
                 navigate('/board');
             }
         } catch (error) {
-            console.error('Error al iniciar sesión con Google:', error);
+            console.error('error al iniciar sesión con Google:', error);
         }
     };
 
@@ -63,15 +64,14 @@ const RegistrationForm: React.FC = () => {
             const details = getAdditionalUserInfo(result);
 
             if (details && details.isNewUser) {
-                console.log("Nuevo usuario registrado con GitHub:", result.user);
-                // Redirigir al usuario a la página de creación de perfil
+                console.log("nuevo usuario registrado con GitHub:", result.user);
                 navigate('/create-profile', { state: { email: result.user.email } });
             } else {
-                console.log("Usuario existente logueado con GitHub:", result.user);
+                console.log("usuario existente logueado con GitHub:", result.user);
                 navigate('/board');
             }
         } catch (error) {
-            console.error("Error al iniciar sesión con GitHub:", error);
+            console.error("error al iniciar sesión con GitHub:", error);
         }
     };
 
@@ -82,10 +82,10 @@ const RegistrationForm: React.FC = () => {
                 <div className="row d-flex justify-content-center align-items-center h-100">
                     <div className="col-12 col-md-8 col-lg-6 col-xl-4">
                         <div className="text-center">
-                            <img src={logo3} className="img-fluid"/>
+                            <img src={logo} className="img-fluid w-75"/>
                         </div>
 
-                        <div className="card shadow-2-strong">
+                        <div className="card shadow-2-strong border border-primary">
                             <div className="card-body p-5 text-center">
 
                                 <h3 className="mb-3">Registro</h3>
@@ -167,9 +167,9 @@ const RegistrationForm: React.FC = () => {
                 </div>
             </div>
             <div
-                className="full-width d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 bg-primary">
+                className="full-width d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 bg-custom">
                 <div className="text-white mb-3 mb-md-0">
-                    Copyright © 2024. All rights reserved.
+                    Copyright © 2024. Partner UP! - Todos los derechos reservados.
                 </div>
             </div>
         </section>

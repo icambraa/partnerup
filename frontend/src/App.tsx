@@ -1,7 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Welcome from './components/welcome/Welcome.tsx';
-import Board from './components/board/Board.tsx';
+import Navbar from './components/inside/Navbar.tsx';
+import Board from './components/inside/Board.tsx';
+import UserProfile from './components/inside/UserProfile.tsx';
 import LoginForm from './components/authentication/LoginForm';
 import RegistrationForm from './components/authentication/RegistrationForm.tsx';
 import ProfileRegistration from './components/authentication/ProfileRegistration.tsx';
@@ -17,8 +19,15 @@ const App: React.FC = () => {
                     <Route path="/" element={<Welcome />} />
                     <Route path="/login" element={<LoginForm />} />
                     <Route path="/registration" element={<RegistrationForm />} />
-                    <Route path="/board" element={<Board />} />
                     <Route path="/create-profile" element={<ProfileRegistration />} />
+                    <Route path="/board" element={<>
+                        <Navbar />
+                        <Board/>
+                    </>} />
+                    <Route path="/profile" element={<>
+                        <Navbar />
+                        <UserProfile/>
+                    </>} />
                 </Routes>
             </AuthProvider>
         </Router>
