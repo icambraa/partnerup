@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Welcome from './components/welcome/Welcome.tsx';
-import Navbar from './components/inside/Navbar.tsx';
+import Navbar from './components/layout/Navbar.tsx';
 import Board from './components/inside/Board.tsx';
 import UserProfile from './components/inside/UserProfile.tsx';
 import LoginForm from './components/authentication/LoginForm';

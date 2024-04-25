@@ -47,7 +47,7 @@ const Navbar: React.FC = () => {
                             <li className="nav-item dropdown">
                                 <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i className="bi bi-person-circle" style={{ color: '#fff', fontSize: '1.5rem' }}></i>
+                                    <i className="bi bi-person-circle" style={{ color: '#fff', fontSize: '2rem' }}></i>
                                 </a>
                                 <ul className="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="navbarDropdown">
                                     <li><Link className="dropdown-item" to="/profile">Perfil de usuario</Link></li>
