@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../../firebase-auth';
 import {getAdditionalUserInfo, signInWithEmailAndPassword} from 'firebase/auth';
-import logo from '../../assets/logo2-naranja.png';
+import logo from '../../assets/logo2-rojo.png';
 import "bootstrap-icons/font/bootstrap-icons.css"
 import { GoogleAuthProvider, signInWithPopup, GithubAuthProvider } from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';

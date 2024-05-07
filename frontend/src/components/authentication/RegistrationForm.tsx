@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { auth } from '../../firebase-auth';
 import {createUserWithEmailAndPassword, GithubAuthProvider, GoogleAuthProvider, signInWithPopup, getAdditionalUserInfo} from 'firebase/auth';
-import logo from '../../assets/logo2-naranja.png';
+import logo from '../../assets/logo2-rojo.png';
 import { useNavigate } from 'react-router-dom';
 
 const RegistrationForm: React.FC = () => {

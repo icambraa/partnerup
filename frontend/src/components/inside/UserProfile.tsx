@@ -33,7 +33,7 @@ const UserProfileComponent: React.FC = () => {
     }
 
     return (
-        <div>
+        <div className="content">
             <h1>{userProfile.nombreusuario}</h1>
             <p>Email: {userProfile.email}</p>
             <p>Rango Actual: {userProfile.rangoactual}</p>
