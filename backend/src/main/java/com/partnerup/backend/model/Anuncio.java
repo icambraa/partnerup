@@ -1,6 +1,7 @@
 package com.partnerup.backend.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "anuncios")
@@ -9,20 +10,26 @@ public class Anuncio {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "riot_nickname")
+    @Column(nullable = false)
     private String riotNickname;
 
-    @Column(name = "rol")
+    @Column(nullable = false)
     private String rol;
 
-    @Column(name = "busca_rol")
+    @Column(nullable = false)
     private String buscaRol;
 
-    @Column(name = "rango")
+    @Column(nullable = false)
     private String rango;
 
-    @Column(name = "comentario")
+    @Column(length = 1024)  // Ajusta según tus necesidades
     private String comentario;
+
+    @Column(nullable = false)
+    private String userId;  // UID de Firebase
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     public Long getId() {
         return id;
@@ -70,5 +77,21 @@ public class Anuncio {
 
     public void setComentario(String comentario) {
         this.comentario = comentario;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

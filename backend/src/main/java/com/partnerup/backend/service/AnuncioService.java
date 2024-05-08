@@ -14,19 +14,27 @@ public class AnuncioService {
     @Autowired
     private AnuncioRepository anuncioRepository;
 
-    public List<Anuncio> findAll() {
+    public List<Anuncio> getAllAnuncios() {
         return anuncioRepository.findAll();
     }
 
-    public Optional<Anuncio> findById(Long id) {
-        return anuncioRepository.findById(id);
-    }
-
-    public Anuncio save(Anuncio anuncio) {
+    public Anuncio createAnuncio(Anuncio anuncio) {
         return anuncioRepository.save(anuncio);
     }
 
-    public void deleteById(Long id) {
-        anuncioRepository.deleteById(id);
+    public List<Anuncio> getAnunciosByUserId(String userId) {
+        return anuncioRepository.findByUserId(userId);
     }
+
+    public void deleteAnuncio(Long id, String userId) throws Exception {
+        Anuncio anuncio = anuncioRepository.findById(id)
+                .orElseThrow(() -> new Exception("Anuncio no encontrado"));
+
+        if (!anuncio.getUserId().equals(userId)) {
+            throw new Exception("No autorizado para borrar este anuncio");
+        }
+
+        anuncioRepository.delete(anuncio);
+    }
+
 }

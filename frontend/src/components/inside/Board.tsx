@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+import { useAuth } from '../../contexts/AuthContext.tsx';
+
 const Board: React.FC = () => {
+    const { currentUser } = useAuth();
     const [formData, setFormData] = useState({
         riotNickname: '',
         rol: '',
@@ -9,16 +12,15 @@ const Board: React.FC = () => {
         rango: '',
         comentario: ''
     });
-
     const [anuncios, setAnuncios] = useState([]);
 
     useEffect(() => {
         fetchAnuncios();
-    }, []); // Ejecutar una vez al montar el componente
+    }, []);
 
     const fetchAnuncios = async () => {
         try {
-            const response = await fetch('http://localhost:8080/api/anuncios'); // Obtener todos los anuncios
+            const response = await fetch('http://localhost:8080/api/anuncios');
             if (response.ok) {
                 const data = await response.json();
                 setAnuncios(data); // Almacenar los anuncios en el estado local
@@ -37,35 +39,67 @@ const Board: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        if (currentUser) {
+            const formDataWithUserId = {
+                ...formData,
+                userId: currentUser.uid
+            };
+
+            try {
+                const response = await fetch('http://localhost:8080/api/anuncios', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formDataWithUserId)
+                });
+                if (response.ok) {
+                    console.log('Anuncio creado con éxito');
+                    fetchAnuncios();
+                } else {
+                    console.error('Error al crear el anuncio');
+                }
+            } catch (error) {
+                console.error('Error al enviar el formulario', error);
+            }
+        } else {
+            console.error('No hay usuario autenticado');
+        }
+    };
+
+    const handleDelete = async (id: number) => {
+        if (!currentUser || !currentUser.uid) {
+            console.error('Error: No hay usuario autenticado.');
+            return;
+        }
+
         try {
-            const response = await fetch('http://localhost:8080/api/anuncios', {
-                method: 'POST',
+            const response = await fetch(`http://localhost:8080/api/anuncios/${id}`, {
+                method: 'DELETE',
                 headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
+                    'Content-Type': 'application/json',
+                    'userId': currentUser.uid
+                }
             });
             if (response.ok) {
-                console.log('Anuncio creado con éxito');
-                fetchAnuncios(); // Volver a obtener la lista de anuncios después de crear uno nuevo
+                console.log('Anuncio borrado con éxito');
+                // @ts-ignore
+                setAnuncios(anuncios.filter((anuncio) => anuncio.id !== id));
             } else {
-                console.error('Error al crear el anuncio');
+                throw new Error('Error al borrar el anuncio');
             }
         } catch (error) {
-            console.error('Error al enviar el formulario', error);
+            console.error('Error al borrar el anuncio', error);
         }
     };
 
     return (
         <section className="content">
-            <div className="container">
-                <button type="button" className="btn btn-primary my-2" data-bs-toggle="modal"
-                        data-bs-target="#formModal">
-                    Anunciarse
-                </button>
-                <div className="table-responsive">
-                    <table className="table table-bordered table-striped">
-                        <thead className="thead-dark">
+            <div className="container" style={{ display: 'flex', alignItems: 'start' }}>
+                <div className="table-responsive" style={{ flex: 1 }}>
+                    <table className="table table-bordered">
+                        <thead className="custom-dark-header">
                         <tr>
                             <th className="text-center">Riot nickname</th>
                             <th className="text-center">Rol</th>
@@ -82,11 +116,64 @@ const Board: React.FC = () => {
                                 <td>{anuncio.buscaRol}</td>
                                 <td>{anuncio.rango}</td>
                                 <td>{anuncio.comentario}</td>
+                                <td style={{backgroundColor: 'transparent'}}>
+                                    {currentUser && currentUser.uid === anuncio.userId ? (
+                                        <div className="dropdown">
+                                            <a className="text-muted" href="#" role="button"
+                                               id={`dropdownMenuLink${index}`}
+                                               data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i className="bi bi-three-dots-vertical"></i>
+                                            </a>
+                                            <ul className="dropdown-menu dropdown-menu-end"
+                                                aria-labelledby={`dropdownMenuLink${index}`}>
+                                                <li>
+                                                    <a className="dropdown-item" href="#" onClick={(e) => {
+                                                        e.preventDefault();
+                                                        handleDelete(anuncio.id);
+                                                    }}>
+                                                        <i className="bi bi-trash"></i> Borrar
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a className="dropdown-item" href="#" onClick={(e) => {
+                                                        e.preventDefault();
+                                                        //handleEdit(anuncio.id);
+                                                    }}>
+                                                        <i className="bi bi-pencil-fill"></i> Editar
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    ) : (
+                                        <div className="dropdown">
+                                            <a className="text-muted" href="#" role="button"
+                                               id={`dropdownMenuLink${index}`}
+                                               data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i className="bi bi-three-dots-vertical"></i>
+                                            </a>
+                                            <ul className="dropdown-menu dropdown-menu-end"
+                                                aria-labelledby={`dropdownMenuLink${index}`}>
+                                                <li>
+                                                    <a className="dropdown-item" href="#" onClick={(e) => {
+                                                        e.preventDefault();
+                                                        //handleReport(anuncio.id);
+                                                    }}>
+                                                        <i className="bi bi-flag-fill"></i> Reportar
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    )}
+                                </td>
                             </tr>
                         ))}
                         </tbody>
                     </table>
                 </div>
+                <button type="button" className="btn btn-primary my-2" data-bs-toggle="modal"
+                        data-bs-target="#formModal">
+                    Anunciarse
+                </button>
             </div>
             <div className="modal fade" id="formModal" tabIndex={-1} aria-labelledby="formModalLabel"
                  aria-hidden="true">
@@ -101,7 +188,8 @@ const Board: React.FC = () => {
                             <form onSubmit={handleSubmit}>
                                 <div className="mb-3">
                                     <label htmlFor="riotNickname" className="form-label">Riot Nickname</label>
-                                    <input type="text" className="form-control" id="riotNickname" required onChange={handleChange}/>
+                                    <input type="text" className="form-control" id="riotNickname" required
+                                           onChange={handleChange}/>
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="rol" className="form-label">Rol</label>
@@ -131,10 +219,12 @@ const Board: React.FC = () => {
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="comentario" className="form-label">Comentario</label>
-                                    <textarea className="form-control" id="comentario" rows={3} onChange={handleChange}></textarea>
+                                    <textarea className="form-control" id="comentario" rows={3}
+                                              onChange={handleChange}></textarea>
                                 </div>
                                 <div className="modal-footer">
-                                    <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                    <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cerrar
+                                    </button>
                                     <button type="submit" className="btn btn-primary">Enviar</button>
                                 </div>
                             </form>

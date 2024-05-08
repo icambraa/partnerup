@@ -18,42 +18,29 @@ public class AnuncioController {
 
     @GetMapping
     public List<Anuncio> getAllAnuncios() {
-        return anuncioService.findAll();
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Anuncio> getAnuncioById(@PathVariable Long id) {
-        return anuncioService.findById(id)
-                .map(anuncio -> ResponseEntity.ok().body(anuncio))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        return anuncioService.getAllAnuncios();
     }
 
     @PostMapping
     public Anuncio createAnuncio(@RequestBody Anuncio anuncio) {
-        return anuncioService.save(anuncio);
+        return anuncioService.createAnuncio(anuncio);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Anuncio> updateAnuncio(@PathVariable Long id, @RequestBody Anuncio anuncioDetails) {
-        Anuncio updatedAnuncio = anuncioService.findById(id)
-                .map(anuncio -> {
-                    anuncio.setRiotNickname(anuncioDetails.getRiotNickname());
-                    anuncio.setRol(anuncioDetails.getRol());
-                    anuncio.setBuscaRol(anuncioDetails.getBuscaRol());
-                    anuncio.setRango(anuncioDetails.getRango());
-                    anuncio.setComentario(anuncioDetails.getComentario());
-                    return anuncioService.save(anuncio);
-                }).orElseGet(() -> anuncioService.save(anuncioDetails));
-
-        return ResponseEntity.ok(updatedAnuncio);
+    @GetMapping("/user/{userId}")
+    public List<Anuncio> getAnunciosByUserId(@PathVariable String userId) {
+        return anuncioService.getAnunciosByUserId(userId);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAnuncio(@PathVariable Long id) {
-        return anuncioService.findById(id)
-                .map(anuncio -> {
-                    anuncioService.deleteById(id);
-                    return ResponseEntity.ok().<Void>build();
-                }).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<?> deleteAnuncio(@PathVariable Long id, @RequestHeader("userId") String userId) {
+        try {
+            anuncioService.deleteAnuncio(id, userId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
+
+
+
 }

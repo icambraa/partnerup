@@ -71,9 +71,18 @@ button:focus-visible {
   border-color: #ea0029;
 }
 
+.btn-primary:hover {
+  background-color: #ff4d4d;
+  border-color: #ff4d4d;
+}
+
 .bg-custom {
   background-color: #ea0029;
   border-color: #ea0029;
+}
+.custom-dark-header {
+  background-color: #343a40;
+  color: white;
 }
 
 .card.border-primary {
@@ -84,4 +93,10 @@ button:focus-visible {
 
   margin-top: 100px;
 }
+
+.custom-dropdown-menu {
+  right: 0;
+  left: auto;
+}
+
 
