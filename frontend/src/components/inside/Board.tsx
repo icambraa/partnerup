@@ -19,6 +19,11 @@ const Board: React.FC = () => {
         comentario: ''
     });
 
+    const [filterData, setFilterData] = useState({
+        rol: '',
+        rango: ''
+    });
+
 
 
     const [currentPage, setCurrentPage] = useState(0);
@@ -39,12 +44,14 @@ const Board: React.FC = () => {
             const url = new URL('http://localhost:8080/api/anuncios');
             url.searchParams.append('page', currentPage.toString());
             url.searchParams.append('size', pageSize.toString());
-            if (formData.rol) {
-                url.searchParams.append('rol', formData.rol);
+
+            if (filterData.rol) {
+                url.searchParams.append('rol', filterData.rol);
             }
-            if (formData.rango) {
-                url.searchParams.append('rango', formData.rango);
+            if (filterData.rango) {
+                url.searchParams.append('rango', filterData.rango);
             }
+
             const response = await fetch(url);
             if (response.ok) {
                 const { content, totalPages } = await response.json();
@@ -69,6 +76,13 @@ const Board: React.FC = () => {
         setFormData({ ...formData, [id]: value });
         setCurrentPage(0); // Reiniciar la página actual a 0 al cambiar un filtro
     };
+
+    const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+        const { id, value } = e.target;
+        setFilterData({ ...filterData, [id]: value });
+        setCurrentPage(0);
+    };
+
     const handleNextPage = () => {
         const nextPage = currentPage + 1;
         setCurrentPage(nextPage);
@@ -138,7 +152,7 @@ const Board: React.FC = () => {
                     <div className="row">
                         <div className="col-auto">
                             <div className="mb-3">
-                                <select className="form-select form-select-sm" id="rol" onChange={handleChange}>
+                                <select className="form-select form-select-sm" id="rol" onChange={handleFilterChange}>
                                     <option value="">Selecciona un rol</option>
                                     <option value="Top">Top</option>
                                     <option value="Mid">Mid</option>
@@ -150,7 +164,7 @@ const Board: React.FC = () => {
                         </div>
                         <div className="col-auto">
                             <div className="mb-3">
-                                <select className="form-select form-select-sm" id="rango" onChange={handleChange}>
+                                <select className="form-select form-select-sm" id="rango" onChange={handleFilterChange}>
                                     <option value="">Selecciona un rango</option>
                                     <option value="Hierro">Hierro</option>
                                     <option value="Bronce">Bronce</option>
@@ -278,7 +292,7 @@ const Board: React.FC = () => {
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="create-rol" className="form-label">Rol</label>
-                                    <select className="form-select" id="create-rol" onChange={handleChange}>
+                                    <select className="form-select" id="rol" onChange={handleChange}>
                                         <option value="">Seleccione un rol</option>
                                         <option value="Top">Top</option>
                                         <option value="Mid">Mid</option>
@@ -300,11 +314,11 @@ const Board: React.FC = () => {
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="create-rango" className="form-label">Rango</label>
-                                    <input type="text" className="form-control" id="create-rango" onChange={handleChange}/>
+                                    <input type="text" className="form-control" id="rango" onChange={handleChange}/>
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="create-comentario" className="form-label">Comentario</label>
-                                    <textarea className="form-control" id="create-comentario" rows={3}
+                                    <textarea className="form-control" id="comentario" rows={3}
                                               onChange={handleChange}></textarea>
                                 </div>
                                 <div className="modal-footer">
