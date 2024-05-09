@@ -3,6 +3,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { useAuth } from '../../contexts/AuthContext.tsx';
 import { Anuncio } from '../../interfaces/AnuncioInterface.tsx';
+import WinRateDisplay from './WinRateDisplay';
+
+
 
 const Board: React.FC = () => {
     const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
@@ -19,13 +22,13 @@ const Board: React.FC = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [pageSize, setPageSize] = useState(10);
+    const isLoading = useRef(false);
 
 
     useEffect(() => {
         fetchAnuncios();
     }, [currentPage, formData, pageSize]);
 
-    const isLoading = useRef(false);
 
     const fetchAnuncios = async () => {
         if (isLoading.current) return;
@@ -57,6 +60,8 @@ const Board: React.FC = () => {
         }
         isLoading.current = false;
     };
+
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
         setFormData({ ...formData, [id]: value });
@@ -162,6 +167,7 @@ const Board: React.FC = () => {
                         <thead className="custom-dark-header">
                         <tr>
                             <th className="text-center">Riot nickname</th>
+                            <th className="text-center">Winrate</th>
                             <th className="text-center">Rol</th>
                             <th className="text-center">Busco rol</th>
                             <th className="text-center">Rango</th>
@@ -173,6 +179,10 @@ const Board: React.FC = () => {
                         {anuncios.map((anuncio: Anuncio, index: number) => (
                             <tr key={index}>
                                 <td>{anuncio.riotNickname}</td>
+                                <WinRateDisplay
+                                    gameName={anuncio.riotNickname.split('#')[0]}
+                                    tagLine={anuncio.riotNickname.split('#')[1]}
+                                />
                                 <td>{anuncio.rol}</td>
                                 <td>{anuncio.buscaRol}</td>
                                 <td>{anuncio.rango}</td>
@@ -255,11 +265,12 @@ const Board: React.FC = () => {
                             <form onSubmit={handleSubmit}>
                                 <div className="mb-3">
                                     <label htmlFor="riotNickname" className="form-label">Riot Nickname</label>
-                                    <input type="text" className="form-control" id="riotNickname"/>
+                                    <input type="text" className="form-control" id="riotNickname" required
+                                           onChange={handleChange}/>
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="rol" className="form-label">Rol</label>
-                                    <select className="form-select" id="rol">
+                                    <select className="form-select" id="rol" onChange={handleChange}>
                                         <option value="">Seleccione un rol</option>
                                         <option value="Top">Top</option>
                                         <option value="Mid">Mid</option>
@@ -270,7 +281,7 @@ const Board: React.FC = () => {
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="buscaRol" className="form-label">Busco rol</label>
-                                    <select className="form-select" id="buscaRol">
+                                    <select className="form-select" id="buscaRol" onChange={handleChange}>
                                         <option value="">Seleccione un rol</option>
                                         <option value="Top">Top</option>
                                         <option value="Mid">Mid</option>
@@ -281,11 +292,12 @@ const Board: React.FC = () => {
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="rango" className="form-label">Rango</label>
-                                    <input type="text" className="form-control" id="rango"/>
+                                    <input type="text" className="form-control" id="rango" onChange={handleChange}/>
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="comentario" className="form-label">Comentario</label>
-                                    <textarea className="form-control" id="comentario" rows={3}></textarea>
+                                    <textarea className="form-control" id="comentario" rows={3}
+                                              onChange={handleChange}></textarea>
                                 </div>
                                 <div className="modal-footer">
                                     <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cerrar
