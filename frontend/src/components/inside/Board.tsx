@@ -259,7 +259,7 @@ const Board: React.FC = () => {
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="rol" className="form-label">Rol</label>
-                                    <select className="form-select" id="rol" onChange={handleChange}>
+                                    <select className="form-select" id="rol">
                                         <option value="">Seleccione un rol</option>
                                         <option value="Top">Top</option>
                                         <option value="Mid">Mid</option>
