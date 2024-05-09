@@ -277,8 +277,8 @@ const Board: React.FC = () => {
                                            onChange={handleChange}/>
                                 </div>
                                 <div className="mb-3">
-                                    <label htmlFor="rol" className="form-label">Rol</label>
-                                    <select className="form-select" id="rol" onChange={handleChange}>
+                                    <label htmlFor="create-rol" className="form-label">Rol</label>
+                                    <select className="form-select" id="create-rol" onChange={handleChange}>
                                         <option value="">Seleccione un rol</option>
                                         <option value="Top">Top</option>
                                         <option value="Mid">Mid</option>
@@ -288,7 +288,7 @@ const Board: React.FC = () => {
                                     </select>
                                 </div>
                                 <div className="mb-3">
-                                    <label htmlFor="buscaRol" className="form-label">Busco rol</label>
+                                    <label htmlFor="create-buscaRol" className="form-label">Busco rol</label>
                                     <select className="form-select" id="buscaRol" onChange={handleChange}>
                                         <option value="">Seleccione un rol</option>
                                         <option value="Top">Top</option>
@@ -299,12 +299,12 @@ const Board: React.FC = () => {
                                     </select>
                                 </div>
                                 <div className="mb-3">
-                                    <label htmlFor="rango" className="form-label">Rango</label>
-                                    <input type="text" className="form-control" id="rango" onChange={handleChange}/>
+                                    <label htmlFor="create-rango" className="form-label">Rango</label>
+                                    <input type="text" className="form-control" id="create-rango" onChange={handleChange}/>
                                 </div>
                                 <div className="mb-3">
-                                    <label htmlFor="comentario" className="form-label">Comentario</label>
-                                    <textarea className="form-control" id="comentario" rows={3}
+                                    <label htmlFor="create-comentario" className="form-label">Comentario</label>
+                                    <textarea className="form-control" id="create-comentario" rows={3}
                                               onChange={handleChange}></textarea>
                                 </div>
                                 <div className="modal-footer">
