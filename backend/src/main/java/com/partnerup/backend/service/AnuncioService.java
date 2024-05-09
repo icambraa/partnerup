@@ -41,13 +41,13 @@ public class AnuncioService {
 
     public Page<Anuncio> getAnunciosFiltered(String rol, String rango, Pageable pageable) {
         if (rol != null && rango != null) {
-            return anuncioRepository.findByRolAndRango(rol, rango, pageable);
+            return anuncioRepository.findByRolAndRangoOrderByCreatedAtDesc(rol, rango, pageable);
         } else if (rol != null) {
-            return anuncioRepository.findByRol(rol, pageable);
+            return anuncioRepository.findByRolOrderByCreatedAtDesc(rol, pageable);
         } else if (rango != null) {
-            return anuncioRepository.findByRango(rango, pageable);
+            return anuncioRepository.findByRangoOrderByCreatedAtDesc(rango, pageable);
         } else {
-            return anuncioRepository.findAll(pageable);
+            return anuncioRepository.findAllByOrderByCreatedAtDesc(pageable);
         }
     }
 }

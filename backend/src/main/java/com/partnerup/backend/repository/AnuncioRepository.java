@@ -9,8 +9,14 @@ import java.util.List;
 
 public interface AnuncioRepository extends JpaRepository<Anuncio, Long> {
     List<Anuncio> findByUserId(String userId);
-    Page<Anuncio> findAll(Pageable pageable);
+    Page<Anuncio> findAllByOrderByCreatedAtDesc(Pageable pageable);
     Page<Anuncio> findByRol(String rol, Pageable pageable);
     Page<Anuncio> findByRango(String rango, Pageable pageable);
     Page<Anuncio> findByRolAndRango(String rol, String rango, Pageable pageable);
+
+    Page<Anuncio> findByRolOrderByCreatedAtDesc(String rol, Pageable pageable);
+
+    Page<Anuncio> findByRangoOrderByCreatedAtDesc(String rango, Pageable pageable);
+
+    Page<Anuncio> findByRolAndRangoOrderByCreatedAtDesc(String rol, String rango, Pageable pageable);
 }

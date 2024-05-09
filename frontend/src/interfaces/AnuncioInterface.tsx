@@ -5,5 +5,6 @@ export interface Anuncio {
     buscaRol: string;
     rango: string;
     comentario: string;
+    createdAt: string;
     userId?: string;
 }

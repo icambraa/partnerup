@@ -166,6 +166,7 @@ const Board: React.FC = () => {
                             <th className="text-center">Busco rol</th>
                             <th className="text-center">Rango</th>
                             <th className="text-center">Comentario</th>
+                            <th className="text-center">Fecha de creación</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -176,6 +177,7 @@ const Board: React.FC = () => {
                                 <td>{anuncio.buscaRol}</td>
                                 <td>{anuncio.rango}</td>
                                 <td>{anuncio.comentario}</td>
+                                <td>{new Date(anuncio.createdAt).toLocaleString()}</td>
                                 <td style={{backgroundColor: 'transparent'}}>
                                     {currentUser && currentUser.uid === anuncio.userId ? (
                                         <div className="dropdown">
