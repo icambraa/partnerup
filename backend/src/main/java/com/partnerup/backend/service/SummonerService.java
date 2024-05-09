@@ -44,6 +44,7 @@ public class SummonerService {
         return response.getBody();
     }
 
+
     private int calculateWinRate(LeagueEntryDto[] leagueEntries) {
         if (leagueEntries.length == 0) {
             return 0;
@@ -55,4 +56,15 @@ public class SummonerService {
         }
         return (int) Math.round(100.0 * entry.getWins() / totalGames);
     }
+
+    @Value("${riot.profile.icon.base.url}")
+    private String profileIconBaseUrl;
+
+    public String getProfileIconUrl(String gameName, String tagLine) {
+        String puuid = getPUUID(gameName, tagLine);
+        SummonerDto summoner = getSummoner(puuid);
+        int profileIconId = summoner.getProfileIconId();
+        return profileIconBaseUrl + profileIconId + ".png";
+    }
+
 }

@@ -17,3 +17,7 @@ server:
 riot:
   api:
     key: RGAPI-d35c4094-83d0-49ef-b232-1adc64c249b9
+  profile:
+    icon:
+      base:
+        url: https://ddragon.leagueoflegends.com/cdn/14.9.1/img/profileicon/

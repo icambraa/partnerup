@@ -8,4 +8,5 @@ export interface Anuncio {
     comentario: string;
     createdAt: string;
     userId?: string;
+    profileIconUrl: string;
 }

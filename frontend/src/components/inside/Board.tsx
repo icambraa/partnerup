@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useAuth } from '../../contexts/AuthContext.tsx';
 import { Anuncio } from '../../interfaces/AnuncioInterface.tsx';
 import WinRateDisplay from './WinRateDisplay';
+import IconProfileDisplay from "./IconProfileDisplay";
 
 
 
@@ -17,6 +18,7 @@ const Board: React.FC = () => {
         rango: '',
         comentario: ''
     });
+
 
 
     const [currentPage, setCurrentPage] = useState(0);
@@ -178,7 +180,13 @@ const Board: React.FC = () => {
                         <tbody>
                         {anuncios.map((anuncio: Anuncio, index: number) => (
                             <tr key={index}>
-                                <td>{anuncio.riotNickname}</td>
+                                <td className="d-flex align-items-center">
+                                    <IconProfileDisplay
+                                        gameName={anuncio.riotNickname.split('#')[0]}
+                                        tagLine={anuncio.riotNickname.split('#')[1]}
+                                    />
+                                    <span className="ms-2">{anuncio.riotNickname}</span>
+                                </td>
                                 <WinRateDisplay
                                     gameName={anuncio.riotNickname.split('#')[0]}
                                     tagLine={anuncio.riotNickname.split('#')[1]}
