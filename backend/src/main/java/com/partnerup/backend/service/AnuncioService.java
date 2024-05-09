@@ -4,6 +4,8 @@ import com.partnerup.backend.model.Anuncio;
 import com.partnerup.backend.repository.AnuncioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,10 +15,6 @@ public class AnuncioService {
 
     @Autowired
     private AnuncioRepository anuncioRepository;
-
-    public List<Anuncio> getAllAnuncios() {
-        return anuncioRepository.findAll();
-    }
 
     public Anuncio createAnuncio(Anuncio anuncio) {
         return anuncioRepository.save(anuncio);
@@ -35,6 +33,10 @@ public class AnuncioService {
         }
 
         anuncioRepository.delete(anuncio);
+    }
+
+    public Page<Anuncio> getAllAnuncios(Pageable pageable) {
+        return anuncioRepository.findAll(pageable);
     }
 
 }

@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { useAuth } from '../../contexts/AuthContext.tsx';
+import { Anuncio } from '../../interfaces/AnuncioInterface.tsx';
 
 const Board: React.FC = () => {
+    const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
     const { currentUser } = useAuth();
     const [formData, setFormData] = useState({
         riotNickname: '',
@@ -12,18 +14,37 @@ const Board: React.FC = () => {
         rango: '',
         comentario: ''
     });
-    const [anuncios, setAnuncios] = useState([]);
+
+
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
+
+    const handleNextPage = () => {
+        const newPage = currentPage + 1;
+        if (newPage < totalPages) {
+            setCurrentPage(newPage);
+        }
+    };
+
+    const handlePreviousPage = () => {
+        const newPage = currentPage - 1;
+        if (newPage >= 0) {
+            setCurrentPage(newPage);
+        }
+    };
 
     useEffect(() => {
         fetchAnuncios();
-    }, []);
+    }, [currentPage, pageSize]);
 
     const fetchAnuncios = async () => {
         try {
-            const response = await fetch('http://localhost:8080/api/anuncios');
+            const response = await fetch(`http://localhost:8080/api/anuncios?page=${currentPage}&size=${pageSize}`);
             if (response.ok) {
-                const data = await response.json();
-                setAnuncios(data); // Almacenar los anuncios en el estado local
+                const { content, totalPages } = await response.json();
+                setAnuncios(content);  // Reemplaza los anuncios existentes con los nuevos
+                setTotalPages(totalPages);
             } else {
                 console.error('Error al obtener los anuncios');
             }
@@ -31,7 +52,6 @@ const Board: React.FC = () => {
             console.error('Error al obtener los anuncios', error);
         }
     };
-
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
         setFormData({ ...formData, [id]: value });
@@ -97,7 +117,7 @@ const Board: React.FC = () => {
     return (
         <section className="content">
             <div className="container" style={{ display: 'flex', alignItems: 'start' }}>
-                <div className="table-responsive" style={{ flex: 1 }}>
+                <div className="table-responsive" style={{flex: 1}}>
                     <table className="table table-bordered">
                         <thead className="custom-dark-header">
                         <tr>
@@ -109,7 +129,7 @@ const Board: React.FC = () => {
                         </tr>
                         </thead>
                         <tbody>
-                        {anuncios.map((anuncio: any, index: number) => (
+                        {anuncios.map((anuncio: Anuncio, index: number) => (
                             <tr key={index}>
                                 <td>{anuncio.riotNickname}</td>
                                 <td>{anuncio.rol}</td>
@@ -137,7 +157,7 @@ const Board: React.FC = () => {
                                                 <li>
                                                     <a className="dropdown-item" href="#" onClick={(e) => {
                                                         e.preventDefault();
-                                                        //handleEdit(anuncio.id);
+                                                        // handleEdit(anuncio.id);  // Implementar si necesario
                                                     }}>
                                                         <i className="bi bi-pencil-fill"></i> Editar
                                                     </a>
@@ -156,7 +176,7 @@ const Board: React.FC = () => {
                                                 <li>
                                                     <a className="dropdown-item" href="#" onClick={(e) => {
                                                         e.preventDefault();
-                                                        //handleReport(anuncio.id);
+                                                        // handleReport(anuncio.id);  // Implementar si necesario
                                                     }}>
                                                         <i className="bi bi-flag-fill"></i> Reportar
                                                     </a>
@@ -169,6 +189,11 @@ const Board: React.FC = () => {
                         ))}
                         </tbody>
                     </table>
+                    <div className="pagination-controls">
+                        <button onClick={handlePreviousPage} disabled={currentPage === 0}>Anterior</button>
+                        <span>Página {currentPage + 1} de {totalPages}</span>
+                        <button onClick={handleNextPage} disabled={currentPage + 1 >= totalPages}>Siguiente</button>
+                    </div>
                 </div>
                 <button type="button" className="btn btn-primary my-2" data-bs-toggle="modal"
                         data-bs-target="#formModal">
