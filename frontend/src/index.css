@@ -100,3 +100,21 @@ button:focus-visible {
 }
 
 
+/* paginator css*/
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.pagination-controls button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.pagination-controls i {
+  font-size: 2rem;
+  color: #213547;
+}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { useAuth } from '../../contexts/AuthContext.tsx';
@@ -36,21 +36,27 @@ const Board: React.FC = () => {
 
     useEffect(() => {
         fetchAnuncios();
-    }, [currentPage, pageSize]);
+    }, []);
+
+    const isLoading = useRef(false);
 
     const fetchAnuncios = async () => {
+        if (isLoading.current) return;
+        isLoading.current = true;
         try {
             const response = await fetch(`http://localhost:8080/api/anuncios?page=${currentPage}&size=${pageSize}`);
             if (response.ok) {
                 const { content, totalPages } = await response.json();
-                setAnuncios(content);  // Reemplaza los anuncios existentes con los nuevos
+                setAnuncios(prevAnuncios => [...prevAnuncios, ...content]);
                 setTotalPages(totalPages);
+                setCurrentPage(prevPage => prevPage + 1);
             } else {
                 console.error('Error al obtener los anuncios');
             }
         } catch (error) {
             console.error('Error al obtener los anuncios', error);
         }
+        isLoading.current = false;
     };
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
@@ -189,10 +195,10 @@ const Board: React.FC = () => {
                         ))}
                         </tbody>
                     </table>
-                    <div className="pagination-controls">
-                        <button onClick={handlePreviousPage} disabled={currentPage === 0}>Anterior</button>
-                        <span>Página {currentPage + 1} de {totalPages}</span>
-                        <button onClick={handleNextPage} disabled={currentPage + 1 >= totalPages}>Siguiente</button>
+                    <div className="pagination-controls text-center">
+                        <button onClick={fetchAnuncios} style={{position: 'relative', left: '-40px'}}>
+                            <i className="bi bi-chevron-compact-down"></i>
+                        </button>
                     </div>
                 </div>
                 <button type="button" className="btn btn-primary my-2" data-bs-toggle="modal"
