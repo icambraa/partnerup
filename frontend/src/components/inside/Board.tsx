@@ -34,7 +34,7 @@ const Board: React.FC = () => {
 
     useEffect(() => {
         fetchAnuncios();
-    }, [currentPage, formData, pageSize]);
+    }, [currentPage, filterData, pageSize]);
 
 
     const fetchAnuncios = async () => {
@@ -80,7 +80,7 @@ const Board: React.FC = () => {
     const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
         setFilterData({ ...filterData, [id]: value });
-        setCurrentPage(0);
+        setCurrentPage(0);  // Esto asegura que la búsqueda empiece siempre desde la primera página con los nuevos filtros
     };
 
     const handleNextPage = () => {
