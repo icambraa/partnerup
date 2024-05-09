@@ -20,23 +20,10 @@ const Board: React.FC = () => {
     const [totalPages, setTotalPages] = useState(0);
     const [pageSize, setPageSize] = useState(10);
 
-    const handleNextPage = () => {
-        const newPage = currentPage + 1;
-        if (newPage < totalPages) {
-            setCurrentPage(newPage);
-        }
-    };
-
-    const handlePreviousPage = () => {
-        const newPage = currentPage - 1;
-        if (newPage >= 0) {
-            setCurrentPage(newPage);
-        }
-    };
 
     useEffect(() => {
         fetchAnuncios();
-    }, []);
+    }, [currentPage, formData, pageSize]);
 
     const isLoading = useRef(false);
 
@@ -44,12 +31,24 @@ const Board: React.FC = () => {
         if (isLoading.current) return;
         isLoading.current = true;
         try {
-            const response = await fetch(`http://localhost:8080/api/anuncios?page=${currentPage}&size=${pageSize}`);
+            const url = new URL('http://localhost:8080/api/anuncios');
+            url.searchParams.append('page', currentPage.toString());
+            url.searchParams.append('size', pageSize.toString());
+            if (formData.rol) {
+                url.searchParams.append('rol', formData.rol);
+            }
+            if (formData.rango) {
+                url.searchParams.append('rango', formData.rango);
+            }
+            const response = await fetch(url);
             if (response.ok) {
                 const { content, totalPages } = await response.json();
-                setAnuncios(prevAnuncios => [...prevAnuncios, ...content]);
+                if (currentPage === 0) {
+                    setAnuncios(content);
+                } else {
+                    setAnuncios(prevAnuncios => [...prevAnuncios, ...content]);
+                }
                 setTotalPages(totalPages);
-                setCurrentPage(prevPage => prevPage + 1);
             } else {
                 console.error('Error al obtener los anuncios');
             }
@@ -61,6 +60,11 @@ const Board: React.FC = () => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
         setFormData({ ...formData, [id]: value });
+        setCurrentPage(0); // Reiniciar la página actual a 0 al cambiar un filtro
+    };
+    const handleNextPage = () => {
+        const nextPage = currentPage + 1;
+        setCurrentPage(nextPage);
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -122,8 +126,38 @@ const Board: React.FC = () => {
 
     return (
         <section className="content">
-            <div className="container" style={{ display: 'flex', alignItems: 'start' }}>
-                <div className="table-responsive" style={{flex: 1}}>
+            <div className="container" style={{display: 'flex', alignItems: 'start'}}>
+                <div style={{flex: 1}}>
+                    <div className="row">
+                        <div className="col-auto">
+                            <div className="mb-3">
+                                <select className="form-select form-select-sm" id="rol" onChange={handleChange}>
+                                    <option value="">Selecciona un rol</option>
+                                    <option value="Top">Top</option>
+                                    <option value="Mid">Mid</option>
+                                    <option value="Jungle">Jungle</option>
+                                    <option value="ADC">ADC</option>
+                                    <option value="Support">Support</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="col-auto">
+                            <div className="mb-3">
+                                <select className="form-select form-select-sm" id="rango" onChange={handleChange}>
+                                    <option value="">Selecciona un rango</option>
+                                    <option value="Hierro">Hierro</option>
+                                    <option value="Bronce">Bronce</option>
+                                    <option value="Plata">Plata</option>
+                                    <option value="Oro">Oro</option>
+                                    <option value="Platino">Platino</option>
+                                    <option value="Diamante">Diamante</option>
+                                    <option value="Ascendente">Ascendente</option>
+                                    <option value="Inmortal">Inmortal</option>
+                                    <option value="Radiante">Radiante</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                     <table className="table table-bordered">
                         <thead className="custom-dark-header">
                         <tr>
@@ -196,7 +230,7 @@ const Board: React.FC = () => {
                         </tbody>
                     </table>
                     <div className="pagination-controls text-center">
-                        <button onClick={fetchAnuncios} style={{position: 'relative', left: '-40px'}}>
+                        <button onClick={handleNextPage} style={{position: 'relative', left: '-40px'}}>
                             <i className="bi bi-chevron-compact-down"></i>
                         </button>
                     </div>
@@ -219,8 +253,7 @@ const Board: React.FC = () => {
                             <form onSubmit={handleSubmit}>
                                 <div className="mb-3">
                                     <label htmlFor="riotNickname" className="form-label">Riot Nickname</label>
-                                    <input type="text" className="form-control" id="riotNickname" required
-                                           onChange={handleChange}/>
+                                    <input type="text" className="form-control" id="riotNickname"/>
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="rol" className="form-label">Rol</label>
@@ -235,7 +268,7 @@ const Board: React.FC = () => {
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="buscaRol" className="form-label">Busco rol</label>
-                                    <select className="form-select" id="buscaRol" onChange={handleChange}>
+                                    <select className="form-select" id="buscaRol">
                                         <option value="">Seleccione un rol</option>
                                         <option value="Top">Top</option>
                                         <option value="Mid">Mid</option>
@@ -246,12 +279,11 @@ const Board: React.FC = () => {
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="rango" className="form-label">Rango</label>
-                                    <input type="text" className="form-control" id="rango" onChange={handleChange}/>
+                                    <input type="text" className="form-control" id="rango"/>
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="comentario" className="form-label">Comentario</label>
-                                    <textarea className="form-control" id="comentario" rows={3}
-                                              onChange={handleChange}></textarea>
+                                    <textarea className="form-control" id="comentario" rows={3}></textarea>
                                 </div>
                                 <div className="modal-footer">
                                     <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cerrar

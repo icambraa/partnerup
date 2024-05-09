@@ -41,11 +41,13 @@ public class AnuncioController {
 
     @GetMapping
     public ResponseEntity<Page<Anuncio>> getAllAnuncios(
+            @RequestParam(required = false) String rol,
+            @RequestParam(required = false) String rango,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Anuncio> anuncios = anuncioService.getAllAnuncios(pageable);
+        Page<Anuncio> anuncios = anuncioService.getAnunciosFiltered(rol, rango, pageable);
         return ResponseEntity.ok(anuncios);
     }
 }
