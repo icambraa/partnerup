@@ -44,14 +44,28 @@ const Navbar: React.FC = () => {
                     </button>
                     <div className="collapse navbar-collapse" id="mynavbar">
                         <ul className="navbar-nav ms-auto">
+                            <li className="nav-item">
+                                <Link className="nav-link" to="/messages">
+                                    <i className="bi bi-envelope-fill"
+                                       style={{color: '#fff', fontSize: '2rem', marginRight: '10px'}}></i>
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link className="nav-link" to="/notifications">
+                                    <i className="bi bi-bell-fill"
+                                       style={{color: '#fff', fontSize: '2rem', marginRight: '50px'}}></i>
+                                </Link>
+                            </li>
                             <li className="nav-item dropdown">
                                 <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i className="bi bi-person-circle" style={{ color: '#fff', fontSize: '2rem' }}></i>
+                                    <i className="bi bi-person-circle" style={{color: '#fff', fontSize: '2rem'}}></i>
                                 </a>
-                                <ul className="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <ul className="dropdown-menu dropdown-menu-dark dropdown-menu-end"
+                                    aria-labelledby="navbarDropdown">
                                     <li><Link className="dropdown-item" to="/profile">Perfil de usuario</Link></li>
-                                    <li><a className="dropdown-item" href="#" onClick={handleLogout}>Cerrar Sesión</a></li>
+                                    <li><a className="dropdown-item" href="#" onClick={handleLogout}>Cerrar Sesión</a>
+                                    </li>
                                 </ul>
                             </li>
                         </ul>

@@ -21,14 +21,17 @@ const Board: React.FC = () => {
 
     const [filterData, setFilterData] = useState<{ rol?: string; rango?: string }>({});
 
-
-
     const [currentPage, setCurrentPage] = useState(0);
     const [, setTotalPages] = useState(0);
     const [pageSize] = useState(10);
     const isLoading = useRef(false);
     const [selectedRole, setSelectedRole] = useState<string | null | undefined>(null);
 
+    const [selectedAnuncio, setSelectedAnuncio] = useState<Anuncio | null>(null);
+
+    const handleOpenMessageModal = (anuncio: Anuncio) => {
+        setSelectedAnuncio(anuncio);
+    };
 
     useEffect(() => {
         fetchAnuncios();
@@ -67,6 +70,7 @@ const Board: React.FC = () => {
         }
         isLoading.current = false;
     };
+
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -213,6 +217,7 @@ const Board: React.FC = () => {
                     <table className="table table-bordered custom-table">
                         <thead className="custom-dark-header">
                         <tr>
+                            <th className="text-center"></th>
                             <th className="text-center">Riot nickname</th>
                             <th className="text-center">Winrate</th>
                             <th className="text-center">Rol</th>
@@ -225,13 +230,24 @@ const Board: React.FC = () => {
                         <tbody>
                         {anuncios.map((anuncio: Anuncio, index: number) => (
                             <tr key={index}>
+                                <td className="align-middle text-center">
+                                    {currentUser && currentUser.uid !== anuncio.userId && (
+                                        <button
+                                            className="btn btn-sm btn-outline-secondary"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#sendMessageModal"
+                                            onClick={() => handleOpenMessageModal(anuncio)}
+                                        >
+                                            <i className="bi bi-envelope-fill"></i>
+                                        </button>
+                                    )}
+                                </td>
                                 <td className="d-flex align-items-center align-middle text-center">
                                     <IconProfileDisplay
                                         gameName={anuncio.riotNickname.split('#')[0]}
                                         tagLine={anuncio.riotNickname.split('#')[1]}
                                     />
-                                    <span
-                                        className="ms-2 d-inline-block">{anuncio.riotNickname}</span> {/* Añadir d-inline-block */}
+                                    <span className="ms-2 d-inline-block">{anuncio.riotNickname}</span>
                                 </td>
                                 <td className="align-middle text-center">
                                     <WinRateDisplay
@@ -281,14 +297,6 @@ const Board: React.FC = () => {
                                             </a>
                                             <ul className="dropdown-menu dropdown-menu-end"
                                                 aria-labelledby={`dropdownMenuLink${index}`}>
-                                                <li>
-                                                    <a className="dropdown-item" href="#" onClick={(e) => {
-                                                        e.preventDefault();
-                                                        // handleSendMessage(anuncio.userId);  // Implementar si necesario
-                                                    }}>
-                                                        <i className="bi bi-chat-dots-fill"></i> Enviar mensaje
-                                                    </a>
-                                                </li>
                                                 <li>
                                                     <a className="dropdown-item" href="#" onClick={(e) => {
                                                         e.preventDefault();
@@ -346,7 +354,7 @@ const Board: React.FC = () => {
                                 <div className="mb-3">
                                     <label htmlFor="create-buscaRol" className="form-label">Busco rol</label>
                                     <select className="form-select" id="buscaRol" onChange={handleChange}>
-                                    <option value="">Seleccione un rol</option>
+                                        <option value="">Seleccione un rol</option>
                                         <option value="Top">Top</option>
                                         <option value="Mid">Mid</option>
                                         <option value="Jungle">Jungle</option>
@@ -362,6 +370,33 @@ const Board: React.FC = () => {
                                     <label htmlFor="create-comentario" className="form-label">Comentario</label>
                                     <textarea className="form-control" id="comentario" rows={3}
                                               onChange={handleChange}></textarea>
+                                </div>
+                                <div className="modal-footer">
+                                    <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cerrar
+                                    </button>
+                                    <button type="submit" className="btn btn-primary">Enviar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className="modal fade" id="sendMessageModal" tabIndex={-1} aria-labelledby="sendMessageModalLabel"
+                 aria-hidden="true">
+                <div className="modal-dialog">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title" id="sendMessageModalLabel">
+                                Enviar Mensaje a {selectedAnuncio ? selectedAnuncio.riotNickname : ''}
+                            </h5>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                        </div>
+                        <div className="modal-body">
+                            <form>
+                                <div className="mb-3">
+                                    <label htmlFor="messageText" className="form-label">Mensaje</label>
+                                    <textarea className="form-control" id="messageText" rows={3} required></textarea>
                                 </div>
                                 <div className="modal-footer">
                                     <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cerrar
