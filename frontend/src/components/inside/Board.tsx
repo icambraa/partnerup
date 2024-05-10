@@ -383,7 +383,7 @@ const Board: React.FC = () => {
             </div>
             <div className="modal fade" id="sendMessageModal" tabIndex={-1} aria-labelledby="sendMessageModalLabel"
                  aria-hidden="true">
-                <div className="modal-dialog">
+                <div className="modal-dialog modal-dialog-centered" role="document">
                     <div className="modal-content">
                         <div className="modal-header">
                             <h5 className="modal-title" id="sendMessageModalLabel">
