@@ -19,18 +19,16 @@ const Board: React.FC = () => {
         comentario: ''
     });
 
-    const [filterData, setFilterData] = useState({
-        rol: '',
-        rango: ''
-    });
+    const [filterData, setFilterData] = useState<{ rol?: string; rango?: string }>({});
 
 
 
     const [currentPage, setCurrentPage] = useState(0);
-    const [totalPages, setTotalPages] = useState(0);
-    const [pageSize, setPageSize] = useState(10);
+    const [, setTotalPages] = useState(0);
+    const [pageSize] = useState(10);
     const isLoading = useRef(false);
-    const [selectedRole, setSelectedRole] = React.useState(null);
+    const [selectedRole, setSelectedRole] = useState<string | null | undefined>(null);
+
 
     useEffect(() => {
         fetchAnuncios();
@@ -77,16 +75,19 @@ const Board: React.FC = () => {
         setCurrentPage(0); // Reiniciar la página actual a 0 al cambiar un filtro
     };
 
-    const handleFilterChange = (id, value) => {
+    const handleFilterChange = (id: string, value: string | undefined | null) => {
         if (id === 'rol') {
             setSelectedRole(value);
-            setFilterData({ ...filterData, rol: value });
+            if (filterData !== null) {
+                setFilterData({ ...filterData, rol: value ?? undefined });
+            }
         } else if (id === 'rango') {
-            setFilterData({ ...filterData, rango: value });
+            if (filterData !== null) {
+                setFilterData({ ...filterData, rango: value ?? undefined });
+            }
         }
         setCurrentPage(0);
     };
-
     const handleNextPage = () => {
         const nextPage = currentPage + 1;
         setCurrentPage(nextPage);
@@ -139,7 +140,6 @@ const Board: React.FC = () => {
             });
             if (response.ok) {
                 console.log('Anuncio borrado con éxito');
-                // @ts-ignore
                 setAnuncios(anuncios.filter((anuncio) => anuncio.id !== id));
             } else {
                 throw new Error('Error al borrar el anuncio');
@@ -225,29 +225,32 @@ const Board: React.FC = () => {
                         <tbody>
                         {anuncios.map((anuncio: Anuncio, index: number) => (
                             <tr key={index}>
-                                <td className="d-flex align-items-center">
+                                <td className="d-flex align-items-center align-middle text-center">
                                     <IconProfileDisplay
                                         gameName={anuncio.riotNickname.split('#')[0]}
                                         tagLine={anuncio.riotNickname.split('#')[1]}
                                     />
-                                    <span className="ms-2">{anuncio.riotNickname}</span>
+                                    <span
+                                        className="ms-2 d-inline-block">{anuncio.riotNickname}</span> {/* Añadir d-inline-block */}
                                 </td>
-                                <WinRateDisplay
-                                    gameName={anuncio.riotNickname.split('#')[0]}
-                                    tagLine={anuncio.riotNickname.split('#')[1]}
-                                />
-                                <td>{anuncio.rol}</td>
-                                <td>{anuncio.buscaRol}</td>
-                                <td>{anuncio.rango}</td>
-                                <td>{anuncio.comentario}</td>
-                                <td>{new Date(anuncio.createdAt).toLocaleString()}</td>
+                                <td className="align-middle text-center">
+                                    <WinRateDisplay
+                                        gameName={anuncio.riotNickname.split('#')[0]}
+                                        tagLine={anuncio.riotNickname.split('#')[1]}
+                                    />
+                                </td>
+                                <td className="align-middle text-center">{anuncio.rol}</td>
+                                <td className="align-middle text-center">{anuncio.buscaRol}</td>
+                                <td className="align-middle text-center">{anuncio.rango}</td>
+                                <td className="align-middle text-center">{anuncio.comentario}</td>
+                                <td className="align-middle text-center">{new Date(anuncio.createdAt).toLocaleString()}</td>
                                 <td style={{backgroundColor: 'transparent'}}>
                                     {currentUser && currentUser.uid === anuncio.userId ? (
                                         <div className="dropdown">
                                             <a className="text-muted" href="#" role="button"
                                                id={`dropdownMenuLink${index}`}
                                                data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i className="bi bi-three-dots-vertical"></i>
+                                                <i className="bi bi-three-dots-vertical"></i>
                                             </a>
                                             <ul className="dropdown-menu dropdown-menu-end"
                                                 aria-labelledby={`dropdownMenuLink${index}`}>
