@@ -78,8 +78,13 @@ const Board: React.FC = () => {
     };
 
     const handleFilterChange = (role) => {
-        setSelectedRole(role);
-        setFilterData({ ...filterData, rol: role });
+        if (selectedRole === role) {
+            setSelectedRole(null);
+            setFilterData({ ...filterData, rol: undefined });
+        } else {
+            setSelectedRole(role);
+            setFilterData({ ...filterData, rol: role });
+        }
         setCurrentPage(0);
     };
 
@@ -153,23 +158,38 @@ const Board: React.FC = () => {
                         <div className="col-auto">
                             <div className="mb-3">
                                 <div className="icon-container">
+                                    <img className={`role-icon all ${selectedRole === null ? 'selected' : ''}`}
+                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-fill.png"
+                                         alt="Todos"
+                                         title="Cualquier rol"
+                                         onClick={() => handleFilterChange(null)}/>
                                     <img className={`role-icon top-icon ${selectedRole === 'Top' ? 'selected' : ''}`}
                                          src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-top.png"
-                                         alt="Top" onClick={() => handleFilterChange('Top')}/>
+                                         alt="Top"
+                                         title="Top"
+                                         onClick={() => handleFilterChange('Top')}/>
                                     <img className={`role-icon mid-icon ${selectedRole === 'Mid' ? 'selected' : ''}`}
                                          src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-middle.png"
-                                         alt="Mid" onClick={() => handleFilterChange('Mid')}/>
+                                         alt="Mid"
+                                         title="Mid"
+                                         onClick={() => handleFilterChange('Mid')}/>
                                     <img
                                         className={`role-icon jungle-icon ${selectedRole === 'Jungle' ? 'selected' : ''}`}
                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-jungle.png"
-                                        alt="Jungle" onClick={() => handleFilterChange('Jungle')}/>
+                                        alt="Jungle"
+                                        title="Jungle"
+                                        onClick={() => handleFilterChange('Jungle')}/>
                                     <img className={`role-icon adc-icon ${selectedRole === 'ADC' ? 'selected' : ''}`}
                                          src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-bottom.png"
-                                         alt="ADC" onClick={() => handleFilterChange('ADC')}/>
+                                         alt="ADC"
+                                         title="ADC"
+                                         onClick={() => handleFilterChange('ADC')}/>
                                     <img
                                         className={`role-icon support-icon ${selectedRole === 'Support' ? 'selected' : ''}`}
                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-utility.png"
-                                        alt="Support" onClick={() => handleFilterChange('Support')}/>
+                                        alt="Support"
+                                        title="Support"
+                                        onClick={() => handleFilterChange('Support')}/>
                                 </div>
                             </div>
                         </div>
@@ -227,7 +247,7 @@ const Board: React.FC = () => {
                                             <a className="text-muted" href="#" role="button"
                                                id={`dropdownMenuLink${index}`}
                                                data-bs-toggle="dropdown" aria-expanded="false">
-                                                <i className="bi bi-three-dots-vertical"></i>
+                                            <i className="bi bi-three-dots-vertical"></i>
                                             </a>
                                             <ul className="dropdown-menu dropdown-menu-end"
                                                 aria-labelledby={`dropdownMenuLink${index}`}>
