@@ -32,7 +32,7 @@ const WinRateDisplay: React.FC<WinRateDisplayProps> = ({ gameName, tagLine }) =>
     }, [gameName, tagLine]);
 
     return (
-        <td>{error || winRate}</td>
+        <td style={{textAlign: 'center'}}>{error || winRate}</td>
     );
 };
 

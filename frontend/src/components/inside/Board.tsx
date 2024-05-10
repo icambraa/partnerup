@@ -210,7 +210,7 @@ const Board: React.FC = () => {
                             </div>
                         </div>
                     </div>
-                    <table className="table table-bordered">
+                    <table className="table table-bordered custom-table">
                         <thead className="custom-dark-header">
                         <tr>
                             <th className="text-center">Riot nickname</th>
@@ -284,6 +284,14 @@ const Board: React.FC = () => {
                                                 <li>
                                                     <a className="dropdown-item" href="#" onClick={(e) => {
                                                         e.preventDefault();
+                                                        // handleSendMessage(anuncio.userId);  // Implementar si necesario
+                                                    }}>
+                                                        <i className="bi bi-chat-dots-fill"></i> Enviar mensaje
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a className="dropdown-item" href="#" onClick={(e) => {
+                                                        e.preventDefault();
                                                         // handleReport(anuncio.id);  // Implementar si necesario
                                                     }}>
                                                         <i className="bi bi-flag-fill"></i> Reportar
@@ -338,7 +346,7 @@ const Board: React.FC = () => {
                                 <div className="mb-3">
                                     <label htmlFor="create-buscaRol" className="form-label">Busco rol</label>
                                     <select className="form-select" id="buscaRol" onChange={handleChange}>
-                                        <option value="">Seleccione un rol</option>
+                                    <option value="">Seleccione un rol</option>
                                         <option value="Top">Top</option>
                                         <option value="Mid">Mid</option>
                                         <option value="Jungle">Jungle</option>
