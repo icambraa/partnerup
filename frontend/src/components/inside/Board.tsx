@@ -30,7 +30,7 @@ const Board: React.FC = () => {
     const [totalPages, setTotalPages] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const isLoading = useRef(false);
-
+    const [selectedRole, setSelectedRole] = React.useState(null);
 
     useEffect(() => {
         fetchAnuncios();
@@ -77,10 +77,10 @@ const Board: React.FC = () => {
         setCurrentPage(0); // Reiniciar la página actual a 0 al cambiar un filtro
     };
 
-    const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        const { id, value } = e.target;
-        setFilterData({ ...filterData, [id]: value });
-        setCurrentPage(0);  // Esto asegura que la búsqueda empiece siempre desde la primera página con los nuevos filtros
+    const handleFilterChange = (role) => {
+        setSelectedRole(role);
+        setFilterData({ ...filterData, rol: role });
+        setCurrentPage(0);
     };
 
     const handleNextPage = () => {
@@ -152,14 +152,25 @@ const Board: React.FC = () => {
                     <div className="row">
                         <div className="col-auto">
                             <div className="mb-3">
-                                <select className="form-select form-select-sm" id="rol" onChange={handleFilterChange}>
-                                    <option value="">Selecciona un rol</option>
-                                    <option value="Top">Top</option>
-                                    <option value="Mid">Mid</option>
-                                    <option value="Jungle">Jungle</option>
-                                    <option value="ADC">ADC</option>
-                                    <option value="Support">Support</option>
-                                </select>
+                                <div className="icon-container">
+                                    <img className={`role-icon top-icon ${selectedRole === 'Top' ? 'selected' : ''}`}
+                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-top.png"
+                                         alt="Top" onClick={() => handleFilterChange('Top')}/>
+                                    <img className={`role-icon mid-icon ${selectedRole === 'Mid' ? 'selected' : ''}`}
+                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-middle.png"
+                                         alt="Mid" onClick={() => handleFilterChange('Mid')}/>
+                                    <img
+                                        className={`role-icon jungle-icon ${selectedRole === 'Jungle' ? 'selected' : ''}`}
+                                        src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-jungle.png"
+                                        alt="Jungle" onClick={() => handleFilterChange('Jungle')}/>
+                                    <img className={`role-icon adc-icon ${selectedRole === 'ADC' ? 'selected' : ''}`}
+                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-bottom.png"
+                                         alt="ADC" onClick={() => handleFilterChange('ADC')}/>
+                                    <img
+                                        className={`role-icon support-icon ${selectedRole === 'Support' ? 'selected' : ''}`}
+                                        src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-utility.png"
+                                        alt="Support" onClick={() => handleFilterChange('Support')}/>
+                                </div>
                             </div>
                         </div>
                         <div className="col-auto">

@@ -118,9 +118,57 @@ button:focus-visible {
   font-size: 2rem;
   color: #213547;
 }
+/* paginator css*/
 
+/* icon summoner*/
 .icon-profile-image {
   width: 50px;
   height: 50px;
   border-radius: 50%;
 }
+/* icon summoner*/
+
+/* icon roles*/
+.icon-container img {
+  background-color: white;
+  padding: 5px;
+  display: block;
+  width: auto;
+  height: 40px;
+}
+.icon-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background-color: white;
+  padding: 5px;
+}
+
+.role-icon {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.top-icon:hover {
+  content: url('https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-top-hover.png');
+}
+.mid-icon:hover {
+  content: url('https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-middle-hover.png');
+}
+.jungle-icon:hover {
+  content: url('https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-jungle-hover.png');
+}
+.adc-icon:hover {
+  content: url('https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-bottom-hover.png');
+}
+.support-icon:hover {
+  content: url('https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-utility-hover.png');
+}
+
+.role-icon.selected {
+  border: 2px solid #AAA9A9;
+  box-shadow: 0px 0px 10px #AAA9A9;
+  cursor: pointer;
+}
+
+/* icon roles*/
