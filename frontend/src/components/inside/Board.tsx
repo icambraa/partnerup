@@ -77,13 +77,12 @@ const Board: React.FC = () => {
         setCurrentPage(0); // Reiniciar la página actual a 0 al cambiar un filtro
     };
 
-    const handleFilterChange = (role) => {
-        if (selectedRole === role) {
-            setSelectedRole(null);
-            setFilterData({ ...filterData, rol: undefined });
-        } else {
-            setSelectedRole(role);
-            setFilterData({ ...filterData, rol: role });
+    const handleFilterChange = (id, value) => {
+        if (id === 'rol') {
+            setSelectedRole(value);
+            setFilterData({ ...filterData, rol: value });
+        } else if (id === 'rango') {
+            setFilterData({ ...filterData, rango: value });
         }
         setCurrentPage(0);
     };
@@ -154,7 +153,7 @@ const Board: React.FC = () => {
         <section className="content">
             <div className="container" style={{display: 'flex', alignItems: 'start'}}>
                 <div style={{flex: 1}}>
-                    <div className="row">
+                    <div className="row align-items-center">
                         <div className="col-auto">
                             <div className="mb-3">
                                 <div className="icon-container">
@@ -162,40 +161,41 @@ const Board: React.FC = () => {
                                          src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-fill.png"
                                          alt="Todos"
                                          title="Cualquier rol"
-                                         onClick={() => handleFilterChange(null)}/>
+                                         onClick={() => handleFilterChange('rol', null)}/>
                                     <img className={`role-icon top-icon ${selectedRole === 'Top' ? 'selected' : ''}`}
                                          src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-top.png"
                                          alt="Top"
                                          title="Top"
-                                         onClick={() => handleFilterChange('Top')}/>
+                                         onClick={() => handleFilterChange('rol', 'Top')}/>
                                     <img className={`role-icon mid-icon ${selectedRole === 'Mid' ? 'selected' : ''}`}
                                          src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-middle.png"
                                          alt="Mid"
                                          title="Mid"
-                                         onClick={() => handleFilterChange('Mid')}/>
+                                         onClick={() => handleFilterChange('rol', 'Mid')}/>
                                     <img
                                         className={`role-icon jungle-icon ${selectedRole === 'Jungle' ? 'selected' : ''}`}
                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-jungle.png"
                                         alt="Jungle"
                                         title="Jungle"
-                                        onClick={() => handleFilterChange('Jungle')}/>
+                                        onClick={() => handleFilterChange('rol', 'Jungle')}/>
                                     <img className={`role-icon adc-icon ${selectedRole === 'ADC' ? 'selected' : ''}`}
                                          src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-bottom.png"
                                          alt="ADC"
                                          title="ADC"
-                                         onClick={() => handleFilterChange('ADC')}/>
+                                         onClick={() => handleFilterChange('rol', 'ADC')}/>
                                     <img
                                         className={`role-icon support-icon ${selectedRole === 'Support' ? 'selected' : ''}`}
                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-utility.png"
                                         alt="Support"
                                         title="Support"
-                                        onClick={() => handleFilterChange('Support')}/>
+                                        onClick={() => handleFilterChange('rol', 'Support')}/>
                                 </div>
                             </div>
                         </div>
                         <div className="col-auto">
                             <div className="mb-3">
-                                <select className="form-select form-select-sm" id="rango" onChange={handleFilterChange}>
+                                <select className="form-select form-select-sm" id="rango"
+                                        onChange={(e) => handleFilterChange('rango', e.target.value)}>
                                     <option value="">Selecciona un rango</option>
                                     <option value="Hierro">Hierro</option>
                                     <option value="Bronce">Bronce</option>
