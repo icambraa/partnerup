@@ -10,7 +10,7 @@ import IconProfileDisplay from "./IconProfileDisplay";
 
 const Board: React.FC = () => {
     const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
-    const { currentUser } = useAuth();
+    const { currentUser} = useAuth();
     const [formData, setFormData] = useState({
         riotNickname: '',
         rol: '',
@@ -18,6 +18,15 @@ const Board: React.FC = () => {
         rango: '',
         comentario: ''
     });
+
+    const [messageText, setMessageText] = useState('');
+
+    const handleMessageChange = (e) => {
+        setMessageText(e.target.value);
+    };
+
+
+
 
     const [filterData, setFilterData] = useState<{ rol?: string; rango?: string }>({});
 
@@ -38,6 +47,39 @@ const Board: React.FC = () => {
     }, [currentPage, filterData, pageSize]);
 
 
+    const handleMessageSubmit = async (e) => {
+        e.preventDefault();
+        if (!currentUser || !selectedAnuncio) {
+            console.error('Authentication error or no announcement selected');
+            return;
+        }
+
+        const messageData = {
+            senderId: currentUser.uid,
+            receiverId: selectedAnuncio.userId,
+            messageText: messageText
+        };
+
+        try {
+            const response = await fetch('http://localhost:8080/api/mensajes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(messageData)
+            });
+
+            if (response.ok) {
+                console.log('Message sent successfully');
+                setMessageText(''); // Clear the message input after sending
+                // Optionally close the modal here if needed
+            } else {
+                throw new Error('Failed to send message');
+            }
+        } catch (error) {
+            console.error('Error sending message:', error);
+        }
+    };
     const fetchAnuncios = async () => {
         if (isLoading.current) return;
         isLoading.current = true;
@@ -393,10 +435,11 @@ const Board: React.FC = () => {
                                     aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
-                            <form>
+                            <form onSubmit={handleMessageSubmit}>
                                 <div className="mb-3">
                                     <label htmlFor="messageText" className="form-label">Mensaje</label>
-                                    <textarea className="form-control" id="messageText" rows={3} required></textarea>
+                                    <textarea className="form-control" id="messageText" rows={3} required
+                                              value={messageText} onChange={handleMessageChange}></textarea>
                                 </div>
                                 <div className="modal-footer">
                                     <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cerrar
