@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { auth } from '../../firebase-auth';
 import {createUserWithEmailAndPassword, GithubAuthProvider, GoogleAuthProvider, signInWithPopup, getAdditionalUserInfo} from 'firebase/auth';
 import logo from '../../assets/logo2-rojo.png';
-import { useNavigate } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 
 const RegistrationForm: React.FC = () => {
     const [email, setEmail] = useState<string>('');
@@ -138,6 +138,15 @@ const RegistrationForm: React.FC = () => {
                                     >
                                         Registrarse
                                     </button>
+
+                                    <div className="text-end mb-3 d-flex justify-content-center"
+                                         style={{marginTop: '35px'}}>
+                                        <p className="letraPeq">
+                                            ¿Ya tienes una cuenta? <Link to="/login"
+                                                                             className="text-primary">Haz clic
+                                            aquí</Link> para logearte.
+                                        </p>
+                                    </div>
                                 </form>
                                 <hr className="my-4"/>
 
@@ -152,7 +161,6 @@ const RegistrationForm: React.FC = () => {
                                         <i className="bi bi-google"></i>
                                     </button>
 
-
                                     <button
                                         type="button"
                                         className="btn btn-link btn-floating mx-1"
@@ -160,6 +168,7 @@ const RegistrationForm: React.FC = () => {
                                     >
                                         <i className="bi bi-github"></i>
                                     </button>
+
                                 </div>
                             </div>
                         </div>

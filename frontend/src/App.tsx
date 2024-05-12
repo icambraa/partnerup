@@ -7,7 +7,6 @@ import UserProfile from './components/inside/UserProfile.tsx';
 import LoginForm from './components/authentication/LoginForm';
 import RegistrationForm from './components/authentication/RegistrationForm.tsx';
 import ProfileRegistration from './components/authentication/ProfileRegistration.tsx';
-import MessagesPage from './components/inside/Chat/MessagesPage.tsx';
 import { AuthProvider } from './contexts/AuthContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -27,10 +26,6 @@ const App: React.FC = () => {
                     <Route path="/profile" element={<>
                         <Navbar />
                         <UserProfile />
-                    </>} />
-                    <Route path="/messages" element={<>
-                        <Navbar />
-                        <MessagesPage />
                     </>} />
                 </Routes>
             </AuthProvider>

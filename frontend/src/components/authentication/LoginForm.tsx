@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import { auth } from '../../firebase-auth';
 import {getAdditionalUserInfo, signInWithEmailAndPassword} from 'firebase/auth';
 import logo from '../../assets/logo2-rojo.png';
@@ -103,7 +103,7 @@ const LoginForm: React.FC = () => {
                                         />
                                         <label className="form-label visually-hidden">Password</label>
                                     </div>
-                                    <div className="d-flex justify-content-end">
+                                    <div className="d-flex justify-content-center">
                                         <button
                                             type="submit"
                                             className="btn btn-primary btn-lg btn-block"
@@ -112,7 +112,16 @@ const LoginForm: React.FC = () => {
                                         </button>
                                     </div>
 
-                                    {error && <p style={{ color: 'red' }}>{error}</p>}
+                                    {error && <p style={{color: 'red'}}>{error}</p>}
+
+                                    <div className="text-end mb-3 d-flex justify-content-center"
+                                         style={{marginTop: '35px'}}>
+                                        <p className="letraPeq">
+                                            ¿Aún no tienes una cuenta? <Link to="/registration"
+                                                                             className="text-primary">Haz clic
+                                            aquí</Link> para registrarte.
+                                        </p>
+                                    </div>
 
                                 </form>
 
