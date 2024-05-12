@@ -20,11 +20,29 @@ const Navbar: React.FC = () => {
     const [unreadMessages, setUnreadMessages] = useState<Message[]>([]);
     const [userProfiles, setUserProfiles] = useState<UserProfiles>({});
     const [showModal, setShowModal] = useState(false);
+    const [hoveredMessageId, setHoveredMessageId] = useState<number | null>(null);
     const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
     const handleOpenMessage = (message: Message) => {
         setSelectedMessage(message);
         setShowModal(true);
+        markMessageAsRead(message.id);
     };
+
+    const handleMouseEnter = (messageId: number) => {
+        setHoveredMessageId(messageId);
+    };
+    const handleMouseLeave = () => {
+        setHoveredMessageId(null);
+    };
+
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+        if (selectedMessage && currentUser?.uid) {
+            fetchUnreadMessagesCount(currentUser.uid);
+        }
+    };
+
     useEffect(() => {
         if (currentUser) {
             fetchUnreadMessagesCount(currentUser.uid);
@@ -105,15 +123,66 @@ const Navbar: React.FC = () => {
         }
     };
 
+    const markMessageAsRead = async (messageId: number) => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/mensajes/mark-as-read/${messageId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            if (!response.ok) {
+                throw new Error('Failed to mark message as read');
+            }
+            // Actualiza el estado de unreadMessages para marcar el mensaje como leído
+            setUnreadMessages(prevMessages =>
+                prevMessages.map(message =>
+                    message.id === messageId ? { ...message, read: true } : message
+                )
+            );
+            console.log("Mensaje marcado como leído");
+        } catch (error) {
+            console.error('Error marking message as read:', error);
+        }
+    };
+
+    const handleDelete = async (messageId: number) => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/mensajes/${messageId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            if (!response.ok) {
+                throw new Error('Failed to delete message');
+            }
+            // Actualiza la lista de mensajes después de eliminar uno
+            const updatedMessages = unreadMessages.map(message => {
+                if (message.id === messageId) {
+                    return { ...message, slideOut: true }; // Agrega la propiedad slideOut al mensaje eliminado
+                }
+                return message;
+            });
+            setUnreadMessages(updatedMessages);
+            setTimeout(() => {
+                const remainingMessages = unreadMessages.filter(message => message.id !== messageId);
+                setUnreadMessages(remainingMessages);
+            }, 500); // Espera 0.5 segundos (duración de la animación) antes de eliminar el mensaje del estado
+        } catch (error) {
+            console.error('Error deleting message:', error);
+        }
+    };
+
     return (
         <section className="vw-100">
             <nav className="navbar navbar-expand-sm navbar-dark bg-dark fixed-top">
                 <div className="container-fluid">
                     <a className="navbar-brand" href="/board">
-                        <img src={logo} alt="Logo" style={{ maxWidth: '100px' }} />
+                        <img src={logo} alt="Logo" style={{maxWidth: '100px'}}/>
                     </a>
                     <form className="d-flex align-items-center">
-                        <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
+                        <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
                         <button className="btn btn-outline-light" type="submit">
                             <i className="bi bi-search"></i>
                         </button>
@@ -123,8 +192,8 @@ const Navbar: React.FC = () => {
                         <span className="navbar-toggler-icon"></span>
                     </button>
                     <div className="collapse navbar-collapse" id="mynavbar">
-                        <ul className="navbar-nav ms-auto" style={{ gap: '20px' }}>
-                            <li className="nav-item" style={{ marginRight: '20px', position: 'relative' }}>
+                        <ul className="navbar-nav ms-auto" style={{gap: '20px'}}>
+                            <li className="nav-item" style={{marginRight: '20px', position: 'relative'}}>
                                 <a className="nav-link" href="#" onClick={toggleSidebar} style={{position: 'relative'}}>
                                     <i className="bi bi-chat-left-dots-fill"
                                        style={{color: '#fff', fontSize: '2rem', position: 'relative'}}></i>
@@ -144,7 +213,8 @@ const Navbar: React.FC = () => {
                                 <ul className="dropdown-menu dropdown-menu-dark dropdown-menu-end"
                                     aria-labelledby="navbarDropdown">
                                     <li><a className="dropdown-item" href="/profile">Perfil de usuario</a></li>
-                                    <li><a className="dropdown-item" href="#" onClick={handleLogout}>Cerrar Sesión</a></li>
+                                    <li><a className="dropdown-item" href="#" onClick={handleLogout}>Cerrar Sesión</a>
+                                    </li>
                                 </ul>
                             </li>
                         </ul>
@@ -153,28 +223,50 @@ const Navbar: React.FC = () => {
             </nav>
             <div id="sidebar" style={{
                 width: '275px',
-                height: '100%',
+                minHeight: '100vh', // Altura mínima que ocupa toda la pantalla
+                maxHeight: '100%', // Se ajusta automáticamente al contenido y no supera el tamaño de la pantalla
+                overflowY: 'auto', // Habilita el desplazamiento vertical si el contenido es más grande que la altura del sidebar
                 position: 'fixed',
+                overflowX: 'hidden',
                 top: 0,
                 right: sidebarOpen ? '0' : '-275px',
                 backgroundColor: '#f8f9fa',
                 transition: 'right 0.5s'
             }}>
-                <h3>Unread Messages</h3>
-                <ul style={{ marginTop: '65px' }}>
+                <ul style={{marginTop: '100px', position: 'relative'}}>
                     {unreadMessages.map((message, index) => {
                         const userProfile = userProfiles[message.senderId];
-                        const riotNickname = userProfile ? userProfile.riotnickname: 'Loading...';
+                        const riotNickname = userProfile ? userProfile.riotnickname : 'Loading...';
 
                         return (
-                            <li key={index} className="p-3 mb-3 message" style={{
-                                borderWidth: '3px',
-                                borderRadius: '15px',
-                                backgroundColor: '#e0f7fa',
-                                borderColor: '#006064',
-                                listStyleType: 'none',
-                                position: 'relative'
-                            }} onClick={() => handleOpenMessage(message)}>
+                            <li key={index}
+                                className={`p-3 mb-3 message ${message.slideOut ? 'slideOutAnimation' : ''} ${message.id === hoveredMessageId ? 'hovered' : ''} ${message.read ? 'readMessage' : ''}`}
+                                style={{
+                                    borderWidth: '1px',
+                                    borderStyle: 'solid',
+                                    borderRight: 'none',
+                                    borderRadius: '15px 0 0 15px',
+                                    backgroundColor: '#e0f7fa',
+                                    borderColor: '#364849',
+                                    boxShadow: '4px 4px 8px rgba(0, 0, 0, 0.2)',
+                                    listStyleType: 'none',
+                                    position: 'relative',
+                                    cursor: 'pointer',
+                                    paddingLeft: '30px',
+                                    marginLeft: message.read ? (message.id === hoveredMessageId ? '0' : '169px') : '0',
+                                    transition: 'margin-left 0.3s ease',
+                                }} onMouseEnter={() => handleMouseEnter(message.id)}
+                                onMouseLeave={handleMouseLeave}
+                                onClick={() => handleOpenMessage(message)}>
+                                <button
+                                    className="btn btn-danger message-button"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDelete(message.id);
+                                    }}
+                                >
+                                    <i className="bi bi-x-lg" style={{color: 'white', fontSize: '14px'}}></i>
+                                </button>
                                 <div className="d-flex align-items-center">
                                     <IconProfileDisplay
                                         gameName={riotNickname.split('#')[0]}
@@ -194,23 +286,12 @@ const Navbar: React.FC = () => {
                                         <p style={{margin: '0', color: '#004d40'}}>{message.messageText}</p>
                                     </div>
                                 </div>
-                                <div style={{
-                                    position: 'absolute',
-                                    left: '-20px',
-                                    top: '50%',
-                                    transform: 'translateY(-50%)',
-                                    width: '6px',
-                                    height: '6px',
-                                    backgroundColor: '#006064',
-                                    borderRadius: '50%'
-                                }}></div>
                             </li>
                         );
                     })}
-
                 </ul>
             </div>
-            <Modal show={showModal} onHide={() => setShowModal(false)}>
+            <Modal show={showModal} onHide={handleCloseModal}>
                 <Modal.Header closeButton>
                     <Modal.Title>Mensaje</Modal.Title>
                 </Modal.Header>
@@ -218,7 +299,7 @@ const Navbar: React.FC = () => {
                     {selectedMessage && selectedMessage.messageText}
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowModal(false)}>
+                    <Button variant="secondary" onClick={handleCloseModal}>
                         Cerrar
                     </Button>
                 </Modal.Footer>

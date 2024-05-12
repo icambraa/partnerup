@@ -35,4 +35,24 @@ public class MensajeController {
         return ResponseEntity.ok(unreadMessages);
     }
 
+    @PostMapping("/mark-as-read/{messageId}")
+    public ResponseEntity<Mensaje> markMessageAsRead(@PathVariable Long messageId) {
+        try {
+            Mensaje updatedMessage = mensajeService.markMessageAsRead(messageId);
+            return ResponseEntity.ok(updatedMessage);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+    @DeleteMapping("/{messageId}")
+    public ResponseEntity<Void> deleteMessage(@PathVariable Long messageId) {
+        try {
+            mensajeService.deleteMessage(messageId);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }

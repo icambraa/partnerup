@@ -4,4 +4,6 @@ export interface Message {
     receiverId: string;
     messageText: string;
     createdAt: string;
+    slideOut?: boolean;
+    read:boolean;
 }

@@ -28,5 +28,16 @@ public class MensajeService {
         return mensajeRepository.findUnreadMessagesByReceiverId(userId);
     }
 
+    public Mensaje markMessageAsRead(Long messageId) {
+        Mensaje mensaje = mensajeRepository.findById(messageId)
+                .orElseThrow(() -> new RuntimeException("Mensaje no encontrado"));
+        mensaje.setRead(true);
+        return mensajeRepository.save(mensaje);
+    }
+
+    public void deleteMessage(Long messageId) {
+        mensajeRepository.deleteById(messageId);
+    }
+
 
 }
