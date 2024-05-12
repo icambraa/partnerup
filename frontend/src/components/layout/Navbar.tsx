@@ -125,13 +125,13 @@ const Navbar: React.FC = () => {
                     <div className="collapse navbar-collapse" id="mynavbar">
                         <ul className="navbar-nav ms-auto" style={{ gap: '20px' }}>
                             <li className="nav-item" style={{ marginRight: '20px', position: 'relative' }}>
-                                <a className="nav-link" href="#" onClick={toggleSidebar} style={{ position: 'relative' }}>
+                                <a className="nav-link" href="#" onClick={toggleSidebar} style={{position: 'relative'}}>
                                     <i className="bi bi-chat-left-dots-fill"
-                                       style={{ color: '#fff', fontSize: '2rem', position: 'relative' }}></i>
+                                       style={{color: '#fff', fontSize: '2rem', position: 'relative'}}></i>
                                     {unreadMessagesCount > 0 &&
-                                        <span className="badge bg-danger" style={{
+                                        <span className="badge bg-danger animate-bounce" style={{
                                             position: 'absolute',
-                                            top: '0',
+                                            top: '5px',
                                             right: '0'
                                         }}>{unreadMessagesCount}</span>}
                                 </a>
@@ -139,7 +139,7 @@ const Navbar: React.FC = () => {
                             <li className="nav-item dropdown">
                                 <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i className="bi bi-person-circle" style={{ color: '#fff', fontSize: '2rem' }}></i>
+                                    <i className="bi bi-person-circle" style={{color: '#fff', fontSize: '2rem'}}></i>
                                 </a>
                                 <ul className="dropdown-menu dropdown-menu-dark dropdown-menu-end"
                                     aria-labelledby="navbarDropdown">

@@ -190,3 +190,16 @@ button:focus-visible {
   transform: scale(1.1); /* Aumenta el tamaño del mensaje al pasar el ratón por encima */
   transition: transform 0.3s ease-in-out; /* Añade una transición suave */
 }
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.animate-bounce {
+  animation: bounce 1s infinite;
+}
