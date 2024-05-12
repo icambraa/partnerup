@@ -161,24 +161,49 @@ const Navbar: React.FC = () => {
                 transition: 'right 0.5s'
             }}>
                 <h3>Unread Messages</h3>
-                <ul style={{ marginTop: '100px' }}>
+                <ul style={{ marginTop: '65px' }}>
                     {unreadMessages.map((message, index) => {
                         const userProfile = userProfiles[message.senderId];
                         const riotNickname = userProfile ? userProfile.riotnickname: 'Loading...';
 
                         return (
-                            <li key={index} className="p-3 mb-3 message" style={{ borderWidth: '3px', borderRadius: '15px', backgroundColor: '#f0f0f0', borderColor: '#999', listStyleType: 'none', position: 'relative' }}>
+                            <li key={index} className="p-3 mb-3 message" style={{
+                                borderWidth: '3px',
+                                borderRadius: '15px',
+                                backgroundColor: '#e0f7fa',
+                                borderColor: '#006064',
+                                listStyleType: 'none',
+                                position: 'relative'
+                            }} onClick={() => handleOpenMessage(message)}>
                                 <div className="d-flex align-items-center">
                                     <IconProfileDisplay
                                         gameName={riotNickname.split('#')[0]}
                                         tagLine={riotNickname.split('#')[1]}
                                     />
-                                    <div style={{ marginLeft: '10px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                                        <p style={{ margin: '0', fontWeight: 'bold', color: '#333' }}>{riotNickname}</p>
-                                        <p style={{ margin: '0', color: '#666' }}>{message.messageText}</p>
+                                    <div style={{
+                                        marginLeft: '10px',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        justifyContent: 'center'
+                                    }}>
+                                        <p style={{
+                                            margin: '0',
+                                            fontWeight: 'bold',
+                                            color: '#006064'
+                                        }}>{riotNickname}</p>
+                                        <p style={{margin: '0', color: '#004d40'}}>{message.messageText}</p>
                                     </div>
                                 </div>
-                                <div style={{ position: 'absolute', left: '-20px', top: '50%', transform: 'translateY(-50%)', width: '6px', height: '6px', backgroundColor: '#000', borderRadius: '50%' }}></div>
+                                <div style={{
+                                    position: 'absolute',
+                                    left: '-20px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    width: '6px',
+                                    height: '6px',
+                                    backgroundColor: '#006064',
+                                    borderRadius: '50%'
+                                }}></div>
                             </li>
                         );
                     })}
