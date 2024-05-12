@@ -24,6 +24,8 @@ public class UserProfileService {
         return userRepository.findByEmail(email);
     }
 
-
+    public UserProfile getUserProfileByFirebaseUid(String firebaseUid) {
+        return userRepository.findByFirebaseUid(firebaseUid);
+    }
 
 }

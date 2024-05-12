@@ -57,7 +57,8 @@ const Board: React.FC = () => {
         const messageData = {
             senderId: currentUser.uid,
             receiverId: selectedAnuncio.userId,
-            messageText: messageText
+            messageText: messageText,
+
         };
 
         try {
@@ -71,8 +72,7 @@ const Board: React.FC = () => {
 
             if (response.ok) {
                 console.log('Message sent successfully');
-                setMessageText(''); // Clear the message input after sending
-                // Optionally close the modal here if needed
+                setMessageText('');
             } else {
                 throw new Error('Failed to send message');
             }
@@ -118,7 +118,7 @@ const Board: React.FC = () => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
         setFormData({ ...formData, [id]: value });
-        setCurrentPage(0); // Reiniciar la página actual a 0 al cambiar un filtro
+        setCurrentPage(0);
     };
 
     const handleFilterChange = (id: string, value: string | undefined | null) => {

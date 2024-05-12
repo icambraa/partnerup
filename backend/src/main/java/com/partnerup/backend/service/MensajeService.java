@@ -19,4 +19,14 @@ public class MensajeService {
     public List<Mensaje> getAllMensajes() {
         return mensajeRepository.findAll();
     }
+
+    public long countUnreadMessages(String receiverId) {
+        return mensajeRepository.countByReceiverIdAndReadFalse(receiverId);
+    }
+
+    public List<Mensaje> getUnreadMessages(String userId) {
+        return mensajeRepository.findUnreadMessagesByReceiverId(userId);
+    }
+
+
 }

@@ -27,6 +27,9 @@ public class UserProfile {
     @Column(name = "email", unique = true, nullable = false)
     private String email;
 
+    @Column(name = "firebase_uid")
+    private String firebaseUid;
+
     public Long getId() {
         return id;
     }
@@ -34,6 +37,7 @@ public class UserProfile {
     public void setId(Long id) {
         this.id = id;
     }
+
 
     public String getNombreusuario() {
         return nombreusuario;
@@ -81,5 +85,13 @@ public class UserProfile {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getFirebaseUid() {
+        return firebaseUid;
+    }
+
+    public void setFirebaseUid(String firebaseUid) {
+        this.firebaseUid = firebaseUid;
     }
 }

@@ -23,11 +23,16 @@ public class MensajeController {
         return new ResponseEntity<>(mensajeGuardado, HttpStatus.CREATED);
     }
 
-    @GetMapping
-    public ResponseEntity<List<Mensaje>> obtenerTodosLosMensajes() {
-        List<Mensaje> mensajes = mensajeService.getAllMensajes();
-        return new ResponseEntity<>(mensajes, HttpStatus.OK);
+    @GetMapping("/unread-count")
+    public ResponseEntity<Long> getUnreadMessagesCount(@RequestParam String userId) {
+        long unreadCount = mensajeService.countUnreadMessages(userId);
+        return ResponseEntity.ok(unreadCount);
     }
 
+    @GetMapping("/unread")
+    public ResponseEntity<List<Mensaje>> getUnreadMessages(@RequestParam String userId) {
+        List<Mensaje> unreadMessages = mensajeService.getUnreadMessages(userId);
+        return ResponseEntity.ok(unreadMessages);
+    }
 
 }

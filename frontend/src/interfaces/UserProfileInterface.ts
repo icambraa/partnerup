@@ -5,4 +5,5 @@ export interface UserProfile {
     region: string;
     riotnickname: string;
     email: string;
+    firebaseUid: string;
 }

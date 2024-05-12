@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Message } from '../../../interfaces/MessageInterfaace.tsx';
+import { Message } from '../../../interfaces/MessageInterface.tsx';
 
 const MessagesPage = () => {
     const [messages, setMessages] = useState<Message[]>([]); // Usa la interfaz Message como tipo de estado
@@ -20,7 +20,6 @@ const MessagesPage = () => {
         };
         fetchMessages();
     }, []);
-
     return (
         <div className="container mt-4">
             <h2>Mensajes</h2>

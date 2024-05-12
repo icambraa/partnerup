@@ -23,6 +23,12 @@ public class Mensaje {
     @Column(name = "created_at")
     private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
+    @Column(name = "read", nullable = false)
+    private boolean read = false;
+
+
+    // Getters y setters
+
     public Long getId() {
         return id;
     }
@@ -62,4 +68,13 @@ public class Mensaje {
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
+
+    public boolean isRead() {
+        return read;
+    }
+
+    public void setRead(boolean read) {
+        this.read = read;
+    }
+
 }

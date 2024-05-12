@@ -31,4 +31,10 @@ public class UserProfileController {
         return userProfile != null ? ResponseEntity.ok(userProfile) : ResponseEntity.notFound().build();
     }
 
+    @GetMapping("/by-firebaseUid")
+    public ResponseEntity<UserProfile> getUserProfileByFirebaseUid(@RequestParam String firebaseUid) {
+        UserProfile userProfile = profileService.getUserProfileByFirebaseUid(firebaseUid);
+        return userProfile != null ? ResponseEntity.ok(userProfile) : ResponseEntity.notFound().build();
+    }
+
 }
