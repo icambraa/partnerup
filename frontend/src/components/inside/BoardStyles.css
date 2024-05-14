@@ -1,0 +1,38 @@
+.custom-table {
+    background-color: #343a40;
+    color: #f8f9fa;
+}
+
+.custom-dark-header {
+    background-color: #212529;
+    color: #f8f9fa;
+}
+
+.custom-table th,
+.custom-table td {
+    border-color: #495057;
+}
+
+.custom-table tbody tr:hover {
+    background-color: #495057;
+}
+
+.btn-outline-secondary {
+    border-color: #adb5bd;
+    color: #adb5bd;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #adb5bd;
+    color: #343a40;
+}
+
+.pagination-controls button {
+    color: #f8f9fa;
+    background-color: #343a40;
+    border: none;
+}
+
+.pagination-controls button:hover {
+    background-color: #495057;
+}

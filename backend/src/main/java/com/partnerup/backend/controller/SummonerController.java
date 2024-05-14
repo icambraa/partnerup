@@ -1,5 +1,6 @@
 package com.partnerup.backend.controller;
 
+import com.partnerup.backend.model.WinRateResponse;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +21,8 @@ public class SummonerController {
     @Cacheable(value = "winRateCache", key = "#gameName.concat('-').concat(#tagLine)")
     public ResponseEntity<?> getSummonerWinrate(@RequestParam String gameName, @RequestParam String tagLine) {
         try {
-            double winRate = summonerService.calculateWinRate(gameName, tagLine);
-            return ResponseEntity.ok(winRate);
+            WinRateResponse winRateResponse = summonerService.calculateWinRate(gameName, tagLine);
+            return ResponseEntity.ok(winRateResponse);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error processing request: " + e.getMessage());
         }

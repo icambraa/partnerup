@@ -1,5 +1,6 @@
 package com.partnerup.backend.service;
 
+import com.partnerup.backend.model.WinRateResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -18,11 +19,11 @@ public class SummonerService {
     @Value("${riot.api.key}")
     private String apiKey;
 
-    public double calculateWinRate(String gameName, String tagLine) throws Exception {
+    public WinRateResponse calculateWinRate(String gameName, String tagLine) throws Exception {
         String puuid = getPUUID(gameName, tagLine);
         SummonerDto summoner = getSummoner(puuid);
         LeagueEntryDto[] leagueEntries = getLeagueEntries(summoner.getId());
-        return calculateWinRate(leagueEntries);
+        return calculateWinRateDetails(leagueEntries);
     }
 
     private String getPUUID(String gameName, String tagLine) {
@@ -44,17 +45,16 @@ public class SummonerService {
         return response.getBody();
     }
 
-
-    private int calculateWinRate(LeagueEntryDto[] leagueEntries) {
+    private WinRateResponse calculateWinRateDetails(LeagueEntryDto[] leagueEntries) {
         if (leagueEntries.length == 0) {
-            return 0;
+            return new WinRateResponse(0, 0, 0);
         }
         LeagueEntryDto entry = leagueEntries[0];
-        int totalGames = entry.getWins() + entry.getLosses();
-        if (totalGames == 0) {
-            return 0;
-        }
-        return (int) Math.round(100.0 * entry.getWins() / totalGames);
+        int wins = entry.getWins();
+        int losses = entry.getLosses();
+        int totalGames = wins + losses;
+        double winRate = totalGames == 0 ? 0 : Math.round(100.0 * wins / totalGames);
+        return new WinRateResponse(winRate, wins, losses);
     }
 
     @Value("${riot.profile.icon.base.url}")
@@ -66,5 +66,4 @@ public class SummonerService {
         int profileIconId = summoner.getProfileIconId();
         return profileIconBaseUrl + profileIconId + ".png";
     }
-
 }

@@ -28,7 +28,9 @@ const IconProfileDisplay: React.FC<IconProfileDisplayProps> = ({ gameName, tagLi
     }, [gameName, tagLine]);
 
     return (
-        <img src={profileIconUrl} alt="Profile Icon" className="icon-profile-image"/>
+        <div className="icon-profile-container">
+            <img src={profileIconUrl} alt="Profile Icon" className="icon-profile-image"/>
+        </div>
     );
 };
 

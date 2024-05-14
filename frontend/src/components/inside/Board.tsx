@@ -25,6 +25,23 @@ const Board: React.FC = () => {
         setMessageText(e.target.value);
     };
 
+    const getRoleIconUrl = (role: string) => {
+        switch (role) {
+            case 'Top':
+                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-top.png';
+            case 'Mid':
+                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-middle.png';
+            case 'Jungle':
+                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-jungle.png';
+            case 'ADC':
+                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-bottom.png';
+            case 'Support':
+                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-utility.png';
+            default:
+                return '';
+        }
+    };
+
 
 
 
@@ -261,7 +278,7 @@ const Board: React.FC = () => {
                         <tr>
                             <th className="text-center"></th>
                             <th className="text-center">Riot nickname</th>
-                            <th className="text-center">Winrate</th>
+                            <th className="text-center winrate">Winrate</th>
                             <th className="text-center">Rol</th>
                             <th className="text-center">Busco rol</th>
                             <th className="text-center">Rango</th>
@@ -284,11 +301,13 @@ const Board: React.FC = () => {
                                         </button>
                                     )}
                                 </td>
-                                <td className="d-flex align-items-center align-middle text-center">
-                                    <IconProfileDisplay
-                                        gameName={anuncio.riotNickname.split('#')[0]}
-                                        tagLine={anuncio.riotNickname.split('#')[1]}
-                                    />
+                                <td className="align-middle">
+                                    <div className="d-inline-block ms-3">
+                                        <IconProfileDisplay
+                                            gameName={anuncio.riotNickname.split('#')[0]}
+                                            tagLine={anuncio.riotNickname.split('#')[1]}
+                                        />
+                                    </div>
                                     <span className="ms-2 d-inline-block">{anuncio.riotNickname}</span>
                                 </td>
                                 <td className="align-middle text-center">
@@ -297,8 +316,18 @@ const Board: React.FC = () => {
                                         tagLine={anuncio.riotNickname.split('#')[1]}
                                     />
                                 </td>
-                                <td className="align-middle text-center">{anuncio.rol}</td>
-                                <td className="align-middle text-center">{anuncio.buscaRol}</td>
+                                <td className="align-middle text-center">
+                                    <img src={getRoleIconUrl(anuncio.rol)} alt={anuncio.rol} title={anuncio.rol}
+                                         style={{width: '30px', height: 'auto'}}/>
+                                </td>
+                                <td className="align-middle text-center">
+                                    <img
+                                        src={getRoleIconUrl(anuncio.buscaRol)}
+                                        alt={anuncio.buscaRol}
+                                        title={anuncio.buscaRol}
+                                        style={{width: '30px', height: 'auto', filter: 'grayscale(100%)'}}
+                                    />
+                                </td>
                                 <td className="align-middle text-center">{anuncio.rango}</td>
                                 <td className="align-middle text-center">{anuncio.comentario}</td>
                                 <td className="align-middle text-center">{new Date(anuncio.createdAt).toLocaleString()}</td>

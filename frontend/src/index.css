@@ -231,3 +231,9 @@ button:focus-visible {
   }
 }
 
+.custom-table th.winrate {
+  width: 200px;
+}
+
+
+

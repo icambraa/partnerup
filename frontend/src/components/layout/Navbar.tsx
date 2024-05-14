@@ -7,7 +7,8 @@ import { Message } from '../../interfaces/MessageInterface.tsx';
 import { UserProfile } from '../../interfaces/UserProfileInterface.ts';
 import IconProfileDisplay from "../inside/IconProfileDisplay.tsx";
 import Modal from 'react-bootstrap/Modal';
-import {Button} from "react-bootstrap";
+import { Button } from "react-bootstrap";
+
 interface UserProfiles {
     [key: string]: UserProfile;
 }
@@ -22,6 +23,7 @@ const Navbar: React.FC = () => {
     const [showModal, setShowModal] = useState(false);
     const [hoveredMessageId, setHoveredMessageId] = useState<number | null>(null);
     const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
+
     const handleOpenMessage = (message: Message) => {
         setSelectedMessage(message);
         setShowModal(true);
@@ -31,10 +33,10 @@ const Navbar: React.FC = () => {
     const handleMouseEnter = (messageId: number) => {
         setHoveredMessageId(messageId);
     };
+
     const handleMouseLeave = () => {
         setHoveredMessageId(null);
     };
-
 
     const handleCloseModal = () => {
         setShowModal(false);
@@ -77,7 +79,13 @@ const Navbar: React.FC = () => {
             const response = await fetch(`http://localhost:8080/api/mensajes/unread?userId=${userId}`);
             if (response.ok) {
                 const data = await response.json();
-                setUnreadMessages(data);
+                // Ordenar los mensajes de forma descendente por la fecha de creación para que los más nuevos aparezcan primero
+                const sortedMessages = data.sort((a: Message, b: Message) => {
+                    const dateA = new Date(a.createdAt).getTime();
+                    const dateB = new Date(b.createdAt).getTime();
+                    return dateB - dateA;
+                });
+                setUnreadMessages(sortedMessages);
                 // Fetch profiles for each message sender
                 const profileFetches = data.map((message: Message) => fetchUserProfileByFirebaseUid(message.senderId));
                 const profiles = await Promise.all(profileFetches);
@@ -85,7 +93,7 @@ const Navbar: React.FC = () => {
                     acc[data[index].senderId] = profile;
                     return acc;
                 }, {});
-                setUserProfiles(prev => ({...prev, ...newProfiles}));
+                setUserProfiles(prev => ({ ...prev, ...newProfiles }));
             } else {
                 throw new Error('Failed to fetch unread messages');
             }
@@ -174,15 +182,26 @@ const Navbar: React.FC = () => {
         }
     };
 
+    // Función para ordenar y agrupar los mensajes
+    const getSortedMessages = () => {
+        const unread = unreadMessages.filter(message => !message.read);
+        const read = unreadMessages.filter(message => message.read);
+
+        return [
+            ...unread.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
+            ...read.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        ];
+    };
+
     return (
         <section className="vw-100">
             <nav className="navbar navbar-expand-sm navbar-dark bg-dark fixed-top">
                 <div className="container-fluid">
                     <a className="navbar-brand" href="/board">
-                        <img src={logo} alt="Logo" style={{maxWidth: '100px'}}/>
+                        <img src={logo} alt="Logo" style={{ maxWidth: '100px' }} />
                     </a>
                     <form className="d-flex align-items-center">
-                        <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
+                        <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
                         <button className="btn btn-outline-light" type="submit">
                             <i className="bi bi-search"></i>
                         </button>
@@ -192,11 +211,11 @@ const Navbar: React.FC = () => {
                         <span className="navbar-toggler-icon"></span>
                     </button>
                     <div className="collapse navbar-collapse" id="mynavbar">
-                        <ul className="navbar-nav ms-auto" style={{gap: '20px'}}>
-                            <li className="nav-item" style={{marginRight: '20px', position: 'relative'}}>
-                                <a className="nav-link" href="#" onClick={toggleSidebar} style={{position: 'relative'}}>
+                        <ul className="navbar-nav ms-auto" style={{ gap: '20px' }}>
+                            <li className="nav-item" style={{ marginRight: '20px', position: 'relative' }}>
+                                <a className="nav-link" href="#" onClick={toggleSidebar} style={{ position: 'relative' }}>
                                     <i className="bi bi-chat-left-dots-fill"
-                                       style={{color: '#fff', fontSize: '2rem', position: 'relative'}}></i>
+                                       style={{ color: '#fff', fontSize: '2rem', position: 'relative' }}></i>
                                     {unreadMessagesCount > 0 &&
                                         <span className="badge bg-danger animate-bounce" style={{
                                             position: 'absolute',
@@ -208,7 +227,7 @@ const Navbar: React.FC = () => {
                             <li className="nav-item dropdown">
                                 <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i className="bi bi-person-circle" style={{color: '#fff', fontSize: '2rem'}}></i>
+                                    <i className="bi bi-person-circle" style={{ color: '#fff', fontSize: '2rem' }}></i>
                                 </a>
                                 <ul className="dropdown-menu dropdown-menu-dark dropdown-menu-end"
                                     aria-labelledby="navbarDropdown">
@@ -223,18 +242,18 @@ const Navbar: React.FC = () => {
             </nav>
             <div id="sidebar" style={{
                 width: '275px',
-                minHeight: '100vh', // Altura mínima que ocupa toda la pantalla
-                maxHeight: '100%', // Se ajusta automáticamente al contenido y no supera el tamaño de la pantalla
-                overflowY: 'auto', // Habilita el desplazamiento vertical si el contenido es más grande que la altura del sidebar
+                minHeight: '100vh',
+                maxHeight: '100%',
+                overflowY: 'auto',
                 position: 'fixed',
                 overflowX: 'hidden',
                 top: 0,
                 right: sidebarOpen ? '0' : '-275px',
-                backgroundColor: '#f8f9fa',
+                backgroundColor: '#343a40',
                 transition: 'right 0.5s'
             }}>
-                <ul style={{marginTop: '100px', position: 'relative'}}>
-                    {unreadMessages.map((message, index) => {
+                <ul style={{ marginTop: '100px', position: 'relative' }}>
+                    {getSortedMessages().map((message, index) => {
                         const userProfile = userProfiles[message.senderId];
                         const riotNickname = userProfile ? userProfile.riotnickname : 'Loading...';
 
@@ -246,16 +265,17 @@ const Navbar: React.FC = () => {
                                     borderStyle: 'solid',
                                     borderRight: 'none',
                                     borderRadius: '15px 0 0 15px',
-                                    backgroundColor: '#e0f7fa',
-                                    borderColor: '#364849',
+                                    backgroundColor: '#495057',
+                                    borderColor: '#6c757d',
                                     boxShadow: '4px 4px 8px rgba(0, 0, 0, 0.2)',
                                     listStyleType: 'none',
                                     position: 'relative',
                                     cursor: 'pointer',
                                     paddingLeft: '30px',
-                                    marginLeft: message.read ? (message.id === hoveredMessageId ? '0' : '169px') : '0',
-                                    transition: 'margin-left 0.3s ease',
-                                }} onMouseEnter={() => handleMouseEnter(message.id)}
+                                    transform: message.read ? (message.id === hoveredMessageId ? 'translateX(0)' : 'translateX(169px)') : 'translateX(0)',
+                                    transition: 'transform 0.3s ease',
+                                }}
+                                onMouseEnter={() => handleMouseEnter(message.id)}
                                 onMouseLeave={handleMouseLeave}
                                 onClick={() => handleOpenMessage(message)}>
                                 <button
@@ -265,7 +285,7 @@ const Navbar: React.FC = () => {
                                         handleDelete(message.id);
                                     }}
                                 >
-                                    <i className="bi bi-x-lg" style={{color: 'white', fontSize: '14px'}}></i>
+                                    <i className="bi bi-x-lg" style={{ color: 'white', fontSize: '14px' }}></i>
                                 </button>
                                 <div className="d-flex align-items-center">
                                     <IconProfileDisplay
@@ -281,9 +301,9 @@ const Navbar: React.FC = () => {
                                         <p style={{
                                             margin: '0',
                                             fontWeight: 'bold',
-                                            color: '#006064'
+                                            color: '#f8f9fa'
                                         }}>{riotNickname}</p>
-                                        <p style={{margin: '0', color: '#004d40'}}>{message.messageText}</p>
+                                        <p style={{ margin: '0', color: '#ced4da' }}>{message.messageText}</p>
                                     </div>
                                 </div>
                             </li>
