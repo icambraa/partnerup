@@ -52,6 +52,7 @@ const Board: React.FC = () => {
     const [pageSize] = useState(10);
     const isLoading = useRef(false);
     const [selectedRole, setSelectedRole] = useState<string | null | undefined>(null);
+    const [selectedRange, setSelectedRange] = useState<string | null | undefined>(null);
 
     const [selectedAnuncio, setSelectedAnuncio] = useState<Anuncio | null>(null);
 
@@ -145,12 +146,14 @@ const Board: React.FC = () => {
                 setFilterData({ ...filterData, rol: value ?? undefined });
             }
         } else if (id === 'rango') {
+            setSelectedRange(value);
             if (filterData !== null) {
                 setFilterData({ ...filterData, rango: value ?? undefined });
             }
         }
         setCurrentPage(0);
     };
+
     const handleNextPage = () => {
         const nextPage = currentPage + 1;
         setCurrentPage(nextPage);
@@ -257,19 +260,58 @@ const Board: React.FC = () => {
                         </div>
                         <div className="col-auto">
                             <div className="mb-3">
-                                <select className="form-select form-select-sm" id="rango"
-                                        onChange={(e) => handleFilterChange('rango', e.target.value)}>
-                                    <option value="">Selecciona un rango</option>
-                                    <option value="Hierro">Hierro</option>
-                                    <option value="Bronce">Bronce</option>
-                                    <option value="Plata">Plata</option>
-                                    <option value="Oro">Oro</option>
-                                    <option value="Platino">Platino</option>
-                                    <option value="Diamante">Diamante</option>
-                                    <option value="Ascendente">Ascendente</option>
-                                    <option value="Inmortal">Inmortal</option>
-                                    <option value="Radiante">Radiante</option>
-                                </select>
+                                <div className="icon-container">
+                                    <img className={`range-icon hierro ${selectedRange === 'Hierro' ? 'selected' : ''}`}
+                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/iron.png"
+                                         alt="Hierro"
+                                         title="Hierro"
+                                         onClick={() => handleFilterChange('rango', 'Hierro')}/>
+                                    <img className={`range-icon bronce ${selectedRange === 'Bronce' ? 'selected' : ''}`}
+                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/bronze.png"
+                                         alt="Bronce"
+                                         title="Bronce"
+                                         onClick={() => handleFilterChange('rango', 'Bronce')}/>
+                                    <img className={`range-icon plata ${selectedRange === 'Plata' ? 'selected' : ''}`}
+                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/silver.png"
+                                         alt="Plata"
+                                         title="Plata"
+                                         onClick={() => handleFilterChange('rango', 'Plata')}/>
+                                    <img className={`range-icon oro ${selectedRange === 'Oro' ? 'selected' : ''}`}
+                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/gold.png"
+                                         alt="Oro"
+                                         title="Oro"
+                                         onClick={() => handleFilterChange('rango', 'Oro')}/>
+                                    <img
+                                        className={`range-icon platino ${selectedRange === 'Platino' ? 'selected' : ''}`}
+                                        src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/platinum.png"
+                                        alt="Platino"
+                                        title="Platino"
+                                        onClick={() => handleFilterChange('rango', 'Platino')}/>
+                                    <img
+                                        className={`range-icon diamante ${selectedRange === 'Diamante' ? 'selected' : ''}`}
+                                        src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/diamond.png"
+                                        alt="Diamante"
+                                        title="Diamante"
+                                        onClick={() => handleFilterChange('rango', 'Diamante')}/>
+                                    <img
+                                        className={`range-icon ascendente ${selectedRange === 'Master' ? 'selected' : ''}`}
+                                        src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/master.png"
+                                        alt="Master"
+                                        title="Master"
+                                        onClick={() => handleFilterChange('rango', 'Master')}/>
+                                    <img
+                                        className={`range-icon inmortal ${selectedRange === 'Grandmaster' ? 'selected' : ''}`}
+                                        src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/grandmaster.png"
+                                        alt="Inmortal"
+                                        title="Inmortal"
+                                        onClick={() => handleFilterChange('rango', 'Grandmaster')}/>
+                                    <img
+                                        className={`range-icon radiante ${selectedRange === 'Challenger' ? 'selected' : ''}`}
+                                        src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/challenger.png"
+                                        alt="Radiante"
+                                        title="Radiante"
+                                        onClick={() => handleFilterChange('rango', 'Challenger')}/>
+                                </div>
                             </div>
                         </div>
                     </div>
