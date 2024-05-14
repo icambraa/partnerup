@@ -1,5 +1,6 @@
 package com.partnerup.backend.controller;
 
+import com.partnerup.backend.model.MatchStatDto;
 import com.partnerup.backend.model.WinRateResponse;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.partnerup.backend.service.SummonerService;
+
+import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:5173")
@@ -37,5 +40,11 @@ public class SummonerController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error processing request: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/lastgames")
+    @Cacheable(value = "lastGamesCache", key = "#gameName.concat('-').concat(#tagLine).concat('-').concat(#count)")
+    public List<MatchStatDto> getLastGames(@RequestParam String gameName, @RequestParam String tagLine, @RequestParam int count) {
+        return summonerService.getLastMatchStats(gameName, tagLine, count);
     }
 }

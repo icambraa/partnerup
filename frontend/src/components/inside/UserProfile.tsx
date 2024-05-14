@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { UserProfile } from '../../interfaces/UserProfileInterface';
-import WinRateDisplayCircle from './WinRateDisplayCircle'; // Asegúrate de que la ruta sea correcta
-import IconProfileDisplay from './IconProfileDisplay'; // Importa el componente del icono
-import { Card, Spinner, Alert, Container, Row, Col } from 'react-bootstrap';
+import { MatchStat } from '../../interfaces/MatchStatInterface';
+import WinRateDisplayCircle from './WinRateDisplayCircle';
+import IconProfileDisplay from './IconProfileDisplay';
+import { Card, Spinner, Alert, Container, Row, Col, Table } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './UserProfileStyles.css';
 
 const UserProfileComponent: React.FC = () => {
     const { currentUser } = useAuth();
     const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+    const [matchStats, setMatchStats] = useState<MatchStat[]>([]);
     const [error, setError] = useState<string>('');
 
     useEffect(() => {
@@ -28,6 +30,24 @@ const UserProfileComponent: React.FC = () => {
                 });
         }
     }, [currentUser]);
+
+    useEffect(() => {
+        if (userProfile) {
+            const [gameName, tagLine] = userProfile.riotnickname.split('#');
+            fetch(`http://localhost:8080/lastgames?gameName=${encodeURIComponent(gameName)}&tagLine=${encodeURIComponent(tagLine)}&count=10`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch match stats');
+                    }
+                    return response.json();
+                })
+                .then(data => setMatchStats(data))
+                .catch(error => {
+                    console.error('Error fetching match stats:', error);
+                    setError(error.message);
+                });
+        }
+    }, [userProfile]);
 
     if (error) {
         return <Alert variant="danger">Error: {error}</Alert>;
@@ -63,6 +83,37 @@ const UserProfileComponent: React.FC = () => {
                             <p><strong>Rango Actual:</strong> {userProfile.rangoactual}</p>
                             <p><strong>Rol Principal:</strong> {userProfile.rolprincipal}</p>
                             <p><strong>Región:</strong> {userProfile.region}</p>
+                        </Col>
+                    </Row>
+                    <Row className="mb-3">
+                        <Col md={12}>
+                            <h4>Últimas 10 Partidas</h4>
+                            {matchStats.length === 0 ? (
+                                <Spinner animation="border" role="status"><span className="sr-only">Loading...</span></Spinner>
+                            ) : (
+                                <Table className="custom-table" bordered hover>
+                                    <thead>
+                                    <tr>
+                                        <th>Partida</th>
+                                        <th>Campeón</th>
+                                        <th>KDA</th>
+                                        <th>Victoria</th>
+                                        <th>Duración (min)</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {matchStats.map((stat) => (
+                                        <tr key={stat.matchId} className="row-shadow">
+                                            <td className={stat.win ? 'victory-cell' : 'defeat-cell'}>{stat.matchId}</td>
+                                            <td className={stat.win ? 'victory-cell' : 'defeat-cell'}>{stat.championName}</td>
+                                            <td className={stat.win ? 'victory-cell' : 'defeat-cell'}>{stat.kills}/{stat.deaths}/{stat.assists}</td>
+                                            <td className={stat.win ? 'victory-cell' : 'defeat-cell'}>{stat.win ? 'Sí' : 'No'}</td>
+                                            <td className={stat.win ? 'victory-cell' : 'defeat-cell'}>{(stat.gameDuration / 60).toFixed(2)}</td>
+                                        </tr>
+                                    ))}
+                                    </tbody>
+                                </Table>
+                            )}
                         </Col>
                     </Row>
                 </Card.Body>

@@ -1,14 +1,14 @@
 package com.partnerup.backend.service;
 
-import com.partnerup.backend.model.WinRateResponse;
+import com.partnerup.backend.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import com.partnerup.backend.model.AccountDto;
-import com.partnerup.backend.model.SummonerDto;
-import com.partnerup.backend.model.LeagueEntryDto;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class SummonerService {
@@ -65,5 +65,49 @@ public class SummonerService {
         SummonerDto summoner = getSummoner(puuid);
         int profileIconId = summoner.getProfileIconId();
         return profileIconBaseUrl + profileIconId + ".png";
+    }
+
+
+    public List<String> getLastMatchIds(String puuid, int start, int count) {
+        String url = String.format("https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/%s/ids?start=%d&count=%d&api_key=%s",
+                puuid, start, count, apiKey);
+        ResponseEntity<List<String>> response = restTemplate.getForEntity(url, (Class<List<String>>)(Object)List.class);
+        return response.getBody();
+    }
+
+    // Nuevo método para obtener los detalles de una partida
+    public MatchDetailsDto getMatchDetails(String matchId) {
+        String url = String.format("https://europe.api.riotgames.com/lol/match/v5/matches/%s?api_key=%s", matchId, apiKey);
+        ResponseEntity<MatchDetailsDto> response = restTemplate.getForEntity(url, MatchDetailsDto.class);
+        return response.getBody();
+    }
+
+    // Método para obtener las estadísticas de las últimas partidas
+    public List<MatchStatDto> getLastMatchStats(String gameName, String tagLine, int count) {
+        String puuid = getPUUID(gameName, tagLine);
+        List<String> matchIds = getLastMatchIds(puuid, 0, count);
+        List<MatchStatDto> matchStats = new ArrayList<>();
+
+        for (String matchId : matchIds) {
+            MatchDetailsDto matchDetails = getMatchDetails(matchId);
+            MatchStatDto matchStat = new MatchStatDto();
+            matchStat.setMatchId(matchId);
+            matchStat.setGameDuration(matchDetails.getInfo().getGameDuration());
+
+            for (MatchDetailsDto.Info.Participant participant : matchDetails.getInfo().getParticipants()) {
+                if (participant.getPuuid().equals(puuid)) {
+                    matchStat.setChampionName(participant.getChampionName());
+                    matchStat.setKills(participant.getKills());
+                    matchStat.setDeaths(participant.getDeaths());
+                    matchStat.setAssists(participant.getAssists());
+                    matchStat.setWin(participant.isWin());
+                    break;
+                }
+            }
+
+            matchStats.add(matchStat);
+        }
+
+        return matchStats;
     }
 }

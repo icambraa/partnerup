@@ -19,3 +19,37 @@ align-items-center {
     margin: 0;
     padding-top: 0;
 }
+
+
+
+.table .victory-cell {
+    background-color: #dfeffd !important;
+}
+
+.table .victory-cell:first-child {
+    border-left: 5px solid #007bff;
+}
+
+.table .defeat-cell {
+    background-color: #fddfdf !important;
+}
+
+.table .defeat-cell:first-child {
+    border-left: 5px solid #dc3545;
+}
+
+.table .row-shadow td {
+    padding: 40px;
+    border-top: 10px solid white;
+
+}
+
+.table .row-shadow td:first-child {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+.table .row-shadow td:last-child {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
