@@ -366,6 +366,16 @@ const Board: React.FC = () => {
                                 </div>
                             </div>
                         </div>
+                        <div className="col-auto" style={{marginLeft: 'auto', marginRight: '50px'}}>
+                            <div className="mt-5">
+                                <div className="icon-container">
+                                    <button type="button" className="btn btn-primary my-2" data-bs-toggle="modal"
+                                            data-bs-target="#formModal">
+                                        Anunciarse
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <table className="table table-bordered custom-table">
                         <thead className="custom-dark-header">
@@ -441,7 +451,7 @@ const Board: React.FC = () => {
                                     {timeSince(new Date(anuncio.createdAt))}
                                 </td>
                                 <td style={{backgroundColor: 'transparent'}}>
-                                {currentUser && currentUser.uid === anuncio.userId ? (
+                                    {currentUser && currentUser.uid === anuncio.userId ? (
                                         <div className="dropdown">
                                             <a className="text-muted" href="#" role="button"
                                                id={`dropdownMenuLink${index}`}
@@ -499,10 +509,6 @@ const Board: React.FC = () => {
                         </button>
                     </div>
                 </div>
-                <button type="button" className="btn btn-primary my-2" data-bs-toggle="modal"
-                        data-bs-target="#formModal">
-                    Anunciarse
-                </button>
             </div>
             <div className="modal fade" id="formModal" tabIndex={-1} aria-labelledby="formModalLabel"
                  aria-hidden="true">

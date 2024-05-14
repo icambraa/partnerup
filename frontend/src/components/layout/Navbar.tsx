@@ -288,10 +288,13 @@ const Navbar: React.FC = () => {
                                     <i className="bi bi-x-lg" style={{ color: 'white', fontSize: '14px' }}></i>
                                 </button>
                                 <div className="d-flex align-items-center">
-                                    <IconProfileDisplay
-                                        gameName={riotNickname.split('#')[0]}
-                                        tagLine={riotNickname.split('#')[1]}
-                                    />
+                                    <div className="d-inline-block">
+                                        <IconProfileDisplay
+                                            gameName={riotNickname.split('#')[0]}
+                                            tagLine={riotNickname.split('#')[1]}
+                                            width="50px" height="50px" borderRadius="10%"
+                                        />
+                                    </div>
                                     <div style={{
                                         marginLeft: '10px',
                                         display: 'flex',
