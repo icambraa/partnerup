@@ -6,4 +6,5 @@ export interface MatchStat {
     assists: number;
     win: boolean;
     gameDuration: number;
+    kd: number;
 }

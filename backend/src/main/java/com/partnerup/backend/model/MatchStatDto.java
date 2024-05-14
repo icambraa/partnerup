@@ -9,6 +9,7 @@ public class MatchStatDto {
     private int assists;
     private boolean win;
     private long gameDuration;
+    private double kd;
 
     // Getters y Setters
     public String getMatchId() {
@@ -65,5 +66,13 @@ public class MatchStatDto {
 
     public void setGameDuration(long gameDuration) {
         this.gameDuration = gameDuration;
+    }
+
+    public double getKd() {
+        return kd;
+    }
+
+    public void setKd(double kd) {
+        this.kd = kd;
     }
 }

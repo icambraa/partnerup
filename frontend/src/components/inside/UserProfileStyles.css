@@ -39,9 +39,12 @@ align-items-center {
 }
 
 .table .row-shadow td {
-    padding: 40px;
+    padding: 10px;
     border-top: 10px solid white;
 
+}
+.stat-cell {
+    font-size: 30px;
 }
 
 .table .row-shadow td:first-child {
@@ -53,3 +56,19 @@ align-items-center {
     border-top-right-radius: 8px;
     border-bottom-right-radius: 8px;
 }
+
+.kd-text {
+    font-size: 0.7em;
+    color: gray;
+}
+
+.kda-text{
+    margin-left: 2em;
+    font-size: 1.5em;
+    text-align: center;
+}
+
+.vertical-align-middle {
+    vertical-align: middle;
+}
+

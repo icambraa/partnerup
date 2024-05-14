@@ -3,6 +3,8 @@ package com.partnerup.backend.service;
 import com.partnerup.backend.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -19,6 +21,9 @@ public class SummonerService {
     @Value("${riot.api.key}")
     private String apiKey;
 
+    @Value("${riot.profile.icon.base.url}")
+    private String profileIconBaseUrl;
+
     public WinRateResponse calculateWinRate(String gameName, String tagLine) throws Exception {
         String puuid = getPUUID(gameName, tagLine);
         SummonerDto summoner = getSummoner(puuid);
@@ -29,36 +34,49 @@ public class SummonerService {
     private String getPUUID(String gameName, String tagLine) {
         String url = String.format("https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/%s/%s?api_key=%s",
                 gameName, tagLine, apiKey);
-        ResponseEntity<AccountDto> response = restTemplate.getForEntity(url, AccountDto.class);
-        return response.getBody().getPuuid();
+        try {
+            ResponseEntity<AccountDto> response = restTemplate.getForEntity(url, AccountDto.class);
+            return response.getBody().getPuuid();
+        } catch (Exception e) {
+            throw new RuntimeException("Error fetching PUUID: " + e.getMessage());
+        }
     }
 
     private SummonerDto getSummoner(String puuid) {
         String url = String.format("https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/%s?api_key=%s", puuid, apiKey);
-        ResponseEntity<SummonerDto> response = restTemplate.getForEntity(url, SummonerDto.class);
-        return response.getBody();
+        try {
+            ResponseEntity<SummonerDto> response = restTemplate.getForEntity(url, SummonerDto.class);
+            return response.getBody();
+        } catch (Exception e) {
+            throw new RuntimeException("Error fetching Summoner: " + e.getMessage());
+        }
     }
 
     private LeagueEntryDto[] getLeagueEntries(String summonerId) {
         String url = String.format("https://euw1.api.riotgames.com/lol/league/v4/entries/by-summoner/%s?api_key=%s", summonerId, apiKey);
-        ResponseEntity<LeagueEntryDto[]> response = restTemplate.getForEntity(url, LeagueEntryDto[].class);
-        return response.getBody();
+        try {
+            ResponseEntity<LeagueEntryDto[]> response = restTemplate.getForEntity(url, LeagueEntryDto[].class);
+            return response.getBody();
+        } catch (Exception e) {
+            throw new RuntimeException("Error fetching League Entries: " + e.getMessage());
+        }
     }
 
     private WinRateResponse calculateWinRateDetails(LeagueEntryDto[] leagueEntries) {
         if (leagueEntries.length == 0) {
             return new WinRateResponse(0, 0, 0);
         }
-        LeagueEntryDto entry = leagueEntries[0];
-        int wins = entry.getWins();
-        int losses = entry.getLosses();
-        int totalGames = wins + losses;
-        double winRate = totalGames == 0 ? 0 : Math.round(100.0 * wins / totalGames);
-        return new WinRateResponse(winRate, wins, losses);
+        // Suponiendo que quieres calcular el winrate de todas las entradas
+        int totalWins = 0;
+        int totalLosses = 0;
+        for (LeagueEntryDto entry : leagueEntries) {
+            totalWins += entry.getWins();
+            totalLosses += entry.getLosses();
+        }
+        int totalGames = totalWins + totalLosses;
+        double winRate = totalGames == 0 ? 0 : Math.round(100.0 * totalWins / totalGames);
+        return new WinRateResponse(winRate, totalWins, totalLosses);
     }
-
-    @Value("${riot.profile.icon.base.url}")
-    private String profileIconBaseUrl;
 
     public String getProfileIconUrl(String gameName, String tagLine) {
         String puuid = getPUUID(gameName, tagLine);
@@ -67,22 +85,28 @@ public class SummonerService {
         return profileIconBaseUrl + profileIconId + ".png";
     }
 
-
     public List<String> getLastMatchIds(String puuid, int start, int count) {
         String url = String.format("https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/%s/ids?start=%d&count=%d&api_key=%s",
                 puuid, start, count, apiKey);
-        ResponseEntity<List<String>> response = restTemplate.getForEntity(url, (Class<List<String>>)(Object)List.class);
-        return response.getBody();
+        try {
+            ResponseEntity<List<String>> response = restTemplate.exchange(
+                    url, HttpMethod.GET, null, new ParameterizedTypeReference<List<String>>() {});
+            return response.getBody();
+        } catch (Exception e) {
+            throw new RuntimeException("Error fetching Match IDs: " + e.getMessage());
+        }
     }
 
-    // Nuevo método para obtener los detalles de una partida
     public MatchDetailsDto getMatchDetails(String matchId) {
         String url = String.format("https://europe.api.riotgames.com/lol/match/v5/matches/%s?api_key=%s", matchId, apiKey);
-        ResponseEntity<MatchDetailsDto> response = restTemplate.getForEntity(url, MatchDetailsDto.class);
-        return response.getBody();
+        try {
+            ResponseEntity<MatchDetailsDto> response = restTemplate.getForEntity(url, MatchDetailsDto.class);
+            return response.getBody();
+        } catch (Exception e) {
+            throw new RuntimeException("Error fetching Match Details: " + e.getMessage());
+        }
     }
 
-    // Método para obtener las estadísticas de las últimas partidas
     public List<MatchStatDto> getLastMatchStats(String gameName, String tagLine, int count) {
         String puuid = getPUUID(gameName, tagLine);
         List<String> matchIds = getLastMatchIds(puuid, 0, count);
@@ -101,6 +125,11 @@ public class SummonerService {
                     matchStat.setDeaths(participant.getDeaths());
                     matchStat.setAssists(participant.getAssists());
                     matchStat.setWin(participant.isWin());
+
+                    // Calcular el KD (Kills / Deaths)
+                    double kd = participant.getDeaths() == 0 ? participant.getKills() : (double) participant.getKills() / participant.getDeaths();
+                    matchStat.setKd(kd);
+
                     break;
                 }
             }
