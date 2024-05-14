@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { UserProfile } from '../../interfaces/UserProfileInterface';
+import WinRateDisplayCircle from './WinRateDisplayCircle'; // Asegúrate de que la ruta sea correcta
+import IconProfileDisplay from './IconProfileDisplay'; // Importa el componente del icono
+import { Card, Spinner, Alert, Container, Row, Col } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './UserProfileStyles.css';
 
 const UserProfileComponent: React.FC = () => {
     const { currentUser } = useAuth();
@@ -25,22 +30,44 @@ const UserProfileComponent: React.FC = () => {
     }, [currentUser]);
 
     if (error) {
-        return <div>Error: {error}</div>;
+        return <Alert variant="danger">Error: {error}</Alert>;
     }
 
     if (!userProfile) {
-        return <div>Loading...</div>;
+        return <Spinner animation="border" role="status"><span className="sr-only">Loading...</span></Spinner>;
     }
 
+    const [gameName, tagLine] = userProfile.riotnickname.split('#');
+
     return (
-        <div className="content">
-            <h1>{userProfile.nombreusuario}</h1>
-            <p>Email: {userProfile.email}</p>
-            <p>Rango Actual: {userProfile.rangoactual}</p>
-            <p>Rol Principal: {userProfile.rolprincipal}</p>
-            <p>Región: {userProfile.region}</p>
-            <p>Nickname Riot: {userProfile.riotnickname}</p>
-        </div>
+        <Container className="custom-margin-top">
+            <Card>
+                <Card.Header>
+                    <h2>{userProfile.nombreusuario}</h2>
+                </Card.Header>
+                <Card.Body>
+                    <Row className="mb-3 align-items-start">
+                        <Col md="auto">
+                            <IconProfileDisplay gameName={gameName} tagLine={tagLine} width="130px" height="130px" borderRadius="10%" />
+                        </Col>
+                        <Col md="auto" className="nickname-container">
+                            <h4 className="nickname-text">{userProfile.riotnickname}</h4>
+                        </Col>
+                        <Col md="auto">
+                            <WinRateDisplayCircle gameName={gameName} tagLine={tagLine} />
+                        </Col>
+                    </Row>
+                    <Row className="mb-3">
+                        <Col md={12} lg={6}>
+                            <p><strong>Email:</strong> {userProfile.email}</p>
+                            <p><strong>Rango Actual:</strong> {userProfile.rangoactual}</p>
+                            <p><strong>Rol Principal:</strong> {userProfile.rolprincipal}</p>
+                            <p><strong>Región:</strong> {userProfile.region}</p>
+                        </Col>
+                    </Row>
+                </Card.Body>
+            </Card>
+        </Container>
     );
 };
 

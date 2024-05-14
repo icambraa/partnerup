@@ -132,7 +132,7 @@ button:focus-visible {
 /* paginator css*/
 
 /* icon summoner*/
-.icon-profile-image {
+.icon-profile-image-board {
   width: 50px;
   height: 50px;
   border-radius: 50%;
@@ -141,7 +141,6 @@ button:focus-visible {
 
 /* icon roles*/
 .icon-container img {
-  background-color: white;
   padding: 5px;
   display: block;
   width: auto;
@@ -151,7 +150,7 @@ button:focus-visible {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  background-color: white;
+
   padding: 5px;
 }
 
@@ -164,6 +163,7 @@ button:focus-visible {
   transition: all 0.3s ease;
   cursor: pointer;
 }
+
 
 .top-icon:hover {
   content: url('https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-top-hover.png');
@@ -255,5 +255,16 @@ button:focus-visible {
 .range-icon {
   cursor: pointer;
   padding: 10px;
+}
+
+.filter-description {
+  font-size: 14px; /* Tamaño de fuente */
+  font-weight: bold; /* Negrita */
+  text-align: center; /* Alineación central */
+  margin-bottom: 8px; /* Espacio inferior */
+}
+.custom-dark-header th {
+  background-color: #343a40;
+  color: white;
 }
 

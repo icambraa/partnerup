@@ -3,9 +3,12 @@ import React, { useState, useEffect } from 'react';
 type IconProfileDisplayProps = {
     gameName: string;
     tagLine: string;
+    width: string;
+    height: string;
+    borderRadius: string;
 };
 
-const IconProfileDisplay: React.FC<IconProfileDisplayProps> = ({ gameName, tagLine }) => {
+const IconProfileDisplay: React.FC<IconProfileDisplayProps> = ({ gameName, tagLine, width, height, borderRadius }) => {
     const [profileIconUrl, setProfileIconUrl] = useState<string>('');
 
     useEffect(() => {
@@ -29,7 +32,7 @@ const IconProfileDisplay: React.FC<IconProfileDisplayProps> = ({ gameName, tagLi
 
     return (
         <div className="icon-profile-container">
-            <img src={profileIconUrl} alt="Profile Icon" className="icon-profile-image"/>
+            <img src={profileIconUrl} alt="Profile Icon" className="icon-profile-image" style={{ width, height, borderRadius }} />
         </div>
     );
 };

@@ -98,6 +98,33 @@ const Board: React.FC = () => {
             console.error('Error sending message:', error);
         }
     };
+
+    function timeSince(date) {
+        const seconds = Math.floor((new Date() - date) / 1000);
+
+        let interval = Math.floor(seconds / 31536000);
+        if (interval >= 1) {
+            return `hace ${interval} año${interval === 1 ? '' : 's'}`;
+        }
+        interval = Math.floor(seconds / 2592000);
+        if (interval >= 1) {
+            return `hace ${interval} mes${interval === 1 ? '' : 'es'}`;
+        }
+        interval = Math.floor(seconds / 86400);
+        if (interval >= 1) {
+            return `hace ${interval} día${interval === 1 ? '' : 's'}`;
+        }
+        interval = Math.floor(seconds / 3600);
+        if (interval >= 1) {
+            return `hace ${interval} hora${interval === 1 ? '' : 's'}`;
+        }
+        interval = Math.floor(seconds / 60);
+        if (interval >= 1) {
+            return `hace ${interval} minuto${interval === 1 ? '' : 's'}`;
+        }
+        return `hace ${Math.floor(seconds)} segundo${Math.floor(seconds) === 1 ? '' : 's'}`;
+    }
+
     const fetchAnuncios = async () => {
         if (isLoading.current) return;
         isLoading.current = true;
@@ -190,6 +217,31 @@ const Board: React.FC = () => {
         }
     };
 
+    const getRankIconUrl = (range) => {
+        switch (range) {
+            case 'Hierro':
+                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/iron.png';
+            case 'Bronce':
+                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/bronze.png';
+            case 'Plata':
+                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/silver.png';
+            case 'Oro':
+                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/gold.png';
+            case 'Platino':
+                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/platinum.png';
+            case 'Diamante':
+                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/diamond.png';
+            case 'Master':
+                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/master.png';
+            case 'Grandmaster':
+                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/grandmaster.png';
+            case 'Challenger':
+                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/challenger.png';
+            default:
+                return ''; // URL por defecto o vacía si el rango no tiene un icono definido
+        }
+    };
+
     const handleDelete = async (id: number) => {
         if (!currentUser || !currentUser.uid) {
             console.error('Error: No hay usuario autenticado.');
@@ -221,7 +273,7 @@ const Board: React.FC = () => {
                 <div style={{flex: 1}}>
                     <div className="row align-items-center">
                         <div className="col-auto">
-                            <div className="mb-3">
+                            <div className="mt-5">
                                 <div className="icon-container">
                                     <img className={`role-icon all ${selectedRole === null ? 'selected' : ''}`}
                                          src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-fill.png"
@@ -259,7 +311,7 @@ const Board: React.FC = () => {
                             </div>
                         </div>
                         <div className="col-auto">
-                            <div className="mb-3">
+                            <div className="mt-5">
                                 <div className="icon-container">
                                     <img className={`range-icon hierro ${selectedRange === 'Hierro' ? 'selected' : ''}`}
                                          src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/iron.png"
@@ -348,6 +400,7 @@ const Board: React.FC = () => {
                                         <IconProfileDisplay
                                             gameName={anuncio.riotNickname.split('#')[0]}
                                             tagLine={anuncio.riotNickname.split('#')[1]}
+                                            width="50px" height="50px" borderRadius="50%"
                                         />
                                     </div>
                                     <span className="ms-2 d-inline-block">{anuncio.riotNickname}</span>
@@ -370,11 +423,25 @@ const Board: React.FC = () => {
                                         style={{width: '30px', height: 'auto', filter: 'grayscale(100%)'}}
                                     />
                                 </td>
-                                <td className="align-middle text-center">{anuncio.rango}</td>
+                                <td className="align-middle text-center">
+                                    {anuncio.rango && (
+                                        <div style={{textAlign: 'center'}}>
+                                            <img
+                                                src={getRankIconUrl(anuncio.rango)}
+                                                alt={anuncio.rango}
+                                                title={anuncio.rango}
+                                                style={{width: '30px', height: 'auto'}}
+                                            />
+                                            <div>{anuncio.rango}</div>
+                                        </div>
+                                    )}
+                                </td>
                                 <td className="align-middle text-center">{anuncio.comentario}</td>
-                                <td className="align-middle text-center">{new Date(anuncio.createdAt).toLocaleString()}</td>
+                                <td className="align-middle text-center">
+                                    {timeSince(new Date(anuncio.createdAt))}
+                                </td>
                                 <td style={{backgroundColor: 'transparent'}}>
-                                    {currentUser && currentUser.uid === anuncio.userId ? (
+                                {currentUser && currentUser.uid === anuncio.userId ? (
                                         <div className="dropdown">
                                             <a className="text-muted" href="#" role="button"
                                                id={`dropdownMenuLink${index}`}
