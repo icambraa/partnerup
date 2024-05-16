@@ -28,4 +28,8 @@ public class UserProfileService {
         return userRepository.findByFirebaseUid(firebaseUid);
     }
 
+    public UserProfile getUserProfileByRiotNickname(String riotnickname) {
+        return userRepository.findByRiotnickname(riotnickname);
+    }
+
 }

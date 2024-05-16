@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface UserProfileRepository extends JpaRepository<UserProfile, Long> {
     UserProfile findByEmail(String email);
     UserProfile findByFirebaseUid(String firebaseUid);
+
+    UserProfile findByRiotnickname(String riotnickname);
 }

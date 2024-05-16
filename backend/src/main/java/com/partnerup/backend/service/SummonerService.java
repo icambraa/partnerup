@@ -62,11 +62,26 @@ public class SummonerService {
         }
     }
 
+    public RankInfo getRankInfo(String gameName, String tagLine) throws Exception {
+        String puuid = getPUUID(gameName, tagLine);
+        SummonerDto summoner = getSummoner(puuid);
+        LeagueEntryDto[] leagueEntries = getLeagueEntries(summoner.getId());
+
+        if (leagueEntries.length > 0) {
+            LeagueEntryDto leagueEntry = leagueEntries[0];
+            String tier = leagueEntry.getTier();
+            String rank = leagueEntry.getRank();
+            int leaguePoints = leagueEntry.getLeaguePoints();
+            return new RankInfo(tier, rank, leaguePoints);
+        } else {
+            return new RankInfo("UNRANKED", "", 0);
+        }
+    }
+
     private WinRateResponse calculateWinRateDetails(LeagueEntryDto[] leagueEntries) {
         if (leagueEntries.length == 0) {
             return new WinRateResponse(0, 0, 0);
         }
-        // Suponiendo que quieres calcular el winrate de todas las entradas
         int totalWins = 0;
         int totalLosses = 0;
         for (LeagueEntryDto entry : leagueEntries) {

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.partnerup.backend.service.SummonerService;
+import com.partnerup.backend.model.RankInfo;
 
 import java.util.List;
 
@@ -46,5 +47,20 @@ public class SummonerController {
     @Cacheable(value = "lastGamesCache", key = "#gameName.concat('-').concat(#tagLine).concat('-').concat(#count)")
     public List<MatchStatDto> getLastGames(@RequestParam String gameName, @RequestParam String tagLine, @RequestParam int count) {
         return summonerService.getLastMatchStats(gameName, tagLine, count);
+    }
+
+    @GetMapping("/summoner/rankinfo")
+    @Cacheable(value = "rankInfoCache", key = "#gameName.concat('-').concat(#tagLine)")
+    public ResponseEntity<?> getSummonerRankInfo(@RequestParam String gameName, @RequestParam String tagLine) {
+        try {
+            RankInfo rankInfo = summonerService.getRankInfo(gameName, tagLine);
+            if (rankInfo != null) {
+                return ResponseEntity.ok(rankInfo);
+            } else {
+                return ResponseEntity.notFound().build(); // Devolvemos 404 si no se encuentra información de rango
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error processing request: " + e.getMessage());
+        }
     }
 }

@@ -1,15 +1,22 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../firebase-auth';
+import { Spinner } from 'react-bootstrap';
 
 interface AuthContextType {
     currentUser: User | null;
     loading: boolean;
 }
 
-const AuthContext = createContext<AuthContextType>({ currentUser: null, loading: true });
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (context === undefined) {
+        throw new Error('useAuth must be used within an AuthProvider');
+    }
+    return context;
+};
 
 type AuthProviderProps = {
     children: React.ReactNode;
@@ -25,11 +32,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setLoading(false);
         });
 
-        return unsubscribe;
+        return () => unsubscribe();
     }, []);
 
     if (loading) {
-        return <div>Cargando...</div>;
+        return (
+            <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+                <Spinner animation="border" role="status">
+                    <span className="sr-only">Cargando...</span>
+                </Spinner>
+            </div>
+        );
     }
 
     return (

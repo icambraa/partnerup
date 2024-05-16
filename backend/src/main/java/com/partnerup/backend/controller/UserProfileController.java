@@ -37,4 +37,10 @@ public class UserProfileController {
         return userProfile != null ? ResponseEntity.ok(userProfile) : ResponseEntity.notFound().build();
     }
 
+    @GetMapping("/by-riotnickname")
+    public ResponseEntity<UserProfile> getUserProfileByRiotnickname(@RequestParam String riotnickname) {
+        UserProfile userProfile = profileService.getUserProfileByRiotNickname(riotnickname);
+        return userProfile != null ? ResponseEntity.ok(userProfile) : ResponseEntity.notFound().build();
+    }
+
 }

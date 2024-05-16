@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState, FormEvent } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import logo from '../../assets/logo2-rojo-blanco.png';
 import { auth } from '../../firebase-auth.ts';
 import { useAuth } from '../../contexts/AuthContext';
@@ -23,6 +23,8 @@ const Navbar: React.FC = () => {
     const [showModal, setShowModal] = useState(false);
     const [hoveredMessageId, setHoveredMessageId] = useState<number | null>(null);
     const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
+    const [searchTermLeft, setSearchTermLeft] = useState('');
+    const [searchTermRight, setSearchTermRight] = useState('');
 
     const handleOpenMessage = (message: Message) => {
         setSelectedMessage(message);
@@ -79,14 +81,12 @@ const Navbar: React.FC = () => {
             const response = await fetch(`http://localhost:8080/api/mensajes/unread?userId=${userId}`);
             if (response.ok) {
                 const data = await response.json();
-                // Ordenar los mensajes de forma descendente por la fecha de creación para que los más nuevos aparezcan primero
                 const sortedMessages = data.sort((a: Message, b: Message) => {
                     const dateA = new Date(a.createdAt).getTime();
                     const dateB = new Date(b.createdAt).getTime();
                     return dateB - dateA;
                 });
                 setUnreadMessages(sortedMessages);
-                // Fetch profiles for each message sender
                 const profileFetches = data.map((message: Message) => fetchUserProfileByFirebaseUid(message.senderId));
                 const profiles = await Promise.all(profileFetches);
                 const newProfiles = profiles.reduce((acc, profile, index) => {
@@ -142,7 +142,6 @@ const Navbar: React.FC = () => {
             if (!response.ok) {
                 throw new Error('Failed to mark message as read');
             }
-            // Actualiza el estado de unreadMessages para marcar el mensaje como leído
             setUnreadMessages(prevMessages =>
                 prevMessages.map(message =>
                     message.id === messageId ? { ...message, read: true } : message
@@ -165,10 +164,9 @@ const Navbar: React.FC = () => {
             if (!response.ok) {
                 throw new Error('Failed to delete message');
             }
-            // Actualiza la lista de mensajes después de eliminar uno
             const updatedMessages = unreadMessages.map(message => {
                 if (message.id === messageId) {
-                    return { ...message, slideOut: true }; // Agrega la propiedad slideOut al mensaje eliminado
+                    return { ...message, slideOut: true };
                 }
                 return message;
             });
@@ -176,13 +174,12 @@ const Navbar: React.FC = () => {
             setTimeout(() => {
                 const remainingMessages = unreadMessages.filter(message => message.id !== messageId);
                 setUnreadMessages(remainingMessages);
-            }, 500); // Espera 0.5 segundos (duración de la animación) antes de eliminar el mensaje del estado
+            }, 500);
         } catch (error) {
             console.error('Error deleting message:', error);
         }
     };
 
-    // Función para ordenar y agrupar los mensajes
     const getSortedMessages = () => {
         const unread = unreadMessages.filter(message => !message.read);
         const read = unreadMessages.filter(message => message.read);
@@ -193,6 +190,20 @@ const Navbar: React.FC = () => {
         ];
     };
 
+    const handleSearchLeftChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTermLeft(event.target.value);
+    };
+
+    const handleSearchRightChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTermRight(event.target.value);
+    };
+
+    const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const searchTerm = `${searchTermLeft}#${searchTermRight}`;
+        navigate(`/profile/${encodeURIComponent(searchTerm)}`);
+    };
+
     return (
         <section className="vw-100">
             <nav className="navbar navbar-expand-sm navbar-dark bg-dark fixed-top">
@@ -200,8 +211,24 @@ const Navbar: React.FC = () => {
                     <a className="navbar-brand" href="/board">
                         <img src={logo} alt="Logo" style={{ maxWidth: '100px' }} />
                     </a>
-                    <form className="d-flex align-items-center">
-                        <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
+                    <form className="d-flex align-items-center search-form" onSubmit={handleSearchSubmit}>
+                        <input
+                            className="form-control search-input"
+                            type="search"
+                            placeholder="Nickname"
+                            aria-label="Izquierda"
+                            value={searchTermLeft}
+                            onChange={handleSearchLeftChange}
+                        />
+                        <span className="search-hash">#</span>
+                        <input
+                            className="form-control search-input"
+                            type="search"
+                            placeholder="#Tag"
+                            aria-label="Derecha"
+                            value={searchTermRight}
+                            onChange={handleSearchRightChange}
+                        />
                         <button className="btn btn-outline-light" type="submit">
                             <i className="bi bi-search"></i>
                         </button>
@@ -257,6 +284,10 @@ const Navbar: React.FC = () => {
                         const userProfile = userProfiles[message.senderId];
                         const riotNickname = userProfile ? userProfile.riotnickname : 'Loading...';
 
+                        const messageTextPreview = message.messageText.length > 20
+                            ? `${message.messageText.substring(0, 20)}...`
+                            : message.messageText;
+
                         return (
                             <li key={index}
                                 className={`p-3 mb-3 message ${message.slideOut ? 'slideOutAnimation' : ''} ${message.id === hoveredMessageId ? 'hovered' : ''} ${message.read ? 'readMessage' : ''}`}
@@ -297,6 +328,7 @@ const Navbar: React.FC = () => {
                                     </div>
                                     <div style={{
                                         marginLeft: '10px',
+                                        marginRight: '10px',
                                         display: 'flex',
                                         flexDirection: 'column',
                                         justifyContent: 'center'
@@ -305,8 +337,10 @@ const Navbar: React.FC = () => {
                                             margin: '0',
                                             fontWeight: 'bold',
                                             color: '#f8f9fa'
-                                        }}>{riotNickname}</p>
-                                        <p style={{ margin: '0', color: '#ced4da' }}>{message.messageText}</p>
+                                        }}><Link to={`/profile/${encodeURIComponent(riotNickname)}`} className="fs-6">
+                                            {riotNickname.split('#')[0]}
+                                        </Link></p>
+                                        <p style={{ margin: '0', color: '#ced4da' }}>{messageTextPreview}</p>
                                     </div>
                                 </div>
                             </li>

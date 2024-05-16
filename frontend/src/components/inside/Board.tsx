@@ -5,6 +5,8 @@ import { useAuth } from '../../contexts/AuthContext.tsx';
 import { Anuncio } from '../../interfaces/AnuncioInterface.tsx';
 import WinRateDisplay from './WinRateDisplay';
 import IconProfileDisplay from "./IconProfileDisplay";
+import RankInfoDisplay from './RankInfoDisplay';
+import { Link } from 'react-router-dom';
 
 
 
@@ -385,7 +387,7 @@ const Board: React.FC = () => {
                             <th className="text-center winrate">Winrate</th>
                             <th className="text-center">Rol</th>
                             <th className="text-center">Busco rol</th>
-                            <th className="text-center">Rango</th>
+                            <th className="text-center">Busco rango</th>
                             <th className="text-center">Comentario</th>
                             <th className="text-center">Fecha de creación</th>
                         </tr>
@@ -406,14 +408,24 @@ const Board: React.FC = () => {
                                     )}
                                 </td>
                                 <td className="align-middle">
-                                    <div className="d-inline-block ms-3">
+                                    <div className="d-inline-block d-flex align-items-center">
                                         <IconProfileDisplay
                                             gameName={anuncio.riotNickname.split('#')[0]}
                                             tagLine={anuncio.riotNickname.split('#')[1]}
                                             width="50px" height="50px" borderRadius="50%"
                                         />
+                                        <div className="ms-3">
+                                            <Link to={`/profile/${encodeURIComponent(anuncio.riotNickname)}`} className="fs-5">
+                                                {anuncio.riotNickname}
+                                            </Link>
+                                            <div className="extra-small text-muted">
+                                                <RankInfoDisplay
+                                                    gameName={anuncio.riotNickname.split('#')[0]}
+                                                    tagLine={anuncio.riotNickname.split('#')[1]}
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
-                                    <span className="ms-2 d-inline-block">{anuncio.riotNickname}</span>
                                 </td>
                                 <td className="align-middle text-center">
                                     <WinRateDisplay

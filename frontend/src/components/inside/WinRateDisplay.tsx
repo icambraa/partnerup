@@ -55,10 +55,10 @@ const WinRateDisplay: React.FC<WinRateDisplayProps> = ({ gameName, tagLine }) =>
 
     const barStyle = (winRate: number): CSSProperties => ({
         position: 'absolute',
-        width: `${winRate}%`,
+        width: winRate > 0 ? `${winRate}%` : '100%',
         height: '100%',
-        backgroundColor: '#007bff',
-        borderRadius: '4px 0 0 4px'
+        backgroundColor: winRate > 0 ? '#007bff' : 'gray',
+        borderRadius: winRate > 0 ? '4px 0 0 4px' : '4px'
     });
 
     const textStyle: CSSProperties = {
@@ -77,13 +77,13 @@ const WinRateDisplay: React.FC<WinRateDisplayProps> = ({ gameName, tagLine }) =>
 
     const winRateTextStyle: CSSProperties = {
         marginTop: '3px',
-        color: '#000',
+        color: winRateData && winRateData.winRate > 0 ? '#000' : '#dc3545',
         fontSize: '0.8em'
     };
 
     return (
         <div style={containerStyle}>
-            <div style={{ width: '70%', margin: '0 auto' }}>
+            <div style={{width: '70%', margin: '0 auto'}}>
                 {error ? (
                     <div>{error}</div>
                 ) : winRateData !== null ? (
@@ -91,12 +91,12 @@ const WinRateDisplay: React.FC<WinRateDisplayProps> = ({ gameName, tagLine }) =>
                         <div style={barContainerStyle}>
                             <div style={barStyle(winRateData.winRate)}></div>
                             <div style={textStyle}>
-                                <span style={{ textAlign: 'left' }}>{winRateData.wins}W</span>
-                                <span style={{ textAlign: 'right' }}>{winRateData.losses}L</span>
+                                <span style={{textAlign: 'left'}}>{winRateData.wins}W</span>
+                                <span style={{textAlign: 'right'}}>{winRateData.losses}L</span>
                             </div>
                         </div>
                         <div style={winRateTextStyle}>
-                            {Math.round(winRateData.winRate)}%
+                            {winRateData.winRate > 0 ? Math.round(winRateData.winRate) + '%' : 'No hay partidas'}
                         </div>
                     </>
                 ) : (

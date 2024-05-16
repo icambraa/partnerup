@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { UserProfile } from '../../interfaces/UserProfileInterface';
+import { UserProfile as UserProfileInterface } from '../../interfaces/UserProfileInterface';
 import { MatchStat } from '../../interfaces/MatchStatInterface';
 import WinRateDisplayCircle from './WinRateDisplayCircle';
 import IconProfileDisplay from './IconProfileDisplay';
@@ -8,7 +8,7 @@ import { Card, Spinner, Alert, Container, Row, Col, Table } from 'react-bootstra
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './UserProfileStyles.css';
 
-const fetchUserProfile = async (email: string | number | boolean) => {
+const fetchUserProfile = async (email: string) => {
     const response = await fetch(`http://localhost:8080/api/profiles/by-email?email=${encodeURIComponent(email)}`);
     if (!response.ok) {
         throw new Error('Failed to fetch user profile');
@@ -16,7 +16,7 @@ const fetchUserProfile = async (email: string | number | boolean) => {
     return response.json();
 };
 
-const fetchMatchStats = async (gameName: string | number | boolean, tagLine: string | number | boolean, count: number) => {
+const fetchMatchStats = async (gameName: string, tagLine: string, count: number) => {
     const response = await fetch(`http://localhost:8080/lastgames?gameName=${encodeURIComponent(gameName)}&tagLine=${encodeURIComponent(tagLine)}&count=${count}`);
     if (!response.ok) {
         throw new Error('Failed to fetch match stats');
@@ -24,41 +24,53 @@ const fetchMatchStats = async (gameName: string | number | boolean, tagLine: str
     return response.json();
 };
 
-const UserProfileComponent: React.FC = () => {
+interface UserProfileComponentProps {
+    riotnickname?: string;
+}
+
+const UserProfileComponent: React.FC<UserProfileComponentProps> = ({ riotnickname }) => {
     const { currentUser } = useAuth();
-    const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+    const [userProfile, setUserProfile] = useState<UserProfileInterface | null>(null);
     const [matchStats, setMatchStats] = useState<MatchStat[]>([]);
     const [error, setError] = useState<string>('');
+    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
         const loadUserProfile = async () => {
+            setLoading(true);
             try {
-                if (currentUser && currentUser.email) {
+                if (riotnickname) {
+                    // Si se proporciona un riotnickname, creamos un perfil temporal.
+                    setUserProfile({ riotnickname } as UserProfileInterface);
+                } else if (currentUser?.email) {
                     const data = await fetchUserProfile(currentUser.email);
                     setUserProfile(data);
                 }
-            } catch (error) {
+            } catch (error: any) {
                 console.error('Error fetching user data:', error);
-                // @ts-ignore
                 setError(error.message);
+            } finally {
+                setLoading(false);
             }
         };
 
         loadUserProfile();
-    }, [currentUser]);
+    }, [currentUser, riotnickname]);
 
     useEffect(() => {
         const loadMatchStats = async () => {
-            try {
-                if (userProfile) {
+            if (userProfile?.riotnickname) {
+                setLoading(true);
+                try {
                     const [gameName, tagLine] = userProfile.riotnickname.split('#');
                     const data = await fetchMatchStats(gameName, tagLine, 10);
                     setMatchStats(data);
+                } catch (error: any) {
+                    console.error('Error fetching match stats:', error);
+                    setError(error.message);
+                } finally {
+                    setLoading(false);
                 }
-            } catch (error) {
-                console.error('Error fetching match stats:', error);
-                // @ts-ignore
-                setError(error.message);
             }
         };
 
@@ -69,8 +81,12 @@ const UserProfileComponent: React.FC = () => {
         return <Alert variant="danger">Error: {error}</Alert>;
     }
 
-    if (!userProfile) {
+    if (loading) {
         return <Spinner animation="border" role="status"><span className="sr-only">Loading...</span></Spinner>;
+    }
+
+    if (!userProfile) {
+        return null;
     }
 
     const [gameName, tagLine] = userProfile.riotnickname.split('#');
@@ -83,7 +99,7 @@ const UserProfileComponent: React.FC = () => {
         <Container className="custom-margin-top">
             <Card>
                 <Card.Header>
-                    <h2>{userProfile.nombreusuario}</h2>
+                    <h2>{userProfile.nombreusuario || 'User Profile'}</h2>
                 </Card.Header>
                 <Card.Body>
                     <Row>
@@ -99,30 +115,29 @@ const UserProfileComponent: React.FC = () => {
                                     <WinRateDisplayCircle gameName={gameName} tagLine={tagLine} />
                                 </Col>
                             </Row>
-                            <Row className="mb-3 mt-4 ">
+                            <Row className="mb-3 mt-4">
                                 <Col>
-                                    <p><strong>Email:</strong> {userProfile.email}</p>
-                                    <p><strong>Rango Actual:</strong> {userProfile.rangoactual}</p>
-                                    <p><strong>Rol Principal:</strong> {userProfile.rolprincipal}</p>
-                                    <p><strong>Región:</strong> {userProfile.region}</p>
+                                    {userProfile.email && <p><strong>Email:</strong> {userProfile.email}</p>}
+                                    {userProfile.rangoactual && <p><strong>Rango Actual:</strong> {userProfile.rangoactual}</p>}
+                                    {userProfile.rolprincipal && <p><strong>Rol Principal:</strong> {userProfile.rolprincipal}</p>}
+                                    {userProfile.region && <p><strong>Región:</strong> {userProfile.region}</p>}
                                 </Col>
                             </Row>
                         </Col>
-                        <Col lg={7} >
+                        <Col lg={7}>
                             {matchStats.length === 0 ? (
                                 <Spinner animation="border" role="status"><span className="sr-only">Loading...</span></Spinner>
                             ) : (
                                 <Table className="custom-table" bordered hover>
                                     <thead>
                                     <tr>
-
                                     </tr>
                                     </thead>
                                     <tbody>
                                     {matchStats.map((stat) => (
                                         <tr key={stat.matchId} className="row-shadow">
                                             <td className={stat.win ? 'victory-cell' : 'defeat-cell'}>
-                                                <div style={{display: 'flex', alignItems: 'center'}}>
+                                                <div style={{ display: 'flex', alignItems: 'center' }}>
                                                     <img
                                                         src={getChampionImageUrl(stat.championName)}
                                                         alt={stat.championName}
@@ -138,8 +153,8 @@ const UserProfileComponent: React.FC = () => {
                                                         fontSize: '1.2em',
                                                         fontWeight: 'bold'
                                                     }}>
-                                                        {stat.win ? 'Victoria' : 'Derrota'}
-                                                    </span>
+                                                            {stat.win ? 'Victoria' : 'Derrota'}
+                                                        </span>
                                                     <div className="kda-text">
                                                         {`${stat.kills}/${stat.deaths}/${stat.assists}`}
                                                         <div className="kd-text">{`KD: ${stat.kd.toFixed(2)}`}</div>
