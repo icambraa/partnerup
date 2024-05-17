@@ -1,6 +1,6 @@
 package com.partnerup.backend.controller;
 
-import com.partnerup.backend.model.MatchStatDto;
+import com.partnerup.backend.model.MatchDetailsDto;
 import com.partnerup.backend.model.WinRateResponse;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +45,13 @@ public class SummonerController {
 
     @GetMapping("/lastgames")
     @Cacheable(value = "lastGamesCache", key = "#gameName.concat('-').concat(#tagLine).concat('-').concat(#count)")
-    public List<MatchStatDto> getLastGames(@RequestParam String gameName, @RequestParam String tagLine, @RequestParam int count) {
-        return summonerService.getLastMatchStats(gameName, tagLine, count);
+    public ResponseEntity<?> getLastGames(@RequestParam String gameName, @RequestParam String tagLine, @RequestParam int count) {
+        try {
+            List<MatchDetailsDto> matchDetailsList = summonerService.getLastMatchDetails(gameName, tagLine, count);
+            return ResponseEntity.ok().body(matchDetailsList);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error processing request: " + e.getMessage());
+        }
     }
 
     @GetMapping("/summoner/rankinfo")
@@ -59,6 +64,17 @@ public class SummonerController {
             } else {
                 return ResponseEntity.notFound().build();
             }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error processing request: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/summoner/riotnickname")
+    @Cacheable(value = "riotNicknameCache", key = "#gameName.concat('-').concat(#tagLine)")
+    public ResponseEntity<?> getSummonerRiotNickname(@RequestParam String puuid) {
+        try {
+            String riotNickname = summonerService.getRiotNicknameByPUUID(puuid);
+            return ResponseEntity.ok(riotNickname);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error processing request: " + e.getMessage());
         }

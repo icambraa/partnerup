@@ -31,6 +31,18 @@ public class SummonerService {
         return calculateWinRateDetails(leagueEntries);
     }
 
+    public String getRiotNicknameByPUUID(String puuid) {
+        String url = String.format("https://europe.api.riotgames.com/riot/account/v1/accounts/by-puuid/%s?api_key=%s", puuid, apiKey);
+        try {
+            ResponseEntity<AccountDto> response = restTemplate.getForEntity(url, AccountDto.class);
+            AccountDto accountDto = response.getBody();
+            return accountDto.getGameName() + " " + accountDto.getTagLine();
+        } catch (Exception e) {
+            throw new RuntimeException("Error fetching Riot nickname: " + e.getMessage());
+        }
+    }
+
+
     private String getPUUID(String gameName, String tagLine) {
         String url = String.format("https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/%s/%s?api_key=%s",
                 gameName, tagLine, apiKey);
@@ -100,7 +112,6 @@ public class SummonerService {
         return profileIconBaseUrl + profileIconId + ".png";
     }
 
-
     public List<String> getLastMatchIds(String puuid, int start, int count) {
         String url = String.format("https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/%s/ids?start=%d&count=%d&api_key=%s",
                 puuid, start, count, apiKey);
@@ -123,36 +134,16 @@ public class SummonerService {
         }
     }
 
-    public List<MatchStatDto> getLastMatchStats(String gameName, String tagLine, int count) {
+    public List<MatchDetailsDto> getLastMatchDetails(String gameName, String tagLine, int count) {
         String puuid = getPUUID(gameName, tagLine);
         List<String> matchIds = getLastMatchIds(puuid, 0, count);
-        List<MatchStatDto> matchStats = new ArrayList<>();
+        List<MatchDetailsDto> matchDetailsList = new ArrayList<>();
 
         for (String matchId : matchIds) {
             MatchDetailsDto matchDetails = getMatchDetails(matchId);
-            MatchStatDto matchStat = new MatchStatDto();
-            matchStat.setMatchId(matchId);
-            matchStat.setGameDuration(matchDetails.getInfo().getGameDuration());
-
-            for (MatchDetailsDto.Info.Participant participant : matchDetails.getInfo().getParticipants()) {
-                if (participant.getPuuid().equals(puuid)) {
-                    matchStat.setChampionName(participant.getChampionName());
-                    matchStat.setKills(participant.getKills());
-                    matchStat.setDeaths(participant.getDeaths());
-                    matchStat.setAssists(participant.getAssists());
-                    matchStat.setWin(participant.isWin());
-
-                    // Calcular el KD (Kills / Deaths)
-                    double kd = participant.getDeaths() == 0 ? participant.getKills() : (double) participant.getKills() / participant.getDeaths();
-                    matchStat.setKd(kd);
-
-                    break;
-                }
-            }
-
-            matchStats.add(matchStat);
+            matchDetailsList.add(matchDetails);
         }
 
-        return matchStats;
+        return matchDetailsList;
     }
 }

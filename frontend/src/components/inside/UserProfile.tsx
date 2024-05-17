@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { UserProfile as UserProfileInterface } from '../../interfaces/UserProfileInterface';
-import { MatchStat } from '../../interfaces/MatchStatInterface';
+import { MatchDetails } from '../../interfaces/MatchDetailsInterface';
 import WinRateDisplayCircle from './WinRateDisplayCircle';
 import IconProfileDisplay from './IconProfileDisplay';
 import { Card, Spinner, Alert, Container, Row, Col, Table } from 'react-bootstrap';
@@ -31,7 +31,7 @@ interface UserProfileComponentProps {
 const UserProfileComponent: React.FC<UserProfileComponentProps> = ({ riotnickname }) => {
     const { currentUser } = useAuth();
     const [userProfile, setUserProfile] = useState<UserProfileInterface | null>(null);
-    const [matchStats, setMatchStats] = useState<MatchStat[]>([]);
+    const [matchStats, setMatchStats] = useState<MatchDetails[]>([]);
     const [error, setError] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(true);
 
@@ -77,6 +77,7 @@ const UserProfileComponent: React.FC<UserProfileComponentProps> = ({ riotnicknam
         loadMatchStats();
     }, [userProfile]);
 
+
     if (error) {
         return <Alert variant="danger">Error: {error}</Alert>;
     }
@@ -101,6 +102,7 @@ const UserProfileComponent: React.FC<UserProfileComponentProps> = ({ riotnicknam
     };
 
 
+    // @ts-ignore
     return (
         <Container className="custom-margin-top">
             <Card>
@@ -137,16 +139,17 @@ const UserProfileComponent: React.FC<UserProfileComponentProps> = ({ riotnicknam
                                 <Table className="custom-table" bordered hover>
                                     <thead>
                                     <tr>
+                                        {/* Aquí puedes agregar tus encabezados de tabla si los tienes */}
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    {matchStats.map((stat) => (
-                                        <tr key={stat.matchId} className="row-shadow">
-                                            <td className={stat.win ? 'victory-cell' : 'defeat-cell'}>
+                                    {matchStats.map((match) => (
+                                        <tr key={match.metadata.matchId} className="row-shadow">
+                                            <td className={match.info.participants.some(p => p.win) ? 'victory-cell' : 'defeat-cell'}>
                                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                                     <img
-                                                        src={getChampionImageUrl(stat.championName)}
-                                                        alt={stat.championName}
+                                                        src={getChampionImageUrl(match.info.participants[0].championName)}
+                                                        alt={match.info.participants[0].championName}
                                                         style={{
                                                             width: '70px',
                                                             height: '70px',
@@ -155,24 +158,30 @@ const UserProfileComponent: React.FC<UserProfileComponentProps> = ({ riotnicknam
                                                         }}
                                                     />
                                                     <span style={{
-                                                        color: stat.win ? '#007bff' : '#dc3545',
+                                                        color: match.info.participants.some(p => p.win) ? '#007bff' : '#dc3545',
                                                         fontSize: '1.2em',
                                                         fontWeight: 'bold'
                                                     }}>
-                                                            {stat.win ? 'Victoria' : 'Derrota'}
-                                                        </span>
+                            {match.info.participants.some(p => p.win) ? 'Victoria' : 'Derrota'}
+                        </span>
                                                     <div className="kda-text">
-                                                        {`${stat.kills}/${stat.deaths}/${stat.assists}`}
-                                                        <div className="kd-text">{`KD: ${stat.kd.toFixed(2)}`}</div>
+                                                        {`${match.info.participants[0].kills}/${match.info.participants[0].deaths}/${match.info.participants[0].assists}`}
+                                                        <div className="kd-text">{`KD: ${(match.info.participants[0].kills / match.info.participants[0].deaths).toFixed(2)}`}</div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className={`stat-cell ${stat.win ? 'victory-cell' : 'defeat-cell'}`}>
+                                            <td className={match.info.participants.some(p => p.win) ? 'victory-cell' : 'defeat-cell'}>
+                                                <ul>
+                                                    {match.info.participants.map((participant, index) => (
+                                                        <li key={index}>{participant.puuid}</li>), {/* Aquí se muestra el identificador del participante */}
+                                                    )}
+                                                </ul>
                                             </td>
                                         </tr>
                                     ))}
                                     </tbody>
                                 </Table>
+
                             )}
                         </Col>
                     </Row>
