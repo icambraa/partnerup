@@ -7,7 +7,6 @@ import WinRateDisplay from './WinRateDisplay';
 import IconProfileDisplay from "./IconProfileDisplay";
 import RankInfoDisplay from './RankInfoDisplay';
 import { Link } from 'react-router-dom';
-import backgroundImage from '../../assets/vecteezy_red-and-white-background-design-flat-and-minimalist_.jpg';
 
 
 
@@ -24,7 +23,7 @@ const Board: React.FC = () => {
 
     const [messageText, setMessageText] = useState('');
 
-    const handleMessageChange = (e) => {
+    const handleMessageChange = (e: { target: { value: React.SetStateAction<string>; }; }) => {
         setMessageText(e.target.value);
     };
 
@@ -68,7 +67,7 @@ const Board: React.FC = () => {
     }, [currentPage, filterData, pageSize]);
 
 
-    const handleMessageSubmit = async (e) => {
+    const handleMessageSubmit = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
         if (!currentUser || !selectedAnuncio) {
             console.error('Authentication error or no announcement selected');
@@ -102,7 +101,8 @@ const Board: React.FC = () => {
         }
     };
 
-    function timeSince(date) {
+    function timeSince(date: number | Date) {
+        // @ts-ignore
         const seconds = Math.floor((new Date() - date) / 1000);
 
         let interval = Math.floor(seconds / 31536000);
@@ -220,7 +220,7 @@ const Board: React.FC = () => {
         }
     };
 
-    const getRankIconUrl = (range) => {
+    const getRankIconUrl = (range: string) => {
         switch (range) {
             case 'Hierro':
                 return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/iron.png';
@@ -241,7 +241,7 @@ const Board: React.FC = () => {
             case 'Challenger':
                 return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/challenger.png';
             default:
-                return ''; // URL por defecto o vacía si el rango no tiene un icono definido
+                return '';
         }
     };
 

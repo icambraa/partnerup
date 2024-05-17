@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { UserProfile as UserProfileInterface } from '../../interfaces/UserProfileInterface';
-import { MatchDetails, Participant } from '../../interfaces/MatchDetailsInterface'; // Importa correctamente las interfaces
+import { MatchDetails, Participant } from '../../interfaces/MatchDetailsInterface';
 import WinRateDisplayCircle from './WinRateDisplayCircle';
 import IconProfileDisplay from './IconProfileDisplay';
+import RankInfoDisplay, { RankInfo } from './RankInfoDisplay'; // Importa RankInfo
 import { Card, Spinner, Alert, Container, Row, Col, Table } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './UserProfileStyles.css';
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
+import { getRankIconUrl } from '../../utils/rankUtils';
 
 const fetchUserProfile = async (email: string) => {
     const response = await fetch(`http://localhost:8080/api/profiles/by-email?email=${encodeURIComponent(email)}`);
@@ -35,6 +37,9 @@ const UserProfileComponent: React.FC<UserProfileComponentProps> = ({ riotnicknam
     const [matchStats, setMatchStats] = useState<MatchDetails[]>([]);
     const [error, setError] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(true);
+    const [rankInfo, setRankInfo] = useState<RankInfo | null>(null);
+
+    const rankIconUrl = rankInfo ? getRankIconUrl(rankInfo.tier) : '';
 
     useEffect(() => {
         const loadUserProfile = async () => {
@@ -107,31 +112,63 @@ const UserProfileComponent: React.FC<UserProfileComponentProps> = ({ riotnicknam
         return `https://ddragon.leagueoflegends.com/cdn/14.10.1/img/champion/${championName}.png`;
     };
 
+    console.log("Rango actual del usuario:", userProfile.rangoactual);
+
     return (
         <Container className="custom-margin-top">
-            <Card>
+            <Card className="custom-card">
                 <Card.Header>
                     <h2>{userProfile.nombreusuario || 'User Profile'}</h2>
                 </Card.Header>
                 <Card.Body>
                     <Row>
                         <Col lg={5}>
-                            <Row className="mt-3 align-items-start justify-content-center">
-                                <Col md="auto">
-                                    <IconProfileDisplay gameName={gameName} tagLine={tagLine} width="130px" height="130px" borderRadius="10%" />
-                                </Col>
-                                <Col md="auto" className="nickname-container">
-                                    <h4 className="nickname-text">{userProfile.riotnickname}</h4>
-                                </Col>
-                                <Col md="auto">
-                                    <WinRateDisplayCircle gameName={gameName} tagLine={tagLine} />
-                                </Col>
-                            </Row>
+                            <div className="profile-info-container">
+                                <Row className="align-items-center">
+                                    <Col md="auto" className="image-container">
+                                        <IconProfileDisplay
+                                            gameName={gameName}
+                                            tagLine={tagLine}
+                                            width="130px"
+                                            height="130px"
+                                            borderRadius="10%"
+                                        />
+                                    </Col>
+                                    <Col className="nickname-container">
+                                        <h5 className="nickname-text">{userProfile?.riotnickname || 'Sin apodo'}</h5>
+                                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                                            {rankIconUrl && (
+                                                <>
+                                                    <img
+                                                        src={rankIconUrl}
+                                                        alt={rankInfo?.tier}
+                                                        style={{ width: '40px', height: '40px', marginRight: '10px' }}
+                                                    />
+                                                    {console.log("URL del icono del rango:", rankIconUrl)}
+                                                </>
+                                            )}
+                                            <RankInfoDisplay
+                                                gameName={gameName}
+                                                tagLine={tagLine}
+                                                onRankInfoChange={setRankInfo}
+                                            />
+                                        </div>
+                                    </Col>
+                                    <Col md="auto" className="circle-container">
+                                        <WinRateDisplayCircle
+                                            gameName={gameName}
+                                            tagLine={tagLine}
+                                        />
+                                    </Col>
+                                </Row>
+                            </div>
                             <Row className="mb-3 mt-4">
                                 <Col>
                                     {userProfile.email && <p><strong>Email:</strong> {userProfile.email}</p>}
-                                    {userProfile.rangoactual && <p><strong>Rango Actual:</strong> {userProfile.rangoactual}</p>}
-                                    {userProfile.rolprincipal && <p><strong>Rol Principal:</strong> {userProfile.rolprincipal}</p>}
+                                    {userProfile.rangoactual &&
+                                        <p><strong>Rango Actual:</strong> {userProfile.rangoactual}</p>}
+                                    {userProfile.rolprincipal &&
+                                        <p><strong>Rol Principal:</strong> {userProfile.rolprincipal}</p>}
                                     {userProfile.region && <p><strong>Región:</strong> {userProfile.region}</p>}
                                 </Col>
                             </Row>
@@ -179,7 +216,7 @@ const UserProfileComponent: React.FC<UserProfileComponentProps> = ({ riotnicknam
                                                         <div className="kda-text">
                                                             {`${userParticipant?.kills || 0}/${userParticipant?.deaths || 0}/${userParticipant?.assists || 0}`}
                                                             <div
-                                                                className="kd-text">{`KD: ${(userParticipant?.kills ?? 0 / (userParticipant?.deaths || 1)).toFixed(2)}`}</div>
+                                                                className="kd-text">{`KD: ${userParticipant?.kills && userParticipant?.deaths !== 0 ? (userParticipant.kills / userParticipant.deaths).toFixed(2) : 'Infinity'}`}</div>
                                                         </div>
                                                     </div>
                                                 </td>

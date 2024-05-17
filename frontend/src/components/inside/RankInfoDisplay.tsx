@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react';
 
-type RankInfoDisplayProps = {
-    gameName: string;
-    tagLine: string;
-    applyColor?: boolean; // Nueva prop opcional
-};
-
-type RankInfo = {
+export type RankInfo = {
     tier: string;
     rank: string;
     leaguePoints: number;
 };
 
-const RankInfoDisplay: React.FC<RankInfoDisplayProps> = ({ gameName, tagLine, applyColor = true }) => {
+type RankInfoDisplayProps = {
+    gameName: string;
+    tagLine: string;
+    applyColor?: boolean;
+    onRankInfoChange?: (rankInfo: RankInfo | null) => void;
+};
+
+const RankInfoDisplay: React.FC<RankInfoDisplayProps> = ({ gameName, tagLine, applyColor = true, onRankInfoChange }) => {
     const [rankInfo, setRankInfo] = useState<RankInfo | null>(null);
     const [error, setError] = useState<string | null>(null);
 
@@ -26,10 +27,13 @@ const RankInfoDisplay: React.FC<RankInfoDisplayProps> = ({ gameName, tagLine, ap
                 const url = new URL('http://localhost:8080/summoner/rankinfo');
                 url.searchParams.append('gameName', gameName);
                 url.searchParams.append('tagLine', tagLine);
-                const response = await fetch(url);
+                const response = await fetch(url.toString());
                 if (response.ok) {
                     const data: RankInfo = await response.json();
                     setRankInfo(data);
+                    if (onRankInfoChange) {
+                        onRankInfoChange(data);
+                    }
                 } else {
                     throw new Error('Failed to fetch rank info');
                 }
@@ -40,7 +44,7 @@ const RankInfoDisplay: React.FC<RankInfoDisplayProps> = ({ gameName, tagLine, ap
         };
 
         fetchRankInfo();
-    }, [gameName, tagLine]);
+    }, [gameName, tagLine, onRankInfoChange]);
 
     const getRankColor = (tier: string) => {
         switch (tier) {
@@ -69,20 +73,17 @@ const RankInfoDisplay: React.FC<RankInfoDisplayProps> = ({ gameName, tagLine, ap
         return <div>{error}</div>;
     }
 
-    if (!rankInfo) {
-        return <div>Cargando...</div>;
+    if (!rankInfo || !rankInfo.tier || rankInfo.tier === "UNRANKED") {
+        return <div style={{ fontWeight: 'bold' }}>UNRANKED</div>;
     }
 
     const rankColor = getRankColor(rankInfo.tier);
-    const style = applyColor ? { color: rankColor } : {};
+    const rankStyle = applyColor ? { color: rankColor, fontWeight: 'bold' } : { fontWeight: 'bold' };
+    const lpStyle = { fontWeight: 'normal' };
 
     return (
-        <div style={style}>
-            {rankInfo.tier === "UNRANKED" ? (
-                <div>UNRANKED</div>
-            ) : (
-                <div>{rankInfo.tier} {rankInfo.rank} {rankInfo.leaguePoints} LP</div>
-            )}
+        <div>
+            <span style={rankStyle}>{rankInfo.tier} {rankInfo.rank}</span> <span style={lpStyle}>{rankInfo.leaguePoints} LP</span>
         </div>
     );
 };

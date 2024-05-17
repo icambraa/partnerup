@@ -6,6 +6,7 @@ type IconProfileDisplayProps = {
     width: string;
     height: string;
     borderRadius: string;
+    style?: React.CSSProperties;
 };
 
 const IconProfileDisplay: React.FC<IconProfileDisplayProps> = ({ gameName, tagLine, width, height, borderRadius }) => {
