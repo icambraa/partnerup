@@ -45,6 +45,8 @@ public class MatchDetailsDto {
             private int deaths;
             private int assists;
             private boolean win;
+            private String riotIdGameName;
+            private String riotIdTagline;
         }
     }
 

@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { UserProfile as UserProfileInterface } from '../../interfaces/UserProfileInterface';
-import { MatchDetails } from '../../interfaces/MatchDetailsInterface';
+import { MatchDetails, Participant } from '../../interfaces/MatchDetailsInterface'; // Importa correctamente las interfaces
 import WinRateDisplayCircle from './WinRateDisplayCircle';
 import IconProfileDisplay from './IconProfileDisplay';
 import { Card, Spinner, Alert, Container, Row, Col, Table } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './UserProfileStyles.css';
+import {Link} from "react-router-dom";
 
 const fetchUserProfile = async (email: string) => {
     const response = await fetch(`http://localhost:8080/api/profiles/by-email?email=${encodeURIComponent(email)}`);
@@ -40,7 +41,6 @@ const UserProfileComponent: React.FC<UserProfileComponentProps> = ({ riotnicknam
             setLoading(true);
             try {
                 if (riotnickname) {
-                    // Si se proporciona un riotnickname, creamos un perfil temporal.
                     setUserProfile({ riotnickname } as UserProfileInterface);
                 } else if (currentUser?.email) {
                     const data = await fetchUserProfile(currentUser.email);
@@ -63,8 +63,17 @@ const UserProfileComponent: React.FC<UserProfileComponentProps> = ({ riotnicknam
                 setLoading(true);
                 try {
                     const [gameName, tagLine] = userProfile.riotnickname.split('#');
-                    const data = await fetchMatchStats(gameName, tagLine, 10);
-                    setMatchStats(data);
+                    const data: MatchDetails[] = await fetchMatchStats(gameName, tagLine, 10);
+
+                    const updatedData = data.map((match: MatchDetails) => {
+                        const participantsWithNames = match.info.participants.map((participant: Participant) => {
+                            const { puuid, riotIdGameName, riotIdTagline } = participant;
+                            return { ...participant, riotIdGameName, riotIdTagline };
+                        });
+                        return { ...match, info: { ...match.info, participants: participantsWithNames } };
+                    });
+
+                    setMatchStats(updatedData);
                 } catch (error: any) {
                     console.error('Error fetching match stats:', error);
                     setError(error.message);
@@ -76,7 +85,6 @@ const UserProfileComponent: React.FC<UserProfileComponentProps> = ({ riotnicknam
 
         loadMatchStats();
     }, [userProfile]);
-
 
     if (error) {
         return <Alert variant="danger">Error: {error}</Alert>;
@@ -93,16 +101,12 @@ const UserProfileComponent: React.FC<UserProfileComponentProps> = ({ riotnicknam
     const [gameName, tagLine] = userProfile.riotnickname.split('#');
 
     const getChampionImageUrl = (championName: string) => {
-        // fiddlestick bug
         if (championName === "FiddleSticks") {
             return `https://ddragon.leagueoflegends.com/cdn/14.10.1/img/champion/Fiddlesticks.png`;
         }
-
         return `https://ddragon.leagueoflegends.com/cdn/14.10.1/img/champion/${championName}.png`;
     };
 
-
-    // @ts-ignore
     return (
         <Container className="custom-margin-top">
             <Card>
@@ -139,49 +143,119 @@ const UserProfileComponent: React.FC<UserProfileComponentProps> = ({ riotnicknam
                                 <Table className="custom-table" bordered hover>
                                     <thead>
                                     <tr>
-                                        {/* Aquí puedes agregar tus encabezados de tabla si los tienes */}
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    {matchStats.map((match) => (
-                                        <tr key={match.metadata.matchId} className="row-shadow">
-                                            <td className={match.info.participants.some(p => p.win) ? 'victory-cell' : 'defeat-cell'}>
-                                                <div style={{ display: 'flex', alignItems: 'center' }}>
-                                                    <img
-                                                        src={getChampionImageUrl(match.info.participants[0].championName)}
-                                                        alt={match.info.participants[0].championName}
-                                                        style={{
-                                                            width: '70px',
-                                                            height: '70px',
-                                                            marginRight: '10px',
-                                                            borderRadius: '10%'
-                                                        }}
-                                                    />
-                                                    <span style={{
-                                                        color: match.info.participants.some(p => p.win) ? '#007bff' : '#dc3545',
-                                                        fontSize: '1.2em',
-                                                        fontWeight: 'bold'
-                                                    }}>
-                            {match.info.participants.some(p => p.win) ? 'Victoria' : 'Derrota'}
-                        </span>
-                                                    <div className="kda-text">
-                                                        {`${match.info.participants[0].kills}/${match.info.participants[0].deaths}/${match.info.participants[0].assists}`}
-                                                        <div className="kd-text">{`KD: ${(match.info.participants[0].kills / match.info.participants[0].deaths).toFixed(2)}`}</div>
+                                    {matchStats.map((match) => {
+                                        const userParticipant = match.info.participants.find(
+                                            (p: Participant) => p.riotIdGameName === gameName && p.riotIdTagline === tagLine
+                                        );
+                                        return (
+                                            <tr key={match.metadata.matchId} className="row-shadow">
+                                                <td
+                                                    className={userParticipant?.win ? 'victory-cell' : 'defeat-cell'}
+                                                    style={{verticalAlign: 'middle'}}
+                                                >
+                                                    <div style={{display: 'flex', alignItems: 'center'}}>
+                                                        <img
+                                                            src={getChampionImageUrl(userParticipant?.championName || '')}
+                                                            alt={userParticipant?.championName || ''}
+                                                            style={{
+                                                                width: '70px',
+                                                                height: '70px',
+                                                                marginRight: '10px',
+                                                                borderRadius: '10%'
+                                                            }}
+                                                        />
+                                                        <span style={{
+                                                            color: userParticipant?.win ? '#007bff' : '#dc3545',
+                                                            fontSize: '1.2em',
+                                                            fontWeight: 'bold',
+                                                            marginBottom: '50px',
+
+                                                        }}>
+            {userParticipant?.win ? 'Victoria' : 'Derrota'}
+        </span>
+                                                        <div className="kda-text">
+                                                            {`${userParticipant?.kills || 0}/${userParticipant?.deaths || 0}/${userParticipant?.assists || 0}`}
+                                                            <div
+                                                                className="kd-text">{`KD: ${(userParticipant?.kills ?? 0 / (userParticipant?.deaths || 1)).toFixed(2)}`}</div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </td>
-                                            <td className={match.info.participants.some(p => p.win) ? 'victory-cell' : 'defeat-cell'}>
-                                                <ul>
-                                                    {match.info.participants.map((participant, index) => (
-                                                        <li key={index}>{participant.puuid}</li>), {/* Aquí se muestra el identificador del participante */}
-                                                    )}
-                                                </ul>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                                </td>
+                                                <td className={userParticipant?.win ? 'victory-cell' : 'defeat-cell'}
+                                                    style={{margin: '0', padding: '0'}}>
+                                                    <ul style={{listStyleType: 'none', margin: '0', padding: '0'}}>
+                                                        {match.info.participants.slice(0, 5).map((participant: Participant, index: number) => (
+                                                            <li key={index}
+                                                                style={{marginBottom: '1px'}}>
+                                                                <Link
+                                                                    to={`/profile/${encodeURIComponent(participant.riotIdGameName)}${encodeURIComponent('#')}${encodeURIComponent(participant.riotIdTagline)}`}
+                                                                    style={{
+                                                                        fontSize: '0.8em',
+                                                                        width: '150px',
+                                                                        whiteSpace: 'nowrap',
+                                                                        overflow: 'hidden',
+                                                                        textOverflow: 'ellipsis',
+                                                                        display: 'block',
+                                                                        padding: '0'
+                                                                    }}
+                                                                >
+                                                                    <img
+                                                                        src={getChampionImageUrl(participant.championName)}
+                                                                        alt={participant.championName}
+                                                                        style={{
+                                                                            width: '20px',
+                                                                            height: '20px',
+                                                                            marginRight: '5px'
+                                                                        }}
+                                                                    />
+                                                                    {`${participant.riotIdGameName}#${participant.riotIdTagline}`.substring(0, 10)}
+                                                                </Link>
+
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </td>
+                                                <td className={userParticipant?.win ? 'victory-cell' : 'defeat-cell'}
+                                                    style={{margin: '0', padding: '0'}}>
+                                                    <ul style={{listStyleType: 'none', margin: '0', padding: '0'}}>
+                                                        {match.info.participants.slice(5, 10).map((participant: Participant, index: number) => (
+                                                            <li key={index}
+                                                                style={{marginBottom: '1px'}}>
+                                                                <Link
+                                                                    to={`/profile/${encodeURIComponent(participant.riotIdGameName)}${encodeURIComponent('#')}${encodeURIComponent(participant.riotIdTagline)}`}
+                                                                    style={{
+                                                                        fontSize: '0.8em',
+                                                                        width: '150px',
+                                                                        whiteSpace: 'nowrap',
+                                                                        overflow: 'hidden',
+                                                                        textOverflow: 'ellipsis',
+                                                                        display: 'block',
+                                                                        padding: '0'
+                                                                    }}
+                                                                >
+                                                                    <img
+                                                                        src={getChampionImageUrl(participant.championName)}
+                                                                        alt={participant.championName}
+                                                                        style={{
+                                                                            width: '20px',
+                                                                            height: '20px',
+                                                                            marginRight: '5px'
+                                                                        }}
+                                                                    />
+                                                                    {`${participant.riotIdGameName}#${participant.riotIdTagline}`.substring(0, 10)}
+                                                                </Link>
+
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
                                     </tbody>
                                 </Table>
-
                             )}
                         </Col>
                     </Row>

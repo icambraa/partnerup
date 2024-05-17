@@ -16,4 +16,6 @@ export interface Participant {
     deaths: number;
     assists: number;
     win: boolean;
+    riotIdGameName: string;
+    riotIdTagline: string;
 }
