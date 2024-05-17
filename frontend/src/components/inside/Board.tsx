@@ -418,7 +418,7 @@ const Board: React.FC = () => {
                                             width="50px" height="50px" borderRadius="50%"
                                         />
                                         <div className="ms-3">
-                                            <Link to={`/profile/${encodeURIComponent(anuncio.riotNickname)}`} className="fs-5">
+                                            <Link to={`/profile/${encodeURIComponent(anuncio.riotNickname)}`} className="fs-6">
                                                 {anuncio.riotNickname}
                                             </Link>
                                             <div className="extra-small text-muted">
