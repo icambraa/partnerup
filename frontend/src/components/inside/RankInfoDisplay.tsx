@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 type RankInfoDisplayProps = {
     gameName: string;
     tagLine: string;
+    applyColor?: boolean; // Nueva prop opcional
 };
 
 type RankInfo = {
@@ -11,7 +12,7 @@ type RankInfo = {
     leaguePoints: number;
 };
 
-const RankInfoDisplay: React.FC<RankInfoDisplayProps> = ({ gameName, tagLine }) => {
+const RankInfoDisplay: React.FC<RankInfoDisplayProps> = ({ gameName, tagLine, applyColor = true }) => {
     const [rankInfo, setRankInfo] = useState<RankInfo | null>(null);
     const [error, setError] = useState<string | null>(null);
 
@@ -37,6 +38,29 @@ const RankInfoDisplay: React.FC<RankInfoDisplayProps> = ({ gameName, tagLine }) 
         fetchRankInfo();
     }, [gameName, tagLine]);
 
+    const getRankColor = (tier: string) => {
+        switch (tier) {
+            case 'BRONZE':
+                return '#cd7f32';
+            case 'SILVER':
+                return '#c0c0c0';
+            case 'GOLD':
+                return '#ffd700';
+            case 'PLATINUM':
+                return '#00ff00';
+            case 'DIAMOND':
+                return '#00ffff';
+            case 'MASTER':
+                return '#ff00ff';
+            case 'GRANDMASTER':
+                return '#ff4500';
+            case 'CHALLENGER':
+                return '#ff0000';
+            default:
+                return '#ffffff';
+        }
+    };
+
     if (error) {
         return <div>{error}</div>;
     }
@@ -45,8 +69,11 @@ const RankInfoDisplay: React.FC<RankInfoDisplayProps> = ({ gameName, tagLine }) 
         return <div>Cargando...</div>;
     }
 
+    const rankColor = getRankColor(rankInfo.tier);
+    const style = applyColor ? { color: rankColor } : {};
+
     return (
-        <div>
+        <div style={style}>
             {rankInfo.tier === "UNRANKED" ? (
                 <div>UNRANKED</div>
             ) : (

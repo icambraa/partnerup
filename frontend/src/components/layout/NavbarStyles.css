@@ -1,0 +1,47 @@
+.tooltip-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip {
+    visibility: hidden;
+    width: 200px;
+    background-color: #000;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 10px;
+    position: absolute;
+    z-index: 2;
+    top: 100%;
+    left: 100%;
+    transform: translateX(-50%) translateY(10px);
+    margin-top: 10px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltip::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 38%;
+    transform: translateX(-50%) translateY(-100%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent #000 transparent;
+}
+
+.tooltip-wrapper:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+.riot-nickname-link {
+    color: #ffcc00; /* Elige un color que contraste bien con el fondo del sidebar */
+    text-decoration: none; /* Elimina el subrayado del enlace si lo deseas */
+}
+
+.riot-nickname-link:hover {
+    color: #ffaa00; /* Color al pasar el ratón por encima */
+}

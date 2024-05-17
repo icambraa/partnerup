@@ -57,7 +57,7 @@ public class SummonerController {
             if (rankInfo != null) {
                 return ResponseEntity.ok(rankInfo);
             } else {
-                return ResponseEntity.notFound().build(); // Devolvemos 404 si no se encuentra información de rango
+                return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error processing request: " + e.getMessage());

@@ -7,6 +7,7 @@ import WinRateDisplay from './WinRateDisplay';
 import IconProfileDisplay from "./IconProfileDisplay";
 import RankInfoDisplay from './RankInfoDisplay';
 import { Link } from 'react-router-dom';
+import backgroundImage from '../../assets/vecteezy_red-and-white-background-design-flat-and-minimalist_.jpg';
 
 
 
@@ -270,6 +271,8 @@ const Board: React.FC = () => {
     };
 
     return (
+
+
         <section className="content">
             <div className="container" style={{display: 'flex', alignItems: 'start'}}>
                 <div style={{flex: 1}}>
@@ -422,6 +425,7 @@ const Board: React.FC = () => {
                                                 <RankInfoDisplay
                                                     gameName={anuncio.riotNickname.split('#')[0]}
                                                     tagLine={anuncio.riotNickname.split('#')[1]}
+                                                    applyColor={false} // Evita aplicar el color
                                                 />
                                             </div>
                                         </div>

@@ -92,8 +92,14 @@ const UserProfileComponent: React.FC<UserProfileComponentProps> = ({ riotnicknam
     const [gameName, tagLine] = userProfile.riotnickname.split('#');
 
     const getChampionImageUrl = (championName: string) => {
+        // fiddlestick bug
+        if (championName === "FiddleSticks") {
+            return `https://ddragon.leagueoflegends.com/cdn/14.10.1/img/champion/Fiddlesticks.png`;
+        }
+
         return `https://ddragon.leagueoflegends.com/cdn/14.10.1/img/champion/${championName}.png`;
     };
+
 
     return (
         <Container className="custom-margin-top">

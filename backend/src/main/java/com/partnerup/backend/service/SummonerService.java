@@ -100,6 +100,7 @@ public class SummonerService {
         return profileIconBaseUrl + profileIconId + ".png";
     }
 
+
     public List<String> getLastMatchIds(String puuid, int start, int count) {
         String url = String.format("https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/%s/ids?start=%d&count=%d&api_key=%s",
                 puuid, start, count, apiKey);

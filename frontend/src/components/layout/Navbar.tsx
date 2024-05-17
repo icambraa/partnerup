@@ -6,8 +6,10 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Message } from '../../interfaces/MessageInterface.tsx';
 import { UserProfile } from '../../interfaces/UserProfileInterface.ts';
 import IconProfileDisplay from "../inside/IconProfileDisplay.tsx";
+import RankInfoDisplay from '../inside/RankInfoDisplay'; // Importa RankInfoDisplay
 import Modal from 'react-bootstrap/Modal';
 import { Button } from "react-bootstrap";
+import './NavbarStyles.css'; // Asegúrate de importar los estilos CSS
 
 interface UserProfiles {
     [key: string]: UserProfile;
@@ -23,8 +25,7 @@ const Navbar: React.FC = () => {
     const [showModal, setShowModal] = useState(false);
     const [hoveredMessageId, setHoveredMessageId] = useState<number | null>(null);
     const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
-    const [searchTermLeft, setSearchTermLeft] = useState('');
-    const [searchTermRight, setSearchTermRight] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
 
     const handleOpenMessage = (message: Message) => {
         setSelectedMessage(message);
@@ -190,17 +191,12 @@ const Navbar: React.FC = () => {
         ];
     };
 
-    const handleSearchLeftChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTermLeft(event.target.value);
-    };
-
-    const handleSearchRightChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTermRight(event.target.value);
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(event.target.value);
     };
 
     const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const searchTerm = `${searchTermLeft}#${searchTermRight}`;
         navigate(`/profile/${encodeURIComponent(searchTerm)}`);
     };
 
@@ -215,19 +211,10 @@ const Navbar: React.FC = () => {
                         <input
                             className="form-control search-input"
                             type="search"
-                            placeholder="Nickname"
-                            aria-label="Izquierda"
-                            value={searchTermLeft}
-                            onChange={handleSearchLeftChange}
-                        />
-                        <span className="search-hash">#</span>
-                        <input
-                            className="form-control search-input"
-                            type="search"
-                            placeholder="#Tag"
-                            aria-label="Derecha"
-                            value={searchTermRight}
-                            onChange={handleSearchRightChange}
+                            placeholder="Nickname#Tag"
+                            aria-label="Buscar"
+                            value={searchTerm}
+                            onChange={handleSearchChange}
                         />
                         <button className="btn btn-outline-light" type="submit">
                             <i className="bi bi-search"></i>
@@ -283,9 +270,11 @@ const Navbar: React.FC = () => {
                     {getSortedMessages().map((message, index) => {
                         const userProfile = userProfiles[message.senderId];
                         const riotNickname = userProfile ? userProfile.riotnickname : 'Loading...';
+                        const gameName = riotNickname.split('#')[0];
+                        const tagLine = riotNickname.split('#')[1];
 
                         const messageTextPreview = message.messageText.length > 20
-                            ? `${message.messageText.substring(0, 20)}...`
+                            ? `${message.messageText.substring(0, 10)}...`
                             : message.messageText;
 
                         return (
@@ -319,12 +308,18 @@ const Navbar: React.FC = () => {
                                     <i className="bi bi-x-lg" style={{ color: 'white', fontSize: '14px' }}></i>
                                 </button>
                                 <div className="d-flex align-items-center">
-                                    <div className="d-inline-block">
+                                    <div className="d-inline-block tooltip-wrapper">
                                         <IconProfileDisplay
-                                            gameName={riotNickname.split('#')[0]}
-                                            tagLine={riotNickname.split('#')[1]}
-                                            width="50px" height="50px" borderRadius="10%"
+                                            gameName={gameName}
+                                            tagLine={tagLine}
+                                            width="50px"
+                                            height="50px"
+                                            borderRadius="10%"
                                         />
+                                        <div className="tooltip">
+                                            {riotNickname}
+                                            <RankInfoDisplay gameName={gameName} tagLine={tagLine} applyColor={true}/>
+                                        </div>
                                     </div>
                                     <div style={{
                                         marginLeft: '10px',
@@ -337,8 +332,8 @@ const Navbar: React.FC = () => {
                                             margin: '0',
                                             fontWeight: 'bold',
                                             color: '#f8f9fa'
-                                        }}><Link to={`/profile/${encodeURIComponent(riotNickname)}`} className="fs-6">
-                                            {riotNickname.split('#')[0]}
+                                        }}><Link to={`/profile/${encodeURIComponent(riotNickname)}`} className="fs-6 riot-nickname-link">
+                                            {gameName}
                                         </Link></p>
                                         <p style={{ margin: '0', color: '#ced4da' }}>{messageTextPreview}</p>
                                     </div>

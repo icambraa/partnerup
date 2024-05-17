@@ -20,16 +20,16 @@ const App: React.FC = () => {
                     <Route path="/registration" element={<RegistrationForm />} />
                     <Route path="/create-profile" element={<ProfileRegistration />} />
                     <Route path="/board" element={<>
-                        <Navbar />
                         <Board />
+                        <Navbar />
                     </>} />
                     <Route path="/profile" element={<>
-                        <Navbar />
                         <UserProfile />
+                        <Navbar />
                     </>} />
                     <Route path="/profile/:riotnickname" element={<>
-                        <Navbar />
                         <UserProfileWrapper />
+                        <Navbar />
                     </>} />
                 </Routes>
             </AuthProvider>
