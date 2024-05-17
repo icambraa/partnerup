@@ -425,7 +425,7 @@ const Board: React.FC = () => {
                                                 <RankInfoDisplay
                                                     gameName={anuncio.riotNickname.split('#')[0]}
                                                     tagLine={anuncio.riotNickname.split('#')[1]}
-                                                    applyColor={false} // Evita aplicar el color
+                                                    applyColor={false}
                                                 />
                                             </div>
                                         </div>

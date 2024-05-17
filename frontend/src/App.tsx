@@ -19,23 +19,21 @@ const App: React.FC = () => {
                     <Route path="/login" element={<LoginForm />} />
                     <Route path="/registration" element={<RegistrationForm />} />
                     <Route path="/create-profile" element={<ProfileRegistration />} />
-                    <Route path="/board" element={<>
-                        <Board />
-                        <Navbar />
-                    </>} />
-                    <Route path="/profile" element={<>
-                        <UserProfile />
-                        <Navbar />
-                    </>} />
-                    <Route path="/profile/:riotnickname" element={<>
-                        <UserProfileWrapper />
-                        <Navbar />
-                    </>} />
+                    <Route path="/board" element={<WithNavbar><Board /></WithNavbar>} />
+                    <Route path="/profile" element={<WithNavbar><UserProfile /></WithNavbar>} />
+                    <Route path="/profile/:riotnickname" element={<WithNavbar><UserProfileWrapper /></WithNavbar>} />
                 </Routes>
             </AuthProvider>
         </Router>
     );
 };
+
+const WithNavbar: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+    <>
+        <Navbar />
+        {children}
+    </>
+);
 
 const UserProfileWrapper: React.FC = () => {
     const { riotnickname } = useParams<{ riotnickname: string }>();

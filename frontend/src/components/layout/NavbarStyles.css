@@ -38,10 +38,10 @@
 }
 
 .riot-nickname-link {
-    color: #ffcc00; /* Elige un color que contraste bien con el fondo del sidebar */
-    text-decoration: none; /* Elimina el subrayado del enlace si lo deseas */
+    color: #ffcc00;
+    text-decoration: none;
 }
 
 .riot-nickname-link:hover {
-    color: #ffaa00; /* Color al pasar el ratón por encima */
+    color: #ffaa00;
 }

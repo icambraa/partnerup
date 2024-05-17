@@ -1,5 +1,5 @@
 import React, { useEffect, useState, FormEvent } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo2-rojo-blanco.png';
 import { auth } from '../../firebase-auth.ts';
 import { useAuth } from '../../contexts/AuthContext';
@@ -26,7 +26,8 @@ const Navbar: React.FC = () => {
     const [hoveredMessageId, setHoveredMessageId] = useState<number | null>(null);
     const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
-
+    const [loadingMessages, setLoadingMessages] = useState(true);
+    const [loadingProfiles, setLoadingProfiles] = useState(true);
     const handleOpenMessage = (message: Message) => {
         setSelectedMessage(message);
         setShowModal(true);
@@ -58,6 +59,7 @@ const Navbar: React.FC = () => {
 
     const fetchUnreadMessagesCount = async (userId: string) => {
         console.log("Fetching unread messages for user ID:", userId);
+        setLoadingMessages(true);
         try {
             const response = await fetch(`http://localhost:8080/api/mensajes/unread-count?userId=${userId}`, {
                 method: 'GET',
@@ -72,8 +74,10 @@ const Navbar: React.FC = () => {
             } else {
                 throw new Error('Failed to fetch unread messages count');
             }
+            setLoadingMessages(false);
         } catch (error) {
             console.error('Error fetching unread messages count:', error);
+            setLoadingMessages(false);
         }
     };
 
@@ -104,6 +108,7 @@ const Navbar: React.FC = () => {
     };
 
     const fetchUserProfileByFirebaseUid = async (firebaseUid: string) => {
+        setLoadingProfiles(true);
         try {
             const response = await fetch(`http://localhost:8080/api/profiles/by-firebaseUid?firebaseUid=${firebaseUid}`);
             if (response.ok) {
@@ -111,8 +116,10 @@ const Navbar: React.FC = () => {
             } else {
                 throw new Error('Failed to fetch user profile');
             }
+            setLoadingProfiles(false);
         } catch (error) {
             console.error('Error fetching user profile:', error);
+            setLoadingProfiles(false);
         }
     };
 
@@ -266,81 +273,85 @@ const Navbar: React.FC = () => {
                 backgroundColor: '#343a40',
                 transition: 'right 0.5s'
             }}>
-                <ul style={{ marginTop: '100px', position: 'relative' }}>
-                    {getSortedMessages().map((message, index) => {
-                        const userProfile = userProfiles[message.senderId];
-                        const riotNickname = userProfile ? userProfile.riotnickname : 'Loading...';
-                        const gameName = riotNickname.split('#')[0];
-                        const tagLine = riotNickname.split('#')[1];
+                {loadingMessages ? (
+                    <div>Cargando mensajes...</div>
+                ) : (
+                    <ul style={{ marginTop: '100px', position: 'relative' }}>
+                        {getSortedMessages().map((message, index) => {
+                            const userProfile = userProfiles[message.senderId];
+                            const riotNickname = userProfile ? userProfile.riotnickname : 'Loading...';
+                            const gameName = riotNickname.split('#')[0];
+                            const tagLine = riotNickname.split('#')[1];
 
-                        const messageTextPreview = message.messageText.length > 20
-                            ? `${message.messageText.substring(0, 10)}...`
-                            : message.messageText;
+                            const messageTextPreview = message.messageText.length > 20
+                                ? `${message.messageText.substring(0, 10)}...`
+                                : message.messageText;
 
-                        return (
-                            <li key={index}
-                                className={`p-3 mb-3 message ${message.slideOut ? 'slideOutAnimation' : ''} ${message.id === hoveredMessageId ? 'hovered' : ''} ${message.read ? 'readMessage' : ''}`}
-                                style={{
-                                    borderWidth: '1px',
-                                    borderStyle: 'solid',
-                                    borderRight: 'none',
-                                    borderRadius: '15px 0 0 15px',
-                                    backgroundColor: '#495057',
-                                    borderColor: '#6c757d',
-                                    boxShadow: '4px 4px 8px rgba(0, 0, 0, 0.2)',
-                                    listStyleType: 'none',
-                                    position: 'relative',
-                                    cursor: 'pointer',
-                                    paddingLeft: '30px',
-                                    transform: message.read ? (message.id === hoveredMessageId ? 'translateX(0)' : 'translateX(169px)') : 'translateX(0)',
-                                    transition: 'transform 0.3s ease',
-                                }}
-                                onMouseEnter={() => handleMouseEnter(message.id)}
-                                onMouseLeave={handleMouseLeave}
-                                onClick={() => handleOpenMessage(message)}>
-                                <button
-                                    className="btn btn-danger message-button"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleDelete(message.id);
+                            return (
+                                <li key={index}
+                                    className={`p-3 mb-3 message ${message.slideOut ? 'slideOutAnimation' : ''} ${message.id === hoveredMessageId ? 'hovered' : ''} ${message.read ? 'readMessage' : ''}`}
+                                    style={{
+                                        borderWidth: '1px',
+                                        borderStyle: 'solid',
+                                        borderRight: 'none',
+                                        borderRadius: '15px 0 0 15px',
+                                        backgroundColor: '#495057',
+                                        borderColor: '#6c757d',
+                                        boxShadow: '4px 4px 8px rgba(0, 0, 0, 0.2)',
+                                        listStyleType: 'none',
+                                        position: 'relative',
+                                        cursor: 'pointer',
+                                        paddingLeft: '30px',
+                                        transform: message.read ? (message.id === hoveredMessageId ? 'translateX(0)' : 'translateX(169px)') : 'translateX(0)',
+                                        transition: 'transform 0.3s ease',
                                     }}
-                                >
-                                    <i className="bi bi-x-lg" style={{ color: 'white', fontSize: '14px' }}></i>
-                                </button>
-                                <div className="d-flex align-items-center">
-                                    <div className="d-inline-block tooltip-wrapper">
-                                        <IconProfileDisplay
-                                            gameName={gameName}
-                                            tagLine={tagLine}
-                                            width="50px"
-                                            height="50px"
-                                            borderRadius="10%"
-                                        />
-                                        <div className="tooltip">
-                                            {riotNickname}
-                                            <RankInfoDisplay gameName={gameName} tagLine={tagLine} applyColor={true}/>
+                                    onMouseEnter={() => handleMouseEnter(message.id)}
+                                    onMouseLeave={handleMouseLeave}
+                                    onClick={() => handleOpenMessage(message)}>
+                                    <button
+                                        className="btn btn-danger message-button"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDelete(message.id);
+                                        }}
+                                    >
+                                        <i className="bi bi-x-lg" style={{ color: 'white', fontSize: '14px' }}></i>
+                                    </button>
+                                    <div className="d-flex align-items-center">
+                                        <div className="d-inline-block tooltip-wrapper">
+                                            <IconProfileDisplay
+                                                gameName={gameName}
+                                                tagLine={tagLine}
+                                                width="50px"
+                                                height="50px"
+                                                borderRadius="10%"
+                                            />
+                                            <div className="tooltip">
+                                                {riotNickname}
+                                                <RankInfoDisplay gameName={gameName} tagLine={tagLine} applyColor={true}/>
+                                            </div>
+                                        </div>
+                                        <div style={{
+                                            marginLeft: '10px',
+                                            marginRight: '10px',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            justifyContent: 'center'
+                                        }}>
+                                            <p style={{
+                                                margin: '0',
+                                                fontWeight: 'bold',
+                                                color: '#f8f9fa'
+                                            }}>{gameName}</p>
+                                            <p style={{ margin: '0', color: '#ced4da' }}>{messageTextPreview}</p>
                                         </div>
                                     </div>
-                                    <div style={{
-                                        marginLeft: '10px',
-                                        marginRight: '10px',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        justifyContent: 'center'
-                                    }}>
-                                        <p style={{
-                                            margin: '0',
-                                            fontWeight: 'bold',
-                                            color: '#f8f9fa'
-                                        }}><Link to={`/profile/${encodeURIComponent(riotNickname)}`} className="fs-6 riot-nickname-link">
-                                            {gameName}
-                                        </Link></p>
-                                        <p style={{ margin: '0', color: '#ced4da' }}>{messageTextPreview}</p>
-                                    </div>
-                                </div>
-                            </li>
-                        );
-                    })}
+                                </li>
+                            );
+                        })}
+                    </ul>
+                )}
+                <ul style={{ marginTop: '100px', position: 'relative' }}>
                 </ul>
             </div>
             <Modal show={showModal} onHide={handleCloseModal}>
@@ -348,7 +359,18 @@ const Navbar: React.FC = () => {
                     <Modal.Title>Mensaje</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {selectedMessage && selectedMessage.messageText}
+                    {selectedMessage && (
+                        <>
+                            <p>{selectedMessage.messageText}</p>
+                            {selectedMessage.senderId && userProfiles[selectedMessage.senderId] && (
+                                <div>
+                                    <p>Riot Nickname: <a href={`/profile/${encodeURIComponent(userProfiles[selectedMessage.senderId].riotnickname)}`}>
+                                        {userProfiles[selectedMessage.senderId].riotnickname}
+                                    </a></p>
+                                </div>
+                            )}
+                        </>
+                    )}
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleCloseModal}>

@@ -31,11 +31,8 @@ const IconProfileDisplay: React.FC<IconProfileDisplayProps> = ({ gameName, tagLi
     }, [gameName, tagLine]);
 
     return (
-        <div className="icon-profile-container tooltip-wrapper">
+        <div className="icon-profile-container">
             <img src={profileIconUrl} alt="Profile Icon" className="icon-profile-image" style={{ width, height, borderRadius }} />
-            <div className="tooltip">
-                Información adicional del usuario.
-            </div>
         </div>
     );
 };

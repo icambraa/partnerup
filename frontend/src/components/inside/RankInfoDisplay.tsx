@@ -18,6 +18,10 @@ const RankInfoDisplay: React.FC<RankInfoDisplayProps> = ({ gameName, tagLine, ap
 
     useEffect(() => {
         const fetchRankInfo = async () => {
+            if (!gameName || !tagLine) {
+                console.error('Error: gameName and tagLine must be defined');
+                return;
+            }
             try {
                 const url = new URL('http://localhost:8080/summoner/rankinfo');
                 url.searchParams.append('gameName', gameName);
