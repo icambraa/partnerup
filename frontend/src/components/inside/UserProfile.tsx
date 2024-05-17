@@ -4,7 +4,7 @@ import { UserProfile as UserProfileInterface } from '../../interfaces/UserProfil
 import { MatchDetails, Participant } from '../../interfaces/MatchDetailsInterface';
 import WinRateDisplayCircle from './WinRateDisplayCircle';
 import IconProfileDisplay from './IconProfileDisplay';
-import RankInfoDisplay, { RankInfo } from './RankInfoDisplay'; // Importa RankInfo
+import RankInfoDisplay, { RankInfo } from './RankInfoDisplay';
 import { Card, Spinner, Alert, Container, Row, Col, Table } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './UserProfileStyles.css';

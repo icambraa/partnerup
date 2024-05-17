@@ -116,3 +116,8 @@ align-items-center {
 .rank-info-container {
     margin-top: 5px;
 }
+
+.custom-card .card-header {
+    background-color: #343a40;
+    color: white;
+}
