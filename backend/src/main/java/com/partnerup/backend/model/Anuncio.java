@@ -31,6 +31,9 @@ public class Anuncio {
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(nullable = true)  // Permite que el enlace pueda ser nulo
+    private String discordChannelLink;  // Nuevo campo para el enlace del canal de Discord
+
     public Long getId() {
         return id;
     }
@@ -93,5 +96,13 @@ public class Anuncio {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getDiscordChannelLink() {
+        return discordChannelLink;
+    }
+
+    public void setDiscordChannelLink(String discordChannelLink) {
+        this.discordChannelLink = discordChannelLink;
     }
 }

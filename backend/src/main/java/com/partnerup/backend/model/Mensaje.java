@@ -26,8 +26,16 @@ public class Mensaje {
     @Column(name = "read", nullable = false)
     private boolean read = false;
 
+    @Column(name = "anuncio_id")
+    private Long anuncioId;
 
-    // Getters y setters
+    public Long getAnuncioId() {
+        return anuncioId;
+    }
+
+    public void setAnuncioId(Long anuncioId) {
+        this.anuncioId = anuncioId;
+    }
 
     public Long getId() {
         return id;

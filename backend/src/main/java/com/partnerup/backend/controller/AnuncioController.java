@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/anuncios")
-@CrossOrigin(origins = "http://localhost:5173", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
+@CrossOrigin(origins = "http://localhost:5173", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE}, allowedHeaders = "*", allowCredentials = "true")
 public class AnuncioController {
 
     @Autowired
@@ -58,6 +58,16 @@ public class AnuncioController {
             return ResponseEntity.ok(anuncio);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @GetMapping("/{id}/discord-link")
+    public ResponseEntity<String> getDiscordLink(@PathVariable Long id) {
+        String discordLink = anuncioService.getDiscordLinkForAnuncio(id);
+        if (discordLink != null) {
+            return ResponseEntity.ok(discordLink);
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
 }

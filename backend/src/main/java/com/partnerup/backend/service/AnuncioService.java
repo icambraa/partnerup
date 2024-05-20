@@ -60,10 +60,24 @@ public class AnuncioService {
             existingAnuncio.setBuscaRol(updatedAnuncio.getBuscaRol());
             existingAnuncio.setRango(updatedAnuncio.getRango());
             existingAnuncio.setComentario(updatedAnuncio.getComentario());
+            existingAnuncio.setDiscordChannelLink(updatedAnuncio.getDiscordChannelLink()); // Actualiza el enlace del canal de Discord
             return anuncioRepository.save(existingAnuncio);
         } else {
             throw new Exception("Anuncio no encontrado");
         }
     }
 
+    public String getDiscordLinkForAnuncio(Long anuncioId) {
+        Optional<Anuncio> optionalAnuncio = anuncioRepository.findById(anuncioId);
+        if (optionalAnuncio.isPresent()) {
+            Anuncio anuncio = optionalAnuncio.get();
+            return anuncio.getDiscordChannelLink();
+        } else {
+            return null;
+        }
+    }
+
+    public Anuncio getAnuncioById(Long id) {
+        return anuncioRepository.findById(id).orElse(null);
+    }
 }

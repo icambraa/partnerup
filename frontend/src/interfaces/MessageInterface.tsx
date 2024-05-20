@@ -6,4 +6,5 @@ export interface Message {
     createdAt: string;
     slideOut?: boolean;
     read:boolean;
+    anuncioId?: number;
 }

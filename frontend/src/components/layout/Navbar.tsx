@@ -209,6 +209,71 @@ const Navbar: React.FC = () => {
         navigate(`/profile/${encodeURIComponent(searchTerm)}`);
     };
 
+    const obtenerEnlaceDiscord = async (anuncioId: number) => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/anuncios/${anuncioId}/discord-link`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            if (response.ok) {
+                const discordLink = await response.text(); // Aquí obtenemos el texto directamente ya que es un string
+                return discordLink;  // Devolvemos el enlace de Discord
+            } else {
+                throw new Error('Failed to fetch Discord link');
+            }
+        } catch (error) {
+            console.error('Error fetching Discord link:', error);
+            return '';
+        }
+    };
+
+    const handleAccept = async () => {
+        if (!selectedMessage || !selectedMessage.anuncioId || !currentUser?.uid) {
+            console.error('Mensaje seleccionado o usuario actual no válido.');
+            handleCloseModal();
+            return;
+        }
+
+        const anuncioId = selectedMessage.anuncioId;
+
+        try {
+            const discordLink = await obtenerEnlaceDiscord(anuncioId);
+
+            if (!discordLink) {
+                console.error('El enlace de Discord no está definido.');
+                handleCloseModal();
+                return;
+            }
+
+            const newMessage = {
+                senderId: currentUser.uid,  // Asegúrate de que el senderId es el usuario actual
+                receiverId: selectedMessage.senderId,
+                messageText: `He aceptado tu solicitud! Puedes encontrarme en ${discordLink}`,
+                anuncioId: anuncioId,
+            };
+
+            const response = await fetch('http://localhost:8080/api/mensajes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newMessage),
+            });
+
+            if (response.ok) {
+                console.log('Mensaje enviado correctamente');
+            } else {
+                console.error('Error al enviar el mensaje');
+            }
+        } catch (error) {
+            console.error('Error al enviar el mensaje:', error);
+        }
+
+        handleCloseModal();
+    };
+
     return (
         <section className="vw-100">
             <nav className="navbar navbar-expand-sm navbar-dark bg-dark fixed-top">
@@ -379,6 +444,12 @@ const Navbar: React.FC = () => {
                     )}
                 </Modal.Body>
                 <Modal.Footer>
+                    <Button variant="success" onClick={handleAccept}>
+                        Aceptar
+                    </Button>
+                    <Button variant="danger">
+                        Rechazar
+                    </Button>
                     <Button variant="secondary" onClick={handleCloseModal}>
                         Cerrar
                     </Button>

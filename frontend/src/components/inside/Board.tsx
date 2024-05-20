@@ -5,7 +5,7 @@ import WinRateDisplay from './WinRateDisplay';
 import IconProfileDisplay from './IconProfileDisplay';
 import RankInfoDisplay from './RankInfoDisplay';
 import { Link } from 'react-router-dom';
-import { Modal, Button } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 
 const Board: React.FC = () => {
     const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
@@ -16,7 +16,6 @@ const Board: React.FC = () => {
         buscaRol: '',
         rango: '',
         comentario: '',
-        crearCanalDiscord: false // Agregar esta línea
     });
 
     const [messageText, setMessageText] = useState('');
@@ -32,6 +31,7 @@ const Board: React.FC = () => {
 
     const [showModal, setShowModal] = useState(false);
     const [channelLink, setChannelLink] = useState('');
+    const [showSuccessModal, setShowSuccessModal] = useState(false); // Añadido para el modal de éxito
 
     const handleEdit = (anuncio: Anuncio) => {
         setFormData({
@@ -40,17 +40,10 @@ const Board: React.FC = () => {
             buscaRol: anuncio.buscaRol,
             rango: anuncio.rango,
             comentario: anuncio.comentario,
-            crearCanalDiscord: false // Agregar esta línea
         });
         setSelectedAnuncio(anuncio);
         setIsEditing(true);
-
-        import('bootstrap/dist/js/bootstrap.bundle.min.js').then(({ Modal }) => {
-            const formModal = new Modal(document.getElementById('formModal') as HTMLElement);
-            formModal.show();
-        }).catch(error => {
-            console.error('Error loading Bootstrap Modal:', error);
-        });
+        setShowModal(true); // Mostrar el formulario como un div
     };
 
     useEffect(() => {
@@ -180,29 +173,37 @@ const Board: React.FC = () => {
                 if (response.ok) {
                     const anuncio = await response.json();
 
-                    if (formData.crearCanalDiscord) { // Comprobar si el usuario desea crear un canal de Discord
-                        try {
-                            const discordResponse = await fetch('http://localhost:8080/api/discord/create-channel', {
-                                method: 'POST',
+                    try {
+                        const discordResponse = await fetch('http://localhost:8080/api/discord/create-channel', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(anuncio)
+                        });
+
+                        if (discordResponse.ok) {
+                            const discordData = await discordResponse.json();
+                            console.log(`Channel created: ${discordData.channelLink}`);
+
+                            // Actualizar el anuncio con el enlace del canal de Discord
+                            await fetch(`http://localhost:8080/api/anuncios/${anuncio.id}`, {
+                                method: 'PUT',
                                 headers: {
                                     'Content-Type': 'application/json'
                                 },
-                                body: JSON.stringify(anuncio)
+                                body: JSON.stringify({ ...anuncio, discordChannelLink: discordData.channelLink })
                             });
 
-                            if (discordResponse.ok) {
-                                const discordData = await discordResponse.json();
-                                console.log(`Channel created: ${discordData.channelLink}`);
-
-                                setChannelLink(discordData.channelLink);
-                                setShowModal(true);
-                            } else {
-                                const discordError = await discordResponse.text();
-                                console.error('Error creating Discord channel:', discordError);
-                            }
-                        } catch (error) {
-                            console.error('Error during Discord channel creation:', error);
+                            setChannelLink(discordData.channelLink);
+                            setShowModal(false); // Cerrar el formulario de creación de anuncio
+                            setShowSuccessModal(true); // Mostrar el modal de éxito
+                        } else {
+                            const discordError = await discordResponse.text();
+                            console.error('Error creating Discord channel:', discordError);
                         }
+                    } catch (error) {
+                        console.error('Error during Discord channel creation:', error);
                     }
 
                     fetchAnuncios();
@@ -324,6 +325,7 @@ const Board: React.FC = () => {
             senderId: currentUser.uid,
             receiverId: selectedAnuncio.userId,
             messageText: messageText,
+            anuncioId: selectedAnuncio.id
         };
 
         try {
@@ -369,21 +371,23 @@ const Board: React.FC = () => {
                                          alt="Mid"
                                          title="Mid"
                                          onClick={() => handleFilterChange('rol', 'Mid')} />
-                                    <img className={`role-icon jungle-icon ${selectedRole === 'Jungle' ? 'selected' : ''}`}
-                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-jungle.png"
-                                         alt="Jungle"
-                                         title="Jungle"
-                                         onClick={() => handleFilterChange('rol', 'Jungle')} />
+                                    <img
+                                        className={`role-icon jungle-icon ${selectedRole === 'Jungle' ? 'selected' : ''}`}
+                                        src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-jungle.png"
+                                        alt="Jungle"
+                                        title="Jungle"
+                                        onClick={() => handleFilterChange('rol', 'Jungle')} />
                                     <img className={`role-icon adc-icon ${selectedRole === 'ADC' ? 'selected' : ''}`}
                                          src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-bottom.png"
                                          alt="ADC"
                                          title="ADC"
                                          onClick={() => handleFilterChange('rol', 'ADC')} />
-                                    <img className={`role-icon support-icon ${selectedRole === 'Support' ? 'selected' : ''}`}
-                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-utility.png"
-                                         alt="Support"
-                                         title="Support"
-                                         onClick={() => handleFilterChange('rol', 'Support')} />
+                                    <img
+                                        className={`role-icon support-icon ${selectedRole === 'Support' ? 'selected' : ''}`}
+                                        src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-utility.png"
+                                        alt="Support"
+                                        title="Support"
+                                        onClick={() => handleFilterChange('rol', 'Support')} />
                                 </div>
                             </div>
                         </div>
@@ -410,39 +414,43 @@ const Board: React.FC = () => {
                                          alt="Oro"
                                          title="Oro"
                                          onClick={() => handleFilterChange('rango', 'Oro')} />
-                                    <img className={`range-icon platino ${selectedRange === 'Platino' ? 'selected' : ''}`}
-                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/platinum.png"
-                                         alt="Platino"
-                                         title="Platino"
-                                         onClick={() => handleFilterChange('rango', 'Platino')} />
-                                    <img className={`range-icon diamante ${selectedRange === 'Diamante' ? 'selected' : ''}`}
-                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/diamond.png"
-                                         alt="Diamante"
-                                         title="Diamante"
-                                         onClick={() => handleFilterChange('rango', 'Diamante')} />
-                                    <img className={`range-icon ascendente ${selectedRange === 'Master' ? 'selected' : ''}`}
-                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/master.png"
-                                         alt="Master"
-                                         title="Master"
-                                         onClick={() => handleFilterChange('rango', 'Master')} />
-                                    <img className={`range-icon inmortal ${selectedRange === 'Grandmaster' ? 'selected' : ''}`}
-                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/grandmaster.png"
-                                         alt="Grandmaster"
-                                         title="Grandmaster"
-                                         onClick={() => handleFilterChange('rango', 'Grandmaster')} />
-                                    <img className={`range-icon radiante ${selectedRange === 'Challenger' ? 'selected' : ''}`}
-                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/challenger.png"
-                                         alt="Challenger"
-                                         title="Challenger"
-                                         onClick={() => handleFilterChange('rango', 'Challenger')} />
+                                    <img
+                                        className={`range-icon platino ${selectedRange === 'Platino' ? 'selected' : ''}`}
+                                        src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/platinum.png"
+                                        alt="Platino"
+                                        title="Platino"
+                                        onClick={() => handleFilterChange('rango', 'Platino')} />
+                                    <img
+                                        className={`range-icon diamante ${selectedRange === 'Diamante' ? 'selected' : ''}`}
+                                        src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/diamond.png"
+                                        alt="Diamante"
+                                        title="Diamante"
+                                        onClick={() => handleFilterChange('rango', 'Diamante')} />
+                                    <img
+                                        className={`range-icon ascendente ${selectedRange === 'Master' ? 'selected' : ''}`}
+                                        src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/master.png"
+                                        alt="Master"
+                                        title="Master"
+                                        onClick={() => handleFilterChange('rango', 'Master')} />
+                                    <img
+                                        className={`range-icon inmortal ${selectedRange === 'Grandmaster' ? 'selected' : ''}`}
+                                        src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/grandmaster.png"
+                                        alt="Grandmaster"
+                                        title="Grandmaster"
+                                        onClick={() => handleFilterChange('rango', 'Grandmaster')} />
+                                    <img
+                                        className={`range-icon radiante ${selectedRange === 'Challenger' ? 'selected' : ''}`}
+                                        src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/challenger.png"
+                                        alt="Challenger"
+                                        title="Challenger"
+                                        onClick={() => handleFilterChange('rango', 'Challenger')} />
                                 </div>
                             </div>
                         </div>
                         <div className="col-auto" style={{ marginLeft: 'auto', marginRight: '50px' }}>
                             <div className="mt-5">
                                 <div className="icon-container">
-                                    <button type="button" className="btn btn-primary my-2" data-bs-toggle="modal"
-                                            data-bs-target="#formModal">
+                                    <button type="button" className="btn btn-primary my-2" onClick={() => setShowModal(true)}>
                                         Anunciarse
                                     </button>
                                 </div>
@@ -466,11 +474,13 @@ const Board: React.FC = () => {
                         {anuncios.map((anuncio: Anuncio, index: number) => (
                             <tr key={index}>
                                 <td className="align-middle text-center">
-                                    {currentUser && currentUser.uid !== anuncio.userId && (
+                                    {currentUser && currentUser.uid === anuncio.userId ? (
+                                        <a href={anuncio.discordChannelLink} target="_blank" rel="noopener noreferrer">
+                                            <i className="bi bi-discord" style={{ fontSize: '24px', color: '#7289da' }}></i>
+                                        </a>
+                                    ) : (
                                         <button
                                             className="btn btn-sm btn-outline-secondary"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#sendMessageModal"
                                             onClick={() => handleOpenMessageModal(anuncio)}
                                         >
                                             <i className="bi bi-envelope-fill"></i>
@@ -485,7 +495,8 @@ const Board: React.FC = () => {
                                             width="50px" height="50px" borderRadius="50%"
                                         />
                                         <div className="ms-3">
-                                            <Link to={`/profile/${encodeURIComponent(anuncio.riotNickname)}`} className="fs-6">
+                                            <Link to={`/profile/${encodeURIComponent(anuncio.riotNickname)}`}
+                                                  className="fs-6">
                                                 {anuncio.riotNickname}
                                             </Link>
                                             <div className="extra-small text-muted">
@@ -506,24 +517,24 @@ const Board: React.FC = () => {
                                 </td>
                                 <td className="align-middle text-center">
                                     <img src={getRoleIconUrl(anuncio.rol)} alt={anuncio.rol} title={anuncio.rol}
-                                         style={{width: '30px', height: 'auto'}}/>
+                                         style={{ width: '30px', height: 'auto' }} />
                                 </td>
                                 <td className="align-middle text-center">
                                     <img
                                         src={getRoleIconUrl(anuncio.buscaRol)}
                                         alt={anuncio.buscaRol}
                                         title={anuncio.buscaRol}
-                                        style={{width: '30px', height: 'auto', filter: 'grayscale(100%)'}}
+                                        style={{ width: '30px', height: 'auto', filter: 'grayscale(100%)' }}
                                     />
                                 </td>
                                 <td className="align-middle text-center">
                                     {anuncio.rango && (
-                                        <div style={{textAlign: 'center'}}>
+                                        <div style={{ textAlign: 'center' }}>
                                             <img
                                                 src={getRankIconUrl(anuncio.rango)}
                                                 alt={anuncio.rango}
                                                 title={anuncio.rango}
-                                                style={{width: '30px', height: 'auto'}}
+                                                style={{ width: '30px', height: 'auto' }}
                                             />
                                             <div>{anuncio.rango}</div>
                                         </div>
@@ -533,7 +544,7 @@ const Board: React.FC = () => {
                                 <td className="align-middle text-center">
                                     {timeSince(new Date(anuncio.createdAt))}
                                 </td>
-                                <td style={{backgroundColor: 'transparent'}}>
+                                <td style={{ backgroundColor: 'transparent' }}>
                                     {currentUser && currentUser.uid === anuncio.userId ? (
                                         <div className="dropdown">
                                             <a className="text-muted" href="#" role="button"
@@ -587,30 +598,31 @@ const Board: React.FC = () => {
                         </tbody>
                     </table>
                     <div className="pagination-controls text-center">
-                        <button onClick={handleNextPage} style={{position: 'relative', left: '-40px'}}>
+                        <button onClick={handleNextPage} style={{ position: 'relative', left: '-40px' }}>
                             <i className="bi bi-chevron-compact-down"></i>
                         </button>
                     </div>
                 </div>
             </div>
-            <div className="modal fade" id="formModal" tabIndex={-1} aria-labelledby="formModalLabel"
-                 aria-hidden="true">
-                <div className="modal-dialog">
+            {showModal && (
+                <div className="custom-modal">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h5 className="modal-title" id="formModalLabel">{isEditing ? 'Editar Anuncio' : 'Formulario de Anuncio'}</h5>
-                            <button type="button" className="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
+                            <h5 className="modal-title"
+                                id="formModalLabel">{isEditing ? 'Editar Anuncio' : 'Crear anuncio'}</h5>
+                            <button type="button" className="btn-close" onClick={() => setShowModal(false)} aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
                             <form onSubmit={handleSubmit}>
                                 <div className="mb-3">
                                     <label htmlFor="riotNickname" className="form-label">Riot Nickname</label>
-                                    <input type="text" className="form-control" id="riotNickname" value={formData.riotNickname} disabled />
+                                    <input type="text" className="form-control" id="riotNickname"
+                                           value={formData.riotNickname} disabled/>
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="rol" className="form-label">Rol</label>
-                                    <select className="form-select" id="rol" value={formData.rol} onChange={handleChange}>
+                                    <select className="form-select" id="rol" value={formData.rol}
+                                            onChange={handleChange}>
                                         <option value="">Seleccione un rol</option>
                                         <option value="Top">Top</option>
                                         <option value="Mid">Mid</option>
@@ -621,7 +633,8 @@ const Board: React.FC = () => {
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="buscaRol" className="form-label">Busco rol</label>
-                                    <select className="form-select" id="buscaRol" value={formData.buscaRol} onChange={handleChange}>
+                                    <select className="form-select" id="buscaRol" value={formData.buscaRol}
+                                            onChange={handleChange}>
                                         <option value="">Seleccione un rol</option>
                                         <option value="Top">Top</option>
                                         <option value="Mid">Mid</option>
@@ -632,7 +645,8 @@ const Board: React.FC = () => {
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="rango" className="form-label">Rango</label>
-                                    <select className="form-select" id="rango" value={formData.rango} onChange={handleChange}>
+                                    <select className="form-select" id="rango" value={formData.rango}
+                                            onChange={handleChange}>
                                         <option value="">Seleccione un rango</option>
                                         <option value="Hierro">Hierro</option>
                                         <option value="Bronce">Bronce</option>
@@ -647,77 +661,71 @@ const Board: React.FC = () => {
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="comentario" className="form-label">Comentario</label>
-                                    <textarea className="form-control" id="comentario" rows={3} value={formData.comentario} onChange={handleChange}></textarea>
+                                    <textarea className="form-control" id="comentario" rows={3}
+                                              value={formData.comentario} onChange={handleChange}></textarea>
                                 </div>
-                                <div className="mb-3">
-                                    <div className="form-check">
-                                        <input
-                                            className="form-check-input"
-                                            type="checkbox"
-                                            id="crearCanalDiscord"
-                                            checked={formData.crearCanalDiscord}
-                                            onChange={handleChange}
-                                        />
-                                        <label className="form-check-label" htmlFor="crearCanalDiscord">
-                                            Desea crear un canal de Discord para el anuncio?
-                                        </label>
+                                <div className="mb-2" style={{textAlign: 'center', marginTop: '40px'}}>
+                                    <div style={{display: 'inline-block'}}>
+                                        <img src="/src/assets/discord-logo-blue.png" alt="Discord Logo"
+                                             style={{width: '300px', marginBottom: '10px'}}/>
                                     </div>
                                 </div>
+                                <div className="mb-4"
+                                     style={{padding: '20px', backgroundColor: '#f0f0f0', borderRadius: '10px'}}>
+                                    <p className="form-text" style={{textAlign: 'left', margin: '0'}}>
+                                        ¡Anúnciate en PartnerUP y únete a la comunidad de jugadores! Al crear un
+                                        anuncio, se generará automáticamente un canal privado en nuestro servidor de
+                                        Discord, exclusivo para ti y tu futuro compañero.
+                                    </p>
+                                </div>
                                 <div className="modal-footer">
-                                    <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                    <button type="button" className="btn btn-secondary"
+                                            onClick={() => setShowModal(false)} style={{marginRight: '10px'}}>
+                                        Cerrar
+                                    </button>
                                     <button type="submit" className="btn btn-primary">Enviar</button>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div className="modal fade" id="sendMessageModal" tabIndex={-1} aria-labelledby="sendMessageModalLabel"
-                 aria-hidden="true">
-                <div className="modal-dialog modal-dialog-centered" role="document">
+            )}
+            {showSuccessModal && (
+                <div className="custom-modal">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h5 className="modal-title" id="sendMessageModalLabel">
-                                Enviar Mensaje a {selectedAnuncio ? selectedAnuncio.riotNickname : ''}
-                            </h5>
-                            <button type="button" className="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
+                            <h5 className="modal-title">Canal del Anuncio</h5>
+                            <button
+                                type="button"
+                                className="btn-close"
+                                onClick={() => setShowSuccessModal(false)}
+                                aria-label="Close"
+                                style={{ marginBottom: '10px' }}
+                            ></button>
                         </div>
-                        <div className="modal-body">
-                            <form onSubmit={handleMessageSubmit}>
-                                <div className="mb-3">
-                                    <label htmlFor="messageText" className="form-label">Mensaje</label>
-                                    <textarea className="form-control" id="messageText" rows={3} required
-                                              value={messageText} onChange={handleMessageChange}></textarea>
-                                </div>
-                                <div className="modal-footer">
-                                    <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                                    <button type="submit" className="btn btn-primary">Enviar</button>
-                                </div>
-                            </form>
+                        <div className="modal-body" style={{ marginTop: '20px' }}>
+                            ¡Tu anuncio ha sido publicado con éxito! 🎉<br /> <br />
+                            Se ha creado automáticamente un canal en nuestro servidor de Discord PartnerUP!<br />
+                            <br /> Puedes acceder al canal utilizando el siguiente enlace:
+                            <br />
+                            <br />
+                            <div style={{ textAlign: 'center' }}>
+                                <a href={channelLink} target="_blank" rel="noopener noreferrer">
+                                    Enlace al canal de Discord
+                                </a>
+                            </div>
+                            <br />
+                            Por favor, espera a que alguien esté interesado en tu anuncio, acepta su petición y espera a que se una a tu canal de Discord.
+                        </div>
+                        <div className="modal-footer" style={{marginTop: '20px'}}>
+                            <Button variant="secondary" onClick={() => setShowSuccessModal(false)}>
+                                Cerrar
+                            </Button>
                         </div>
                     </div>
                 </div>
-            </div>
-            <Modal show={showModal} onHide={() => setShowModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Canal del Anuncio</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    Haz clic en el siguiente enlace para unirte al canal de voz del anuncio:
-                    <br />
-                    <a href={channelLink} target="_blank" rel="noopener noreferrer">
-                        Unirse al canal
-                    </a>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowModal(false)}>
-                        Cerrar
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+            )}
         </section>
     );
 }
-
 export default Board;
