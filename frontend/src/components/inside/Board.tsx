@@ -32,6 +32,7 @@ const Board: React.FC = () => {
     const [showModal, setShowModal] = useState(false);
     const [channelLink, setChannelLink] = useState('');
     const [showSuccessModal, setShowSuccessModal] = useState(false); // Añadido para el modal de éxito
+    const [showMessageModal, setShowMessageModal] = useState(false); // Añadido para el modal de mensaje
 
     const handleEdit = (anuncio: Anuncio) => {
         setFormData({
@@ -72,6 +73,7 @@ const Board: React.FC = () => {
 
     const handleOpenMessageModal = (anuncio: Anuncio) => {
         setSelectedAnuncio(anuncio);
+        setShowMessageModal(true);
     };
 
     useEffect(() => {
@@ -340,6 +342,7 @@ const Board: React.FC = () => {
             if (response.ok) {
                 console.log('Message sent successfully');
                 setMessageText('');
+                setShowMessageModal(false); // Cerrar el modal después de enviar el mensaje
             } else {
                 throw new Error('Failed to send message');
             }
@@ -725,7 +728,33 @@ const Board: React.FC = () => {
                     </div>
                 </div>
             )}
+            {showMessageModal && (
+                <div className="custom-modal">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title">
+                                Enviar Mensaje a {selectedAnuncio ? selectedAnuncio.riotNickname : ''}
+                            </h5>
+                            <button type="button" className="btn-close" onClick={() => setShowMessageModal(false)} aria-label="Close"></button>
+                        </div>
+                        <div className="modal-body">
+                            <form onSubmit={handleMessageSubmit}>
+                                <div className="mb-3">
+                                    <label htmlFor="messageText" className="form-label">Mensaje</label>
+                                    <textarea className="form-control" id="messageText" rows={3} required
+                                              value={messageText} onChange={handleMessageChange}></textarea>
+                                </div>
+                                <div className="modal-footer" style={{ marginTop: '20px' }}>
+                                    <button type="button" className="btn btn-secondary" onClick={() => setShowMessageModal(false)}>Cerrar</button>
+                                    <button type="submit" className="btn btn-primary">Enviar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
         </section>
     );
 }
+
 export default Board;
