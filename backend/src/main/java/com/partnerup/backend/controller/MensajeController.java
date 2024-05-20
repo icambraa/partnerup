@@ -1,7 +1,6 @@
 package com.partnerup.backend.controller;
 
 import com.partnerup.backend.model.Mensaje;
-import com.partnerup.backend.repository.MensajeRepository;
 import com.partnerup.backend.service.MensajeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

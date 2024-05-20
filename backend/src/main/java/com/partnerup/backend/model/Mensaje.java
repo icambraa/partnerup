@@ -1,5 +1,6 @@
 package com.partnerup.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 import java.sql.Timestamp;
@@ -28,6 +29,12 @@ public class Mensaje {
 
     @Column(name = "anuncio_id")
     private Long anuncioId;
+
+    @JsonProperty("isAcceptanceMessage")
+    @Column(name = "acceptance_message", nullable = false)
+    private boolean acceptanceMessage = false;
+
+    // Getters y setters...
 
     public Long getAnuncioId() {
         return anuncioId;
@@ -85,4 +92,11 @@ public class Mensaje {
         this.read = read;
     }
 
+    public boolean isAcceptanceMessage() {
+        return acceptanceMessage;
+    }
+
+    public void setAcceptanceMessage(boolean acceptanceMessage) {
+        this.acceptanceMessage = acceptanceMessage;
+    }
 }

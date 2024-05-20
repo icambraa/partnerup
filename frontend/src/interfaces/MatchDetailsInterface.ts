@@ -18,4 +18,6 @@ export interface Participant {
     win: boolean;
     riotIdGameName: string;
     riotIdTagline: string;
+    summoner1Id: number;
+    summoner2Id: number;
 }

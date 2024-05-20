@@ -745,7 +745,7 @@ const Board: React.FC = () => {
                                               value={messageText} onChange={handleMessageChange}></textarea>
                                 </div>
                                 <div className="modal-footer" style={{ marginTop: '20px' }}>
-                                    <button type="button" className="btn btn-secondary" onClick={() => setShowMessageModal(false)}>Cerrar</button>
+                                    <button type="button" className="btn btn-secondary" onClick={() => setShowMessageModal(false)} style={{ marginRight: '10px' }}>Cerrar</button>
                                     <button type="submit" className="btn btn-primary">Enviar</button>
                                 </div>
                             </form>

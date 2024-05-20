@@ -7,4 +7,5 @@ export interface Message {
     slideOut?: boolean;
     read:boolean;
     anuncioId?: number;
+    isAcceptanceMessage: boolean;
 }

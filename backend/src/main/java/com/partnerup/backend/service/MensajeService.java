@@ -38,6 +38,4 @@ public class MensajeService {
     public void deleteMessage(Long messageId) {
         mensajeRepository.deleteById(messageId);
     }
-
-
 }

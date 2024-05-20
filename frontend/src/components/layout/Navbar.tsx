@@ -30,6 +30,7 @@ const Navbar: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [loadingMessages, setLoadingMessages] = useState(true);
     const [loadingProfiles, setLoadingProfiles] = useState(true);
+
     const handleOpenMessage = (message: Message) => {
         setSelectedMessage(message);
         setShowModal(true);
@@ -248,10 +249,11 @@ const Navbar: React.FC = () => {
             }
 
             const newMessage = {
-                senderId: currentUser.uid,  // Asegúrate de que el senderId es el usuario actual
+                senderId: currentUser.uid,
                 receiverId: selectedMessage.senderId,
-                messageText: `He aceptado tu solicitud! Puedes encontrarme en ${discordLink}`,
+                messageText: `He aceptado tu solicitud! Puedes encontrarme en este canal de  <a href="${discordLink}" target="_blank">Discord</a>`,
                 anuncioId: anuncioId,
+                isAcceptanceMessage: true // Asegúrate de que este campo esté aquí
             };
 
             const response = await fetch('http://localhost:8080/api/mensajes', {
@@ -259,20 +261,20 @@ const Navbar: React.FC = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(newMessage),
+                body: JSON.stringify(newMessage), // Asegúrate de convertir el objeto a JSON
             });
 
             if (response.ok) {
                 console.log('Mensaje enviado correctamente');
+                handleCloseModal();
             } else {
-                console.error('Error al enviar el mensaje');
+                console.error('Error al enviar el mensaje de aceptación');
             }
         } catch (error) {
             console.error('Error al enviar el mensaje:', error);
         }
-
-        handleCloseModal();
     };
+
 
     return (
         <section className="vw-100">
@@ -299,8 +301,7 @@ const Navbar: React.FC = () => {
                         <span className="navbar-toggler-icon"></span>
                     </button>
 
-                    <img src={lolIcon} alt="LoL Icon" style={{height: '40px', marginLeft: '60px'}}/>
-                    <img src={ValorantIcon} alt="Valorant Icon" style={{height: '45px', marginLeft: '45px'}}/>
+                    <img src={lolIcon} alt="LoL Icon" style={{height: '30px', marginLeft: '60px'}}/>
 
                     <div className="collapse navbar-collapse" id="mynavbar">
                         <ul className="navbar-nav ms-auto" style={{gap: '20px'}}>
@@ -425,36 +426,52 @@ const Navbar: React.FC = () => {
                 <ul style={{ marginTop: '100px', position: 'relative' }}>
                 </ul>
             </div>
-            <Modal show={showModal} onHide={handleCloseModal}>
+            <Modal show={showModal} onHide={handleCloseModal} dialogClassName="modal-dialog-centered custom-modal-centered">
                 <Modal.Header closeButton>
-                    <Modal.Title>Mensaje</Modal.Title>
+                    {selectedMessage && selectedMessage.senderId && userProfiles[selectedMessage.senderId] && (
+                        <a href={`/profile/${encodeURIComponent(userProfiles[selectedMessage.senderId].riotnickname)}`} className="d-inline-flex align-items-center">
+                            <IconProfileDisplay
+                                gameName={userProfiles[selectedMessage.senderId].riotnickname.split('#')[0]}
+                                tagLine={userProfiles[selectedMessage.senderId].riotnickname.split('#')[1]}
+                                width="80px"
+                                height="80px"
+                                borderRadius="10%"
+                            />
+                            <div className="ms-2">
+                                <strong>{userProfiles[selectedMessage.senderId].riotnickname}</strong>
+                                <RankInfoDisplay
+                                    gameName={userProfiles[selectedMessage.senderId].riotnickname.split('#')[0]}
+                                    tagLine={userProfiles[selectedMessage.senderId].riotnickname.split('#')[1]}
+                                    applyColor={true}
+                                />
+                            </div>
+                        </a>
+                    )}
                 </Modal.Header>
                 <Modal.Body>
                     {selectedMessage && (
                         <>
-                            <p>{selectedMessage.messageText}</p>
-                            {selectedMessage.senderId && userProfiles[selectedMessage.senderId] && (
-                                <div>
-                                    <p>Riot Nickname: <a href={`/profile/${encodeURIComponent(userProfiles[selectedMessage.senderId].riotnickname)}`}>
-                                        {userProfiles[selectedMessage.senderId].riotnickname}
-                                    </a></p>
-                                </div>
-                            )}
+                            <p dangerouslySetInnerHTML={{ __html: selectedMessage.messageText }}></p>
                         </>
                     )}
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="success" onClick={handleAccept}>
-                        Aceptar
-                    </Button>
+                    {!selectedMessage?.isAcceptanceMessage && (
+                        <Button variant="success" onClick={handleAccept}>
+                            Aceptar
+                        </Button>
+                    )}
+                    {!selectedMessage?.isAcceptanceMessage && (
                     <Button variant="danger">
                         Rechazar
                     </Button>
+                    )}
                     <Button variant="secondary" onClick={handleCloseModal}>
                         Cerrar
                     </Button>
                 </Modal.Footer>
             </Modal>
+
         </section>
     );
 }

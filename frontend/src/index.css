@@ -294,3 +294,14 @@ button:focus-visible {
   background: transparent;
   border: none;
 }
+
+.custom-modal-centered .modal-dialog {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100% - 1rem);
+}
+
+.custom-modal-centered .modal-content {
+  margin: auto;
+}

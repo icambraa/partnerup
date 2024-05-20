@@ -5,11 +5,6 @@ import lombok.Setter;
 
 import java.util.List;
 
-import lombok.Getter;
-import lombok.Setter;
-
-import java.util.List;
-
 @Setter
 @Getter
 public class MatchDetailsDto {
@@ -25,7 +20,6 @@ public class MatchDetailsDto {
         // Getters y Setters
         private String matchId;
         private List<String> participants;
-
     }
 
     @Setter
@@ -47,7 +41,8 @@ public class MatchDetailsDto {
             private boolean win;
             private String riotIdGameName;
             private String riotIdTagline;
+            private int summoner1Id; // Nuevo campo
+            private int summoner2Id; // Nuevo campo
         }
     }
-
 }
