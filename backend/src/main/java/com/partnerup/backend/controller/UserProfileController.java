@@ -14,7 +14,17 @@ public class UserProfileController {
     private UserProfileService profileService;
 
     @PostMapping
-    public ResponseEntity<UserProfile> createUserProfile(@RequestBody UserProfile userProfile) {
+    public ResponseEntity<?> createUserProfile(@RequestBody UserProfile userProfile) {
+        if (profileService.existsByNombreusuario(userProfile.getNombreusuario())) {
+            return ResponseEntity.badRequest().body("Nombre de usuario ya existe");
+        }
+        if (profileService.existsByRiotnickname(userProfile.getRiotnickname())) {
+            return ResponseEntity.badRequest().body("Riot Nickname ya existe");
+        }
+        if (!profileService.isRiotNicknameValid(userProfile.getRiotnickname())) {
+            return ResponseEntity.badRequest().body("Riot Nickname no es válido o no existe en la región");
+        }
+
         UserProfile savedProfile = profileService.saveUserProfile(userProfile);
         return ResponseEntity.ok(savedProfile);
     }
@@ -42,5 +52,4 @@ public class UserProfileController {
         UserProfile userProfile = profileService.getUserProfileByRiotNickname(riotnickname);
         return userProfile != null ? ResponseEntity.ok(userProfile) : ResponseEntity.notFound().build();
     }
-
 }

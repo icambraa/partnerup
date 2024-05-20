@@ -54,6 +54,17 @@ public class SummonerService {
         }
     }
 
+    public boolean isRiotNicknameValid(String gameName, String tagLine) {
+        String url = String.format("https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/%s/%s?api_key=%s",
+                gameName, tagLine, apiKey);
+        try {
+            ResponseEntity<AccountDto> response = restTemplate.getForEntity(url, AccountDto.class);
+            return response.getStatusCode().is2xxSuccessful() && response.getBody() != null;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     private SummonerDto getSummoner(String puuid) {
         String url = String.format("https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/%s?api_key=%s", puuid, apiKey);
         try {

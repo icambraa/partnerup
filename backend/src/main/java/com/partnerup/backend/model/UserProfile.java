@@ -12,9 +12,6 @@ public class UserProfile {
     @Column(name = "nombreusuario")
     private String nombreusuario;
 
-    @Column(name = "rangoactual")
-    private String rangoactual;
-
     @Column(name = "rolprincipal")
     private String rolprincipal;
 
@@ -38,21 +35,12 @@ public class UserProfile {
         this.id = id;
     }
 
-
     public String getNombreusuario() {
         return nombreusuario;
     }
 
     public void setNombreusuario(String nombreusuario) {
         this.nombreusuario = nombreusuario;
-    }
-
-    public String getRangoactual() {
-        return rangoactual;
-    }
-
-    public void setRangoactual(String rangoactual) {
-        this.rangoactual = rangoactual;
     }
 
     public String getRolprincipal() {

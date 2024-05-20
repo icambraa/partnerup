@@ -6,10 +6,12 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Message } from '../../interfaces/MessageInterface.tsx';
 import { UserProfile } from '../../interfaces/UserProfileInterface.ts';
 import IconProfileDisplay from "../inside/IconProfileDisplay.tsx";
-import RankInfoDisplay from '../inside/RankInfoDisplay'; // Importa RankInfoDisplay
+import RankInfoDisplay from '../inside/RankInfoDisplay';
 import Modal from 'react-bootstrap/Modal';
 import { Button } from "react-bootstrap";
-import './NavbarStyles.css'; // Asegúrate de importar los estilos CSS
+import './NavbarStyles.css';
+import lolIcon from '../../assets/lol-logo.png';
+import ValorantIcon from '../../assets/valorant-logo.png';
 
 interface UserProfiles {
     [key: string]: UserProfile;
@@ -212,7 +214,7 @@ const Navbar: React.FC = () => {
             <nav className="navbar navbar-expand-sm navbar-dark bg-dark fixed-top">
                 <div className="container-fluid">
                     <a className="navbar-brand" href="/board">
-                        <img src={logo} alt="Logo" style={{ maxWidth: '100px' }} />
+                        <img src={logo} alt="Logo" style={{maxWidth: '100px'}}/>
                     </a>
                     <form className="d-flex align-items-center search-form" onSubmit={handleSearchSubmit}>
                         <input
@@ -231,12 +233,16 @@ const Navbar: React.FC = () => {
                             data-bs-target="#mynavbar">
                         <span className="navbar-toggler-icon"></span>
                     </button>
+
+                    <img src={lolIcon} alt="LoL Icon" style={{height: '40px', marginLeft: '60px'}}/>
+                    <img src={ValorantIcon} alt="Valorant Icon" style={{height: '45px', marginLeft: '45px'}}/>
+
                     <div className="collapse navbar-collapse" id="mynavbar">
-                        <ul className="navbar-nav ms-auto" style={{ gap: '20px' }}>
-                            <li className="nav-item" style={{ marginRight: '20px', position: 'relative' }}>
-                                <a className="nav-link" href="#" onClick={toggleSidebar} style={{ position: 'relative' }}>
+                        <ul className="navbar-nav ms-auto" style={{gap: '20px'}}>
+                            <li className="nav-item" style={{marginRight: '20px', position: 'relative'}}>
+                                <a className="nav-link" href="#" onClick={toggleSidebar} style={{position: 'relative'}}>
                                     <i className="bi bi-chat-left-dots-fill"
-                                       style={{ color: '#fff', fontSize: '2rem', position: 'relative' }}></i>
+                                       style={{color: '#fff', fontSize: '2rem', position: 'relative'}}></i>
                                     {unreadMessagesCount > 0 &&
                                         <span className="badge bg-danger animate-bounce" style={{
                                             position: 'absolute',
@@ -248,7 +254,7 @@ const Navbar: React.FC = () => {
                             <li className="nav-item dropdown">
                                 <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i className="bi bi-person-circle" style={{ color: '#fff', fontSize: '2rem' }}></i>
+                                    <i className="bi bi-person-circle" style={{color: '#fff', fontSize: '2rem'}}></i>
                                 </a>
                                 <ul className="dropdown-menu dropdown-menu-dark dropdown-menu-end"
                                     aria-labelledby="navbarDropdown">

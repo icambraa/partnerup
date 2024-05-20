@@ -50,4 +50,20 @@ public class AnuncioService {
             return anuncioRepository.findAllByOrderByCreatedAtDesc(pageable);
         }
     }
+
+    public Anuncio updateAnuncio(Long id, Anuncio updatedAnuncio) throws Exception {
+        Optional<Anuncio> optionalAnuncio = anuncioRepository.findById(id);
+        if (optionalAnuncio.isPresent()) {
+            Anuncio existingAnuncio = optionalAnuncio.get();
+            existingAnuncio.setRiotNickname(updatedAnuncio.getRiotNickname());
+            existingAnuncio.setRol(updatedAnuncio.getRol());
+            existingAnuncio.setBuscaRol(updatedAnuncio.getBuscaRol());
+            existingAnuncio.setRango(updatedAnuncio.getRango());
+            existingAnuncio.setComentario(updatedAnuncio.getComentario());
+            return anuncioRepository.save(existingAnuncio);
+        } else {
+            throw new Exception("Anuncio no encontrado");
+        }
+    }
+
 }

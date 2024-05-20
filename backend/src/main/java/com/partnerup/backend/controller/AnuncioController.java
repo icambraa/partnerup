@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/anuncios")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5173", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
 public class AnuncioController {
 
     @Autowired
@@ -49,5 +49,15 @@ public class AnuncioController {
         Pageable pageable = PageRequest.of(page, size);
         Page<Anuncio> anuncios = anuncioService.getAnunciosFiltered(rol, rango, pageable);
         return ResponseEntity.ok(anuncios);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Anuncio> updateAnuncio(@PathVariable Long id, @RequestBody Anuncio updatedAnuncio) {
+        try {
+            Anuncio anuncio = anuncioService.updateAnuncio(id, updatedAnuncio);
+            return ResponseEntity.ok(anuncio);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 }

@@ -10,4 +10,8 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, Long> 
     UserProfile findByFirebaseUid(String firebaseUid);
 
     UserProfile findByRiotnickname(String riotnickname);
+
+    UserProfile findByNombreusuario(String nombreusuario);
+    boolean existsByNombreusuario(String nombreusuario);
+    boolean existsByRiotnickname(String riotnickname);
 }

@@ -16,8 +16,14 @@ server:
 
 riot:
   api:
-    key: RGAPI-e7d44711-3b78-424a-a456-7479946e17d0
+    key: RGAPI-dfeb2dd9-b324-4107-bfdd-dea7c9296b01
   profile:
     icon:
       base:
         url: https://ddragon.leagueoflegends.com/cdn/14.9.1/img/profileicon/
+
+discord:
+  bot:
+    token: MTI0MDM2ODAzMzk5NDY0MTQ3MQ.GgD_Yz.y3B8Ql976ozetlt7pNbT92bvCgHUQHGVqVdDJw
+  guild:
+    id: 1242122335931076608

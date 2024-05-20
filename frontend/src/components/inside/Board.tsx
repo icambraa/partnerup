@@ -1,62 +1,81 @@
 import React, { useState, useEffect, useRef } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
-
-import { useAuth } from '../../contexts/AuthContext.tsx';
-import { Anuncio } from '../../interfaces/AnuncioInterface.tsx';
+import { useAuth } from '../../contexts/AuthContext';
+import { Anuncio } from '../../interfaces/AnuncioInterface';
 import WinRateDisplay from './WinRateDisplay';
-import IconProfileDisplay from "./IconProfileDisplay";
+import IconProfileDisplay from './IconProfileDisplay';
 import RankInfoDisplay from './RankInfoDisplay';
 import { Link } from 'react-router-dom';
-
-
+import { Modal, Button } from 'react-bootstrap';
 
 const Board: React.FC = () => {
     const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
-    const { currentUser} = useAuth();
+    const { currentUser } = useAuth();
     const [formData, setFormData] = useState({
         riotNickname: '',
         rol: '',
         buscaRol: '',
         rango: '',
-        comentario: ''
+        comentario: '',
+        crearCanalDiscord: false // Agregar esta línea
     });
 
     const [messageText, setMessageText] = useState('');
-
-    const handleMessageChange = (e: { target: { value: React.SetStateAction<string>; }; }) => {
-        setMessageText(e.target.value);
-    };
-
-    const getRoleIconUrl = (role: string) => {
-        switch (role) {
-            case 'Top':
-                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-top.png';
-            case 'Mid':
-                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-middle.png';
-            case 'Jungle':
-                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-jungle.png';
-            case 'ADC':
-                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-bottom.png';
-            case 'Support':
-                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-utility.png';
-            default:
-                return '';
-        }
-    };
-
-
-
-
     const [filterData, setFilterData] = useState<{ rol?: string; rango?: string }>({});
-
     const [currentPage, setCurrentPage] = useState(0);
     const [, setTotalPages] = useState(0);
     const [pageSize] = useState(10);
     const isLoading = useRef(false);
     const [selectedRole, setSelectedRole] = useState<string | null | undefined>(null);
     const [selectedRange, setSelectedRange] = useState<string | null | undefined>(null);
-
     const [selectedAnuncio, setSelectedAnuncio] = useState<Anuncio | null>(null);
+    const [isEditing, setIsEditing] = useState(false);
+
+    const [showModal, setShowModal] = useState(false);
+    const [channelLink, setChannelLink] = useState('');
+
+    const handleEdit = (anuncio: Anuncio) => {
+        setFormData({
+            riotNickname: anuncio.riotNickname,
+            rol: anuncio.rol,
+            buscaRol: anuncio.buscaRol,
+            rango: anuncio.rango,
+            comentario: anuncio.comentario,
+            crearCanalDiscord: false // Agregar esta línea
+        });
+        setSelectedAnuncio(anuncio);
+        setIsEditing(true);
+
+        import('bootstrap/dist/js/bootstrap.bundle.min.js').then(({ Modal }) => {
+            const formModal = new Modal(document.getElementById('formModal') as HTMLElement);
+            formModal.show();
+        }).catch(error => {
+            console.error('Error loading Bootstrap Modal:', error);
+        });
+    };
+
+    useEffect(() => {
+        const fetchUserProfile = async () => {
+            if (currentUser) {
+                try {
+                    const response = await fetch(`http://localhost:8080/api/profiles/by-firebaseUid?firebaseUid=${currentUser.uid}`);
+                    if (response.ok) {
+                        const profile = await response.json();
+                        setFormData((prevFormData) => ({
+                            ...prevFormData,
+                            riotNickname: profile.riotnickname,
+                            rol: profile.rolprincipal
+                        }));
+                    } else {
+                        console.error('Error fetching user profile');
+                    }
+                } catch (error) {
+                    console.error('Error fetching user profile:', error);
+                }
+            }
+        };
+
+        fetchUserProfile();
+    }, [currentUser]);
 
     const handleOpenMessageModal = (anuncio: Anuncio) => {
         setSelectedAnuncio(anuncio);
@@ -66,67 +85,9 @@ const Board: React.FC = () => {
         fetchAnuncios();
     }, [currentPage, filterData, pageSize]);
 
-
-    const handleMessageSubmit = async (e: { preventDefault: () => void; }) => {
-        e.preventDefault();
-        if (!currentUser || !selectedAnuncio) {
-            console.error('Authentication error or no announcement selected');
-            return;
-        }
-
-        const messageData = {
-            senderId: currentUser.uid,
-            receiverId: selectedAnuncio.userId,
-            messageText: messageText,
-
-        };
-
-        try {
-            const response = await fetch('http://localhost:8080/api/mensajes', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(messageData)
-            });
-
-            if (response.ok) {
-                console.log('Message sent successfully');
-                setMessageText('');
-            } else {
-                throw new Error('Failed to send message');
-            }
-        } catch (error) {
-            console.error('Error sending message:', error);
-        }
+    const handleMessageChange = (e: { target: { value: React.SetStateAction<string>; }; }) => {
+        setMessageText(e.target.value);
     };
-
-    function timeSince(date: number | Date) {
-        // @ts-ignore
-        const seconds = Math.floor((new Date() - date) / 1000);
-
-        let interval = Math.floor(seconds / 31536000);
-        if (interval >= 1) {
-            return `hace ${interval} año${interval === 1 ? '' : 's'}`;
-        }
-        interval = Math.floor(seconds / 2592000);
-        if (interval >= 1) {
-            return `hace ${interval} mes${interval === 1 ? '' : 'es'}`;
-        }
-        interval = Math.floor(seconds / 86400);
-        if (interval >= 1) {
-            return `hace ${interval} día${interval === 1 ? '' : 's'}`;
-        }
-        interval = Math.floor(seconds / 3600);
-        if (interval >= 1) {
-            return `hace ${interval} hora${interval === 1 ? '' : 's'}`;
-        }
-        interval = Math.floor(seconds / 60);
-        if (interval >= 1) {
-            return `hace ${interval} minuto${interval === 1 ? '' : 's'}`;
-        }
-        return `hace ${Math.floor(seconds)} segundo${Math.floor(seconds) === 1 ? '' : 's'}`;
-    }
 
     const fetchAnuncios = async () => {
         if (isLoading.current) return;
@@ -161,11 +122,9 @@ const Board: React.FC = () => {
         isLoading.current = false;
     };
 
-
-
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        const { id, value } = e.target;
-        setFormData({ ...formData, [id]: value });
+        const { id, value, type, checked } = e.target;
+        setFormData({ ...formData, [id]: type === 'checkbox' ? checked : value });
         setCurrentPage(0);
     };
 
@@ -199,49 +158,65 @@ const Board: React.FC = () => {
             };
 
             try {
-                const response = await fetch('http://localhost:8080/api/anuncios', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(formDataWithUserId)
-                });
-                if (response.ok) {
-                    console.log('Anuncio creado con éxito');
-                    fetchAnuncios();
+                let response;
+                if (isEditing && selectedAnuncio) {
+                    response = await fetch(`http://localhost:8080/api/anuncios/${selectedAnuncio.id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formDataWithUserId)
+                    });
                 } else {
-                    console.error('Error al crear el anuncio');
+                    response = await fetch('http://localhost:8080/api/anuncios', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formDataWithUserId)
+                    });
+                }
+
+                if (response.ok) {
+                    const anuncio = await response.json();
+
+                    if (formData.crearCanalDiscord) { // Comprobar si el usuario desea crear un canal de Discord
+                        try {
+                            const discordResponse = await fetch('http://localhost:8080/api/discord/create-channel', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(anuncio)
+                            });
+
+                            if (discordResponse.ok) {
+                                const discordData = await discordResponse.json();
+                                console.log(`Channel created: ${discordData.channelLink}`);
+
+                                setChannelLink(discordData.channelLink);
+                                setShowModal(true);
+                            } else {
+                                const discordError = await discordResponse.text();
+                                console.error('Error creating Discord channel:', discordError);
+                            }
+                        } catch (error) {
+                            console.error('Error during Discord channel creation:', error);
+                        }
+                    }
+
+                    fetchAnuncios();
+                    setIsEditing(false);
+                    setSelectedAnuncio(null);
+                } else {
+                    const errorText = await response.text();
+                    console.error(`Error al ${isEditing ? 'editar' : 'crear'} el anuncio:`, errorText);
                 }
             } catch (error) {
                 console.error('Error al enviar el formulario', error);
             }
         } else {
             console.error('No hay usuario autenticado');
-        }
-    };
-
-    const getRankIconUrl = (range: string) => {
-        switch (range) {
-            case 'Hierro':
-                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/iron.png';
-            case 'Bronce':
-                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/bronze.png';
-            case 'Plata':
-                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/silver.png';
-            case 'Oro':
-                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/gold.png';
-            case 'Platino':
-                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/platinum.png';
-            case 'Diamante':
-                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/diamond.png';
-            case 'Master':
-                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/master.png';
-            case 'Grandmaster':
-                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/grandmaster.png';
-            case 'Challenger':
-                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/challenger.png';
-            default:
-                return '';
         }
     };
 
@@ -270,12 +245,111 @@ const Board: React.FC = () => {
         }
     };
 
+    const getRoleIconUrl = (role: string) => {
+        switch (role) {
+            case 'Top':
+                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-top.png';
+            case 'Mid':
+                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-middle.png';
+            case 'Jungle':
+                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-jungle.png';
+            case 'ADC':
+                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-bottom.png';
+            case 'Support':
+                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-utility.png';
+            default:
+                return '';
+        }
+    };
+
+    const getRankIconUrl = (range: string) => {
+        switch (range) {
+            case 'Hierro':
+                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/iron.png';
+            case 'Bronce':
+                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/bronze.png';
+            case 'Plata':
+                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/silver.png';
+            case 'Oro':
+                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/gold.png';
+            case 'Platino':
+                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/platinum.png';
+            case 'Diamante':
+                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/diamond.png';
+            case 'Master':
+                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/master.png';
+            case 'Grandmaster':
+                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/grandmaster.png';
+            case 'Challenger':
+                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/challenger.png';
+            default:
+                return '';
+        }
+    };
+
+    function timeSince(date: number | Date) {
+        const seconds = Math.floor((new Date().getTime() - new Date(date).getTime()) / 1000);
+
+        let interval = Math.floor(seconds / 31536000);
+        if (interval >= 1) {
+            return `hace ${interval} año${interval === 1 ? '' : 's'}`;
+        }
+        interval = Math.floor(seconds / 2592000);
+        if (interval >= 1) {
+            return `hace ${interval} mes${interval === 1 ? '' : 'es'}`;
+        }
+        interval = Math.floor(seconds / 86400);
+        if (interval >= 1) {
+            return `hace ${interval} día${interval === 1 ? '' : 's'}`;
+        }
+        interval = Math.floor(seconds / 3600);
+        if (interval >= 1) {
+            return `hace ${interval} hora${interval === 1 ? '' : 's'}`;
+        }
+        interval = Math.floor(seconds / 60);
+        if (interval >= 1) {
+            return `hace ${interval} minuto${interval === 1 ? '' : 's'}`;
+        }
+        return `hace ${Math.floor(seconds)} segundo${Math.floor(seconds) === 1 ? '' : 's'}`;
+    }
+
+    const handleMessageSubmit = async (e: { preventDefault: () => void; }) => {
+        e.preventDefault();
+        if (!currentUser || !selectedAnuncio) {
+            console.error('Authentication error or no announcement selected');
+            return;
+        }
+
+        const messageData = {
+            senderId: currentUser.uid,
+            receiverId: selectedAnuncio.userId,
+            messageText: messageText,
+        };
+
+        try {
+            const response = await fetch('http://localhost:8080/api/mensajes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(messageData)
+            });
+
+            if (response.ok) {
+                console.log('Message sent successfully');
+                setMessageText('');
+            } else {
+                throw new Error('Failed to send message');
+            }
+        } catch (error) {
+            console.error('Error sending message:', error);
+        }
+    };
+
     return (
-
-
         <section className="content">
-            <div className="container" style={{display: 'flex', alignItems: 'start'}}>
-                <div style={{flex: 1}}>
+            <div className="container" style={{ display: 'flex', alignItems: 'start' }}>
+                <div style={{ flex: 1 }}>
                     <div className="row align-items-center">
                         <div className="col-auto">
                             <div className="mt-5">
@@ -284,34 +358,32 @@ const Board: React.FC = () => {
                                          src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-fill.png"
                                          alt="Todos"
                                          title="Cualquier rol"
-                                         onClick={() => handleFilterChange('rol', null)}/>
+                                         onClick={() => handleFilterChange('rol', null)} />
                                     <img className={`role-icon top-icon ${selectedRole === 'Top' ? 'selected' : ''}`}
                                          src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-top.png"
                                          alt="Top"
                                          title="Top"
-                                         onClick={() => handleFilterChange('rol', 'Top')}/>
+                                         onClick={() => handleFilterChange('rol', 'Top')} />
                                     <img className={`role-icon mid-icon ${selectedRole === 'Mid' ? 'selected' : ''}`}
                                          src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-middle.png"
                                          alt="Mid"
                                          title="Mid"
-                                         onClick={() => handleFilterChange('rol', 'Mid')}/>
-                                    <img
-                                        className={`role-icon jungle-icon ${selectedRole === 'Jungle' ? 'selected' : ''}`}
-                                        src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-jungle.png"
-                                        alt="Jungle"
-                                        title="Jungle"
-                                        onClick={() => handleFilterChange('rol', 'Jungle')}/>
+                                         onClick={() => handleFilterChange('rol', 'Mid')} />
+                                    <img className={`role-icon jungle-icon ${selectedRole === 'Jungle' ? 'selected' : ''}`}
+                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-jungle.png"
+                                         alt="Jungle"
+                                         title="Jungle"
+                                         onClick={() => handleFilterChange('rol', 'Jungle')} />
                                     <img className={`role-icon adc-icon ${selectedRole === 'ADC' ? 'selected' : ''}`}
                                          src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-bottom.png"
                                          alt="ADC"
                                          title="ADC"
-                                         onClick={() => handleFilterChange('rol', 'ADC')}/>
-                                    <img
-                                        className={`role-icon support-icon ${selectedRole === 'Support' ? 'selected' : ''}`}
-                                        src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-utility.png"
-                                        alt="Support"
-                                        title="Support"
-                                        onClick={() => handleFilterChange('rol', 'Support')}/>
+                                         onClick={() => handleFilterChange('rol', 'ADC')} />
+                                    <img className={`role-icon support-icon ${selectedRole === 'Support' ? 'selected' : ''}`}
+                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-utility.png"
+                                         alt="Support"
+                                         title="Support"
+                                         onClick={() => handleFilterChange('rol', 'Support')} />
                                 </div>
                             </div>
                         </div>
@@ -322,56 +394,51 @@ const Board: React.FC = () => {
                                          src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/iron.png"
                                          alt="Hierro"
                                          title="Hierro"
-                                         onClick={() => handleFilterChange('rango', 'Hierro')}/>
+                                         onClick={() => handleFilterChange('rango', 'Hierro')} />
                                     <img className={`range-icon bronce ${selectedRange === 'Bronce' ? 'selected' : ''}`}
                                          src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/bronze.png"
                                          alt="Bronce"
                                          title="Bronce"
-                                         onClick={() => handleFilterChange('rango', 'Bronce')}/>
+                                         onClick={() => handleFilterChange('rango', 'Bronce')} />
                                     <img className={`range-icon plata ${selectedRange === 'Plata' ? 'selected' : ''}`}
                                          src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/silver.png"
                                          alt="Plata"
                                          title="Plata"
-                                         onClick={() => handleFilterChange('rango', 'Plata')}/>
+                                         onClick={() => handleFilterChange('rango', 'Plata')} />
                                     <img className={`range-icon oro ${selectedRange === 'Oro' ? 'selected' : ''}`}
                                          src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/gold.png"
                                          alt="Oro"
                                          title="Oro"
-                                         onClick={() => handleFilterChange('rango', 'Oro')}/>
-                                    <img
-                                        className={`range-icon platino ${selectedRange === 'Platino' ? 'selected' : ''}`}
-                                        src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/platinum.png"
-                                        alt="Platino"
-                                        title="Platino"
-                                        onClick={() => handleFilterChange('rango', 'Platino')}/>
-                                    <img
-                                        className={`range-icon diamante ${selectedRange === 'Diamante' ? 'selected' : ''}`}
-                                        src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/diamond.png"
-                                        alt="Diamante"
-                                        title="Diamante"
-                                        onClick={() => handleFilterChange('rango', 'Diamante')}/>
-                                    <img
-                                        className={`range-icon ascendente ${selectedRange === 'Master' ? 'selected' : ''}`}
-                                        src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/master.png"
-                                        alt="Master"
-                                        title="Master"
-                                        onClick={() => handleFilterChange('rango', 'Master')}/>
-                                    <img
-                                        className={`range-icon inmortal ${selectedRange === 'Grandmaster' ? 'selected' : ''}`}
-                                        src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/grandmaster.png"
-                                        alt="Inmortal"
-                                        title="Inmortal"
-                                        onClick={() => handleFilterChange('rango', 'Grandmaster')}/>
-                                    <img
-                                        className={`range-icon radiante ${selectedRange === 'Challenger' ? 'selected' : ''}`}
-                                        src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/challenger.png"
-                                        alt="Radiante"
-                                        title="Radiante"
-                                        onClick={() => handleFilterChange('rango', 'Challenger')}/>
+                                         onClick={() => handleFilterChange('rango', 'Oro')} />
+                                    <img className={`range-icon platino ${selectedRange === 'Platino' ? 'selected' : ''}`}
+                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/platinum.png"
+                                         alt="Platino"
+                                         title="Platino"
+                                         onClick={() => handleFilterChange('rango', 'Platino')} />
+                                    <img className={`range-icon diamante ${selectedRange === 'Diamante' ? 'selected' : ''}`}
+                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/diamond.png"
+                                         alt="Diamante"
+                                         title="Diamante"
+                                         onClick={() => handleFilterChange('rango', 'Diamante')} />
+                                    <img className={`range-icon ascendente ${selectedRange === 'Master' ? 'selected' : ''}`}
+                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/master.png"
+                                         alt="Master"
+                                         title="Master"
+                                         onClick={() => handleFilterChange('rango', 'Master')} />
+                                    <img className={`range-icon inmortal ${selectedRange === 'Grandmaster' ? 'selected' : ''}`}
+                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/grandmaster.png"
+                                         alt="Grandmaster"
+                                         title="Grandmaster"
+                                         onClick={() => handleFilterChange('rango', 'Grandmaster')} />
+                                    <img className={`range-icon radiante ${selectedRange === 'Challenger' ? 'selected' : ''}`}
+                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/challenger.png"
+                                         alt="Challenger"
+                                         title="Challenger"
+                                         onClick={() => handleFilterChange('rango', 'Challenger')} />
                                 </div>
                             </div>
                         </div>
-                        <div className="col-auto" style={{marginLeft: 'auto', marginRight: '50px'}}>
+                        <div className="col-auto" style={{ marginLeft: 'auto', marginRight: '50px' }}>
                             <div className="mt-5">
                                 <div className="icon-container">
                                     <button type="button" className="btn btn-primary my-2" data-bs-toggle="modal"
@@ -487,7 +554,7 @@ const Board: React.FC = () => {
                                                 <li>
                                                     <a className="dropdown-item" href="#" onClick={(e) => {
                                                         e.preventDefault();
-                                                        // handleEdit(anuncio.id);  // Implementar si necesario
+                                                        handleEdit(anuncio);
                                                     }}>
                                                         <i className="bi bi-pencil-fill"></i> Editar
                                                     </a>
@@ -531,7 +598,7 @@ const Board: React.FC = () => {
                 <div className="modal-dialog">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h5 className="modal-title" id="formModalLabel">Formulario de Anuncio</h5>
+                            <h5 className="modal-title" id="formModalLabel">{isEditing ? 'Editar Anuncio' : 'Formulario de Anuncio'}</h5>
                             <button type="button" className="btn-close" data-bs-dismiss="modal"
                                     aria-label="Close"></button>
                         </div>
@@ -539,12 +606,11 @@ const Board: React.FC = () => {
                             <form onSubmit={handleSubmit}>
                                 <div className="mb-3">
                                     <label htmlFor="riotNickname" className="form-label">Riot Nickname</label>
-                                    <input type="text" className="form-control" id="riotNickname" required
-                                           onChange={handleChange}/>
+                                    <input type="text" className="form-control" id="riotNickname" value={formData.riotNickname} disabled />
                                 </div>
                                 <div className="mb-3">
-                                    <label htmlFor="create-rol" className="form-label">Rol</label>
-                                    <select className="form-select" id="rol" onChange={handleChange}>
+                                    <label htmlFor="rol" className="form-label">Rol</label>
+                                    <select className="form-select" id="rol" value={formData.rol} onChange={handleChange}>
                                         <option value="">Seleccione un rol</option>
                                         <option value="Top">Top</option>
                                         <option value="Mid">Mid</option>
@@ -554,8 +620,8 @@ const Board: React.FC = () => {
                                     </select>
                                 </div>
                                 <div className="mb-3">
-                                    <label htmlFor="create-buscaRol" className="form-label">Busco rol</label>
-                                    <select className="form-select" id="buscaRol" onChange={handleChange}>
+                                    <label htmlFor="buscaRol" className="form-label">Busco rol</label>
+                                    <select className="form-select" id="buscaRol" value={formData.buscaRol} onChange={handleChange}>
                                         <option value="">Seleccione un rol</option>
                                         <option value="Top">Top</option>
                                         <option value="Mid">Mid</option>
@@ -565,17 +631,40 @@ const Board: React.FC = () => {
                                     </select>
                                 </div>
                                 <div className="mb-3">
-                                    <label htmlFor="create-rango" className="form-label">Rango</label>
-                                    <input type="text" className="form-control" id="rango" onChange={handleChange}/>
+                                    <label htmlFor="rango" className="form-label">Rango</label>
+                                    <select className="form-select" id="rango" value={formData.rango} onChange={handleChange}>
+                                        <option value="">Seleccione un rango</option>
+                                        <option value="Hierro">Hierro</option>
+                                        <option value="Bronce">Bronce</option>
+                                        <option value="Plata">Plata</option>
+                                        <option value="Oro">Oro</option>
+                                        <option value="Platino">Platino</option>
+                                        <option value="Diamante">Diamante</option>
+                                        <option value="Master">Master</option>
+                                        <option value="Grandmaster">Grandmaster</option>
+                                        <option value="Challenger">Challenger</option>
+                                    </select>
                                 </div>
                                 <div className="mb-3">
-                                    <label htmlFor="create-comentario" className="form-label">Comentario</label>
-                                    <textarea className="form-control" id="comentario" rows={3}
-                                              onChange={handleChange}></textarea>
+                                    <label htmlFor="comentario" className="form-label">Comentario</label>
+                                    <textarea className="form-control" id="comentario" rows={3} value={formData.comentario} onChange={handleChange}></textarea>
+                                </div>
+                                <div className="mb-3">
+                                    <div className="form-check">
+                                        <input
+                                            className="form-check-input"
+                                            type="checkbox"
+                                            id="crearCanalDiscord"
+                                            checked={formData.crearCanalDiscord}
+                                            onChange={handleChange}
+                                        />
+                                        <label className="form-check-label" htmlFor="crearCanalDiscord">
+                                            Desea crear un canal de Discord para el anuncio?
+                                        </label>
+                                    </div>
                                 </div>
                                 <div className="modal-footer">
-                                    <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cerrar
-                                    </button>
+                                    <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                                     <button type="submit" className="btn btn-primary">Enviar</button>
                                 </div>
                             </form>
@@ -602,8 +691,7 @@ const Board: React.FC = () => {
                                               value={messageText} onChange={handleMessageChange}></textarea>
                                 </div>
                                 <div className="modal-footer">
-                                    <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cerrar
-                                    </button>
+                                    <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                                     <button type="submit" className="btn btn-primary">Enviar</button>
                                 </div>
                             </form>
@@ -611,9 +699,25 @@ const Board: React.FC = () => {
                     </div>
                 </div>
             </div>
+            <Modal show={showModal} onHide={() => setShowModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Canal del Anuncio</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Haz clic en el siguiente enlace para unirte al canal de voz del anuncio:
+                    <br />
+                    <a href={channelLink} target="_blank" rel="noopener noreferrer">
+                        Unirse al canal
+                    </a>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowModal(false)}>
+                        Cerrar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </section>
     );
 }
-
 
 export default Board;

@@ -12,6 +12,9 @@ public class UserProfileService {
     @Autowired
     private UserProfileRepository userRepository;
 
+    @Autowired
+    private SummonerService summonerService;
+
     public UserProfile saveUserProfile(UserProfile userProfile) {
         return userRepository.save(userProfile);
     }
@@ -32,4 +35,19 @@ public class UserProfileService {
         return userRepository.findByRiotnickname(riotnickname);
     }
 
+    public boolean existsByNombreusuario(String nombreusuario) {
+        return userRepository.existsByNombreusuario(nombreusuario);
+    }
+
+    public boolean existsByRiotnickname(String riotnickname) {
+        return userRepository.existsByRiotnickname(riotnickname);
+    }
+
+    public boolean isRiotNicknameValid(String riotnickname) {
+        String[] parts = riotnickname.split("#");
+        if (parts.length != 2) {
+            return false;
+        }
+        return summonerService.isRiotNicknameValid(parts[0], parts[1]);
+    }
 }

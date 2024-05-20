@@ -28,6 +28,7 @@
     "webstomp-client": "^1.2.6"
   },
   "devDependencies": {
+    "@types/bootstrap": "^5.2.10",
     "@types/react": "^18.2.79",
     "@types/react-dom": "^18.2.25",
     "@types/react-modal": "^3.16.3",
