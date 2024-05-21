@@ -2,7 +2,9 @@ package com.partnerup.backend.controller;
 
 import com.partnerup.backend.model.Anuncio;
 import com.partnerup.backend.service.AnuncioService;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +35,9 @@ public class DiscordController {
             if (channel == null) {
                 return ResponseEntity.status(500).body("Error creating Discord voice channel: channel is null");
             }
+
+            Role everyoneRole = guild.getPublicRole();
+            channel.upsertPermissionOverride(everyoneRole).deny(Permission.VIEW_CHANNEL).queue();
 
             String channelLink = "https://discord.com/channels/" + guild.getId() + "/" + channel.getId();
             String inviteLink = channel.createInvite().setMaxAge(0).setMaxUses(0).complete().getUrl();
