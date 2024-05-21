@@ -292,9 +292,10 @@ const Navbar: React.FC = () => {
                             value={searchTerm}
                             onChange={handleSearchChange}
                         />
-                        <button className="btn btn-outline-light" type="submit">
+                        <button className="btn btn-outline-light" type="submit" style={{marginLeft: '10px'}}>
                             <i className="bi bi-search"></i>
                         </button>
+
                     </form>
                     <button className="navbar-toggler" type="button" data-bs-toggle="collapse"
                             data-bs-target="#mynavbar">
