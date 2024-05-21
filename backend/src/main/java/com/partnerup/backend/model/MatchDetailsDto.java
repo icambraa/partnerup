@@ -41,8 +41,8 @@ public class MatchDetailsDto {
             private boolean win;
             private String riotIdGameName;
             private String riotIdTagline;
-            private int summoner1Id; // Nuevo campo
-            private int summoner2Id; // Nuevo campo
+            private int summoner1Id;
+            private int summoner2Id;
         }
     }
 }
