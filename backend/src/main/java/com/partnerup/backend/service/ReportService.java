@@ -16,4 +16,7 @@ public class ReportService {
         return reportRepository.save(report);
     }
 
+    public List<Report> getAllReports() {
+        return reportRepository.findAll();
+    }
 }

@@ -7,7 +7,8 @@ import UserProfile from './components/inside/UserProfile';
 import LoginForm from './components/authentication/LoginForm';
 import RegistrationForm from './components/authentication/RegistrationForm';
 import ProfileRegistration from './components/authentication/ProfileRegistration';
-import AdminPanel from './components/admin/AdminPanel';  // Importa el nuevo componente
+import AdminPanel from './components/admin/AdminPanel';
+import ReportsView from './components/admin/ReportsView'; // Importa el nuevo componente
 import { AuthProvider } from './contexts/AuthContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -24,6 +25,7 @@ const App: React.FC = () => {
                     <Route path="/profile" element={<WithNavbar><UserProfile /></WithNavbar>} />
                     <Route path="/profile/:riotnickname" element={<WithNavbar><UserProfileWrapper /></WithNavbar>} />
                     <Route path="/admin-panel" element={<WithNavbar><AdminPanel /></WithNavbar>} />
+                    <Route path="/admin-panel/reports" element={<WithNavbar><ReportsView /></WithNavbar>} /> {/* Nueva ruta */}
                 </Routes>
             </AuthProvider>
         </Router>

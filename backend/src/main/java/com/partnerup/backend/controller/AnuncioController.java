@@ -70,4 +70,10 @@ public class AnuncioController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @PostMapping("/by-ids")
+    public ResponseEntity<List<Anuncio>> getAnunciosByIds(@RequestBody List<Long> ids) {
+        List<Anuncio> anuncios = anuncioService.getAnunciosByIds(ids);
+        return ResponseEntity.ok(anuncios);
+    }
 }

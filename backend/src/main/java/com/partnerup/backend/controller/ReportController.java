@@ -24,4 +24,9 @@ public class ReportController {
         return ResponseEntity.ok(newReport);
     }
 
+    @GetMapping
+    public ResponseEntity<List<Report>> getAllReports() {
+        List<Report> reports = reportService.getAllReports();
+        return ResponseEntity.ok(reports);
+    }
 }

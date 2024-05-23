@@ -80,4 +80,8 @@ public class AnuncioService {
     public Anuncio getAnuncioById(Long id) {
         return anuncioRepository.findById(id).orElse(null);
     }
+
+    public List<Anuncio> getAnunciosByIds(List<Long> ids) {
+        return anuncioRepository.findAllById(ids);
+    }
 }
