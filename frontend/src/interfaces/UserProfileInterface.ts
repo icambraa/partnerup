@@ -5,4 +5,5 @@ export interface UserProfile {
     riotnickname: string;
     email: string;
     firebaseUid: string;
+    admin: boolean;
 }

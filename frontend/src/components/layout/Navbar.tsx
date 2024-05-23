@@ -30,7 +30,7 @@ const Navbar: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [loadingMessages, setLoadingMessages] = useState(true);
     const [loadingProfiles, setLoadingProfiles] = useState(true);
-
+    const [isAdmin, setIsAdmin] = useState(false);
     const handleOpenMessage = (message: Message) => {
         setSelectedMessage(message);
         setShowModal(true);
@@ -54,6 +54,11 @@ const Navbar: React.FC = () => {
 
     useEffect(() => {
         if (currentUser) {
+            fetchUserProfileByFirebaseUid(currentUser.uid).then(userProfile => {
+                if (userProfile) {
+                    setIsAdmin(userProfile.admin);
+                }
+            });
             fetchUnreadMessagesCount(currentUser.uid);
         } else {
             navigate('/');
@@ -77,9 +82,9 @@ const Navbar: React.FC = () => {
             } else {
                 throw new Error('Failed to fetch unread messages count');
             }
-            setLoadingMessages(false);
         } catch (error) {
             console.error('Error fetching unread messages count:', error);
+        } finally {
             setLoadingMessages(false);
         }
     };
@@ -110,7 +115,7 @@ const Navbar: React.FC = () => {
         }
     };
 
-    const fetchUserProfileByFirebaseUid = async (firebaseUid: string) => {
+    const fetchUserProfileByFirebaseUid = async (firebaseUid: string): Promise<UserProfile | undefined> => {
         setLoadingProfiles(true);
         try {
             const response = await fetch(`http://localhost:8080/api/profiles/by-firebaseUid?firebaseUid=${firebaseUid}`);
@@ -119,9 +124,9 @@ const Navbar: React.FC = () => {
             } else {
                 throw new Error('Failed to fetch user profile');
             }
-            setLoadingProfiles(false);
         } catch (error) {
             console.error('Error fetching user profile:', error);
+        } finally {
             setLoadingProfiles(false);
         }
     };
@@ -305,7 +310,12 @@ const Navbar: React.FC = () => {
                     <img src={lolIcon} alt="LoL Icon" style={{height: '30px', marginLeft: '60px'}}/>
 
                     <div className="collapse navbar-collapse" id="mynavbar">
-                        <ul className="navbar-nav ms-auto" style={{gap: '20px'}}>
+                        <ul className="navbar-nav ms-auto d-flex align-items-center" style={{gap: '20px'}}>
+                            {isAdmin && (
+                                <li className="nav-item d-flex align-items-center">
+                                    <a className="nav-link" href="/admin-panel">Panel de administrador</a>
+                                </li>
+                            )}
                             <li className="nav-item" style={{marginRight: '20px', position: 'relative'}}>
                                 <a className="nav-link" href="#" onClick={toggleSidebar} style={{position: 'relative'}}>
                                     <i className="bi bi-chat-left-dots-fill"

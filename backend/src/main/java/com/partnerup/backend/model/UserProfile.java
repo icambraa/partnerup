@@ -27,6 +27,9 @@ public class UserProfile {
     @Column(name = "firebase_uid")
     private String firebaseUid;
 
+    @Column(name = "admin")
+    private boolean admin;
+
     public Long getId() {
         return id;
     }
@@ -81,5 +84,13 @@ public class UserProfile {
 
     public void setFirebaseUid(String firebaseUid) {
         this.firebaseUid = firebaseUid;
+    }
+
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
     }
 }
