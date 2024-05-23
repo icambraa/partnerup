@@ -33,6 +33,48 @@ const Board: React.FC = () => {
     const [channelLink, setChannelLink] = useState('');
     const [showSuccessModal, setShowSuccessModal] = useState(false); // Añadido para el modal de éxito
     const [showMessageModal, setShowMessageModal] = useState(false); // Añadido para el modal de mensaje
+    const [showReportModal, setShowReportModal] = useState(false);
+    const [reportMessage, setReportMessage] = useState('');
+
+    const handleOpenReportModal = (anuncio: Anuncio) => {
+        setSelectedAnuncio(anuncio);
+        setShowReportModal(true);
+    };
+
+    const handleReportSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (!currentUser || !selectedAnuncio) {
+            console.error('Authentication error or no announcement selected');
+            return;
+        }
+
+        const reportData = {
+            reporterId: currentUser.uid,
+            anuncioId: selectedAnuncio.id,
+            reason: reportMessage,
+            status: 'pendiente'
+        };
+
+        try {
+            const response = await fetch('http://localhost:8080/api/reports', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(reportData)
+            });
+
+            if (response.ok) {
+                console.log('Report submitted successfully');
+                setReportMessage('');
+                setShowReportModal(false); // Cerrar el modal después de enviar el reporte
+            } else {
+                throw new Error('Failed to submit report');
+            }
+        } catch (error) {
+            console.error('Error submitting report:', error);
+        }
+    };
 
     const handleEdit = (anuncio: Anuncio) => {
         setFormData({
@@ -44,7 +86,7 @@ const Board: React.FC = () => {
         });
         setSelectedAnuncio(anuncio);
         setIsEditing(true);
-        setShowModal(true); // Mostrar el formulario como un div
+        setShowModal(true);
     };
 
     useEffect(() => {
@@ -479,7 +521,8 @@ const Board: React.FC = () => {
                                 <td className="align-middle text-center">
                                     {currentUser && currentUser.uid === anuncio.userId ? (
                                         <a href={anuncio.discordChannelLink} target="_blank" rel="noopener noreferrer">
-                                            <i className="bi bi-discord" style={{ fontSize: '24px', color: '#7289da' }}></i>
+                                            <i className="bi bi-discord"
+                                               style={{fontSize: '24px', color: '#7289da'}}></i>
                                         </a>
                                     ) : (
                                         <button
@@ -520,24 +563,24 @@ const Board: React.FC = () => {
                                 </td>
                                 <td className="align-middle text-center">
                                     <img src={getRoleIconUrl(anuncio.rol)} alt={anuncio.rol} title={anuncio.rol}
-                                         style={{ width: '30px', height: 'auto' }} />
+                                         style={{width: '30px', height: 'auto'}}/>
                                 </td>
                                 <td className="align-middle text-center">
                                     <img
                                         src={getRoleIconUrl(anuncio.buscaRol)}
                                         alt={anuncio.buscaRol}
                                         title={anuncio.buscaRol}
-                                        style={{ width: '30px', height: 'auto', filter: 'grayscale(100%)' }}
+                                        style={{width: '30px', height: 'auto', filter: 'grayscale(100%)'}}
                                     />
                                 </td>
                                 <td className="align-middle text-center">
                                     {anuncio.rango && (
-                                        <div style={{ textAlign: 'center' }}>
+                                        <div style={{textAlign: 'center'}}>
                                             <img
                                                 src={getRankIconUrl(anuncio.rango)}
                                                 alt={anuncio.rango}
                                                 title={anuncio.rango}
-                                                style={{ width: '30px', height: 'auto' }}
+                                                style={{width: '30px', height: 'auto'}}
                                             />
                                             <div>{anuncio.rango}</div>
                                         </div>
@@ -547,7 +590,7 @@ const Board: React.FC = () => {
                                 <td className="align-middle text-center">
                                     {timeSince(new Date(anuncio.createdAt))}
                                 </td>
-                                <td style={{ backgroundColor: 'transparent' }}>
+                                <td style={{backgroundColor: 'transparent'}}>
                                     {currentUser && currentUser.uid === anuncio.userId ? (
                                         <div className="dropdown">
                                             <a className="text-muted" href="#" role="button"
@@ -587,7 +630,7 @@ const Board: React.FC = () => {
                                                 <li>
                                                     <a className="dropdown-item" href="#" onClick={(e) => {
                                                         e.preventDefault();
-                                                        // handleReport(anuncio.id);  // Implementar si necesario
+                                                        handleOpenReportModal(anuncio); // Llamada a la función handleOpenReportModal para mostrar el modal de reporte
                                                     }}>
                                                         <i className="bi bi-flag-fill"></i> Reportar
                                                     </a>
@@ -601,7 +644,7 @@ const Board: React.FC = () => {
                         </tbody>
                     </table>
                     <div className="pagination-controls text-center">
-                        <button onClick={handleNextPage} style={{ position: 'relative', left: '-40px' }}>
+                        <button onClick={handleNextPage} style={{position: 'relative', left: '-40px'}}>
                             <i className="bi bi-chevron-compact-down"></i>
                         </button>
                     </div>
@@ -613,7 +656,8 @@ const Board: React.FC = () => {
                         <div className="modal-header">
                             <h5 className="modal-title"
                                 id="formModalLabel">{isEditing ? 'Editar Anuncio' : 'Crear anuncio'}</h5>
-                            <button type="button" className="btn-close" onClick={() => setShowModal(false)} aria-label="Close"></button>
+                            <button type="button" className="btn-close" onClick={() => setShowModal(false)}
+                                    aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
                             <form onSubmit={handleSubmit}>
@@ -747,6 +791,31 @@ const Board: React.FC = () => {
                                 <div className="modal-footer" style={{ marginTop: '20px' }}>
                                     <button type="button" className="btn btn-secondary" onClick={() => setShowMessageModal(false)} style={{ marginRight: '10px' }}>Cerrar</button>
                                     <button type="submit" className="btn btn-primary">Enviar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {showReportModal && (
+                <div className="custom-modal">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title">
+                                Reportar Anuncio
+                            </h5>
+                            <button type="button" className="btn-close" onClick={() => setShowReportModal(false)} aria-label="Close"></button>
+                        </div>
+                        <div className="modal-body">
+                            <form onSubmit={handleReportSubmit}>
+                                <div className="mb-3">
+                                    <label htmlFor="reportMessage" className="form-label">Motivo del Reporte</label>
+                                    <textarea className="form-control" id="reportMessage" rows={3} required
+                                              value={reportMessage} onChange={(e) => setReportMessage(e.target.value)}></textarea>
+                                </div>
+                                <div className="modal-footer" style={{ marginTop: '20px' }}>
+                                    <button type="button" className="btn btn-secondary" onClick={() => setShowReportModal(false)} style={{ marginRight: '10px' }}>Cerrar</button>
+                                    <button type="submit" className="btn btn-primary">Enviar Reporte</button>
                                 </div>
                             </form>
                         </div>

@@ -26,7 +26,7 @@ public class Anuncio {
     private String comentario;
 
     @Column(nullable = false)
-    private String userId;  // UID de Firebase
+    private String userId;
 
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
