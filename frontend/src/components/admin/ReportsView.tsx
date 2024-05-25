@@ -9,10 +9,10 @@ const ReportsView: React.FC = () => {
     const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
     const { currentUser } = useAuth();
     const alertMessages = [
-        "Tu anuncio ha sido reportado por contener lenguaje inapropiado.",
-        "Tu anuncio ha sido reportado por comportamiento ofensivo.",
-        "Tu anuncio ha sido reportado por información engañosa.",
-        "Tu anuncio ha sido reportado por spam.",
+        "Tu anuncio ha sido eliminado por contener lenguaje inapropiado.",
+        "Tu anuncio ha sido eliminado por comportamiento ofensivo.",
+        "Tu anuncio ha sido eliminado por información engañosa.",
+        "Tu anuncio ha sido eliminado por spam.",
     ];
     const [showModal, setShowModal] = useState(false);
     const [selectedAnuncioId, setSelectedAnuncioId] = useState<number | null>(null);
@@ -29,8 +29,9 @@ const ReportsView: React.FC = () => {
             const response = await fetch('http://localhost:8080/api/reports');
             if (response.ok) {
                 const reportsData = await response.json();
-                setReports(reportsData);
-                const anuncioIds = reportsData.map((report: Report) => report.anuncioId);
+                const pendingReports = reportsData.filter((report: Report) => report.status === 'pendiente');
+                setReports(pendingReports);
+                const anuncioIds = pendingReports.map((report: Report) => report.anuncioId);
                 fetchAnuncios(anuncioIds);
             } else {
                 throw new Error('Failed to fetch reports');
@@ -74,29 +75,7 @@ const ReportsView: React.FC = () => {
         setShowModal(true);
     };
 
-    const deleteAnuncio = async (anuncioId: number) => {
-        try {
-            const response = await fetch(`http://localhost:8080/api/anuncios/${anuncioId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'userId': currentUser?.uid || '',
-                },
-            });
-            if (response.ok) {
-                // Actualizar el estado local inmediatamente
-                setAnuncios(prevAnuncios => prevAnuncios.filter(anuncio => anuncio.id !== anuncioId));
-                setReports(prevReports => prevReports.filter(report => report.anuncioId !== anuncioId));
-                console.log('Anuncio borrado con éxito');
-            } else {
-                throw new Error('Error al borrar el anuncio');
-            }
-        } catch (error) {
-            console.error('Error al borrar el anuncio', error);
-        }
-    };
-
-    const createAlerta = async (userId: number, message: string) => {
+    const createAlerta = async (userId: string, message: string) => {
         try {
             const alerta = {
                 userId: userId,
@@ -122,14 +101,83 @@ const ReportsView: React.FC = () => {
         }
     };
 
-    const handleModalSubmit = (selectedMessageIndex: number) => {
+    const updateReportStatus = async (reportId: number) => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/reports/${reportId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: 'revisado' }),
+            });
+
+            if (response.ok) {
+                console.log('Reporte actualizado a revisado');
+                fetchReports(); // Refrescar la lista de reportes
+            } else {
+                throw new Error('Error al actualizar el reporte');
+            }
+        } catch (error) {
+            console.error('Error al actualizar el reporte', error);
+        }
+    };
+
+    const getUserProfile = async (uid: string) => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/profiles/by-firebaseUid?firebaseUid=${uid}`);
+            if (response.ok) {
+                return await response.json();
+            } else {
+                throw new Error('Error al obtener el perfil del usuario');
+            }
+        } catch (error) {
+            console.error('Error al obtener el perfil del usuario', error);
+            return null;
+        }
+    };
+
+    const deleteAnuncio = async (anuncioId: number) => {
+        try {
+            const userProfile = await getUserProfile(currentUser?.uid || '');
+            if (!userProfile) {
+                throw new Error('No se pudo obtener el perfil del usuario');
+            }
+
+            const response = await fetch(`http://localhost:8080/api/anuncios/${anuncioId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'userId': currentUser?.uid || '',
+                    'isAdmin': userProfile.admin ? 'true' : 'false'
+                },
+            });
+
+            if (response.ok) {
+                console.log('Anuncio eliminado con éxito');
+                // Actualizar los reportes relacionados
+                const relatedReports = reports.filter(report => report.anuncioId === anuncioId);
+                for (const report of relatedReports) {
+                    await updateReportStatus(report.id);
+                }
+            } else {
+                throw new Error('Error al eliminar el anuncio');
+            }
+        } catch (error) {
+            console.error('Error al eliminar el anuncio', error);
+        }
+    };
+    const handleModalSubmit = async (selectedMessageIndex: number) => {
         if (modalAction === "delete" && selectedAnuncioId !== null) {
-            createAlerta(selectedAnuncioId, alertMessages[selectedMessageIndex]);
-            deleteAnuncio(selectedAnuncioId);
+            const anuncio = getAnuncioById(selectedAnuncioId);
+            if (anuncio && anuncio.userId) {
+                await createAlerta(anuncio.userId, alertMessages[selectedMessageIndex]);
+                await deleteAnuncio(selectedAnuncioId);
+            } else {
+                console.error('No se pudo encontrar el userId del anuncio');
+            }
         }
         setShowModal(false);
     };
-
     return (
         <div className="container">
             <h1>Reportes de Anuncios</h1>

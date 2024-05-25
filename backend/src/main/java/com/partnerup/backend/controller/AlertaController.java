@@ -21,9 +21,21 @@ public class AlertaController {
         return ResponseEntity.ok(newAlerta);
     }
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/by-user/{userId}")
     public ResponseEntity<List<Alerta>> getAlertasByUserId(@PathVariable String userId) {
         List<Alerta> alertas = alertaService.getAlertasByUserId(userId);
         return ResponseEntity.ok(alertas);
+    }
+
+    @GetMapping("/unread-by-user/{userId}")
+    public ResponseEntity<List<Alerta>> getUnreadAlertasByUserId(@PathVariable String userId) {
+        List<Alerta> alertas = alertaService.getUnreadAlertasByUserId(userId);
+        return ResponseEntity.ok(alertas);
+    }
+
+    @PostMapping("/mark-as-read/{userId}")
+    public ResponseEntity<Void> markAlertasAsRead(@PathVariable String userId) {
+        alertaService.markAlertasAsRead(userId);
+        return ResponseEntity.ok().build();
     }
 }

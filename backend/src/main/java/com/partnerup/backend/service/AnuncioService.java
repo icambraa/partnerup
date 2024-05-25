@@ -1,11 +1,14 @@
 package com.partnerup.backend.service;
 
 import com.partnerup.backend.model.Anuncio;
+import com.partnerup.backend.model.UserProfile;
 import com.partnerup.backend.repository.AnuncioRepository;
+import com.partnerup.backend.repository.UserProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +19,12 @@ public class AnuncioService {
     @Autowired
     private AnuncioRepository anuncioRepository;
 
+    @Autowired
+    private UserProfileRepository userProfileRepository;
+
+    @Autowired
+    private ReportService reportService;
+
     public Anuncio createAnuncio(Anuncio anuncio) {
         return anuncioRepository.save(anuncio);
     }
@@ -24,13 +33,27 @@ public class AnuncioService {
         return anuncioRepository.findByUserId(userId);
     }
 
-    public void deleteAnuncio(Long id, String userId) throws Exception {
+    @Transactional
+    public void deleteAnuncio(Long id, String userId, boolean isAdmin) throws Exception {
         Anuncio anuncio = anuncioRepository.findById(id)
                 .orElseThrow(() -> new Exception("Anuncio no encontrado"));
 
-        if (!anuncio.getUserId().equals(userId)) {
+        String anuncioCreatorId = anuncio.getUserId();
+
+        if (!anuncioCreatorId.equals(userId) && !isAdmin) {
             throw new Exception("No autorizado para borrar este anuncio");
         }
+
+        UserProfile creatorProfile = userProfileRepository.findByFirebaseUid(anuncioCreatorId);
+        if (creatorProfile != null) {
+            creatorProfile.setDeletedAdsCount(creatorProfile.getDeletedAdsCount() + 1);
+            if (creatorProfile.getDeletedAdsCount() > 10 && !creatorProfile.isAdmin()) {
+                creatorProfile.setBanned(true);
+            }
+            userProfileRepository.save(creatorProfile);
+        }
+
+        reportService.updateReportsStatusByAnuncioId(id, "revisado");
 
         anuncioRepository.delete(anuncio);
     }

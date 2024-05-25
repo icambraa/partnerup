@@ -19,4 +19,16 @@ public class AlertaService {
     public List<Alerta> getAlertasByUserId(String userId) {
         return alertaRepository.findByUserId(userId);
     }
+
+    public List<Alerta> getUnreadAlertasByUserId(String userId) {
+        return alertaRepository.findByUserIdAndReadFalse(userId);  // Nuevo método
+    }
+
+    public void markAlertasAsRead(String userId) {
+        List<Alerta> alertas = alertaRepository.findByUserIdAndReadFalse(userId);
+        alertas.forEach(alerta -> {
+            alerta.setRead(true);
+            alertaRepository.save(alerta);
+        });
+    }
 }

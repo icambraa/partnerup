@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import {Link, useNavigate} from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { auth } from '../../firebase-auth';
-import {getAdditionalUserInfo, signInWithEmailAndPassword} from 'firebase/auth';
+import { getAdditionalUserInfo, signInWithEmailAndPassword } from 'firebase/auth';
 import logo from '../../assets/logo2-rojo.png';
-import "bootstrap-icons/font/bootstrap-icons.css"
+import "bootstrap-icons/font/bootstrap-icons.css";
 import { GoogleAuthProvider, signInWithPopup, GithubAuthProvider } from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';
 
@@ -13,16 +13,38 @@ const LoginForm: React.FC = () => {
     const [error, setError] = useState<string>('');
     const navigate = useNavigate();
 
+    const checkIfUserIsBanned = async (uid: string): Promise<boolean> => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/profiles/is-banned?firebaseUid=${uid}`);
+            if (!response.ok) {
+                throw new Error('Failed to check ban status');
+            }
+            const isBanned = await response.json();
+            return isBanned;
+        } catch (error) {
+            console.error('Error checking ban status:', error);
+            return false;
+        }
+    };
+
     const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setError('');
 
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            const isBanned = await checkIfUserIsBanned(user.uid);
+            if (isBanned) {
+                setError('Tu cuenta está baneada. Por favor, contacta con soporte.');
+                return;
+            }
+
             console.log("Usuario logueado");
             navigate('/board');
         } catch (error: unknown) {
-            if (error instanceof FirebaseError) { // Chequeo específico para errores de Firebase
+            if (error instanceof FirebaseError) {
                 console.error("Error al iniciar sesión:", error.message);
                 setError(error.message);
             } else {
@@ -31,17 +53,25 @@ const LoginForm: React.FC = () => {
             }
         }
     };
+
     const signInWithGoogle = async () => {
         const provider = new GoogleAuthProvider();
         try {
             const result = await signInWithPopup(auth, provider);
             const details = getAdditionalUserInfo(result);
+            const user = result.user;
+
+            const isBanned = await checkIfUserIsBanned(user.uid);
+            if (isBanned) {
+                setError('Tu cuenta está baneada.');
+                return;
+            }
 
             if (details && details.isNewUser) {
-                console.log('nuevo usuario registrado con Google:', result.user);
-                navigate('/create-profile', { state: { email: result.user.email } });
+                console.log('nuevo usuario registrado con Google:', user);
+                navigate('/create-profile', { state: { email: user.email } });
             } else {
-                console.log('usuario existente logueado con Google:', result.user);
+                console.log('usuario existente logueado con Google:', user);
                 navigate('/board');
             }
         } catch (error) {
@@ -54,20 +84,25 @@ const LoginForm: React.FC = () => {
         try {
             const result = await signInWithPopup(auth, provider);
             const details = getAdditionalUserInfo(result);
+            const user = result.user;
+
+            const isBanned = await checkIfUserIsBanned(user.uid);
+            if (isBanned) {
+                setError('Tu cuenta está baneada. Por favor, contacta con soporte.');
+                return;
+            }
 
             if (details && details.isNewUser) {
-                console.log("nuevo usuario registrado con GitHub:", result.user);
-                navigate('/create-profile', { state: { email: result.user.email } });
+                console.log("nuevo usuario registrado con GitHub:", user);
+                navigate('/create-profile', { state: { email: user.email } });
             } else {
-                console.log("usuario existente logueado con GitHub:", result.user);
+                console.log("usuario existente logueado con GitHub:", user);
                 navigate('/board');
             }
         } catch (error) {
             console.error("error al iniciar sesión con GitHub:", error);
         }
     };
-
-
 
     return (
         <section className="vw-100 vh-100">

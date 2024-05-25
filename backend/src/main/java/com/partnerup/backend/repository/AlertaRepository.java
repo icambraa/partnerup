@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface AlertaRepository extends JpaRepository<Alerta, Long> {
     List<Alerta> findByUserId(String userId);
+    List<Alerta> findByUserIdAndReadFalse(String userId);
 }

@@ -50,4 +50,14 @@ public class UserProfileService {
         }
         return summonerService.isRiotNicknameValid(parts[0], parts[1]);
     }
+
+    public boolean isAdmin(String userId) {
+        UserProfile user = userRepository.findByFirebaseUid(userId);
+        return user != null && user.isAdmin();
+    }
+
+    public boolean isUserBanned(String firebaseUid) {
+        UserProfile userProfile = userRepository.findByFirebaseUid(firebaseUid);
+        return userProfile != null && userProfile.isBanned();
+    }
 }

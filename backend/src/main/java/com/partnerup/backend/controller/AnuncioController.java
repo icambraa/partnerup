@@ -3,6 +3,7 @@ package com.partnerup.backend.controller;
 import com.partnerup.backend.model.Anuncio;
 import com.partnerup.backend.service.AnuncioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
@@ -30,12 +31,14 @@ public class AnuncioController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteAnuncio(@PathVariable Long id, @RequestHeader("userId") String userId) {
+    public ResponseEntity<?> deleteAnuncio(@PathVariable Long id,
+                                           @RequestHeader("userId") String userId,
+                                           @RequestHeader("isAdmin") boolean isAdmin) {
         try {
-            anuncioService.deleteAnuncio(id, userId);
+            anuncioService.deleteAnuncio(id, userId, isAdmin);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         }
     }
 

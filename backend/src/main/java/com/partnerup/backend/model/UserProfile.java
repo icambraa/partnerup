@@ -30,6 +30,12 @@ public class UserProfile {
     @Column(name = "admin")
     private boolean admin;
 
+    @Column(name = "deleted_ads_count")
+    private int deletedAdsCount;
+
+    @Column(name = "banned")
+    private boolean banned;
+
     public Long getId() {
         return id;
     }
@@ -92,5 +98,21 @@ public class UserProfile {
 
     public void setAdmin(boolean admin) {
         this.admin = admin;
+    }
+
+    public int getDeletedAdsCount() {
+        return deletedAdsCount;
+    }
+
+    public void setDeletedAdsCount(int deletedAdsCount) {
+        this.deletedAdsCount = deletedAdsCount;
+    }
+
+    public boolean isBanned() {
+        return banned;
+    }
+
+    public void setBanned(boolean banned) {
+        this.banned = banned;
     }
 }

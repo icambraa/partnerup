@@ -13,6 +13,8 @@ public class UserProfileController {
     @Autowired
     private UserProfileService profileService;
 
+
+
     @PostMapping
     public ResponseEntity<?> createUserProfile(@RequestBody UserProfile userProfile) {
         if (profileService.existsByNombreusuario(userProfile.getNombreusuario())) {
@@ -28,6 +30,7 @@ public class UserProfileController {
         UserProfile savedProfile = profileService.saveUserProfile(userProfile);
         return ResponseEntity.ok(savedProfile);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<UserProfile> getUserProfile(@PathVariable Long id) {
@@ -51,5 +54,11 @@ public class UserProfileController {
     public ResponseEntity<UserProfile> getUserProfileByRiotnickname(@RequestParam String riotnickname) {
         UserProfile userProfile = profileService.getUserProfileByRiotNickname(riotnickname);
         return userProfile != null ? ResponseEntity.ok(userProfile) : ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/is-banned")
+    public ResponseEntity<Boolean> checkIfUserIsBanned(@RequestParam String firebaseUid) {
+        boolean isBanned = profileService.isUserBanned(firebaseUid);
+        return ResponseEntity.ok(isBanned);
     }
 }

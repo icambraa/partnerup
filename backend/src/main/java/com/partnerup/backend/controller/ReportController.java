@@ -29,4 +29,15 @@ public class ReportController {
         List<Report> reports = reportService.getAllReports();
         return ResponseEntity.ok(reports);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateReportStatus(@PathVariable Long id, @RequestBody Report updatedReport) {
+        Report report = reportService.getReportById(id);
+        if (report == null) {
+            return ResponseEntity.notFound().build();
+        }
+        report.setStatus(updatedReport.getStatus());
+        reportService.updateReport(report);
+        return ResponseEntity.ok(report);
+    }
 }

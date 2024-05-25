@@ -12,6 +12,8 @@ import { Button } from "react-bootstrap";
 import './NavbarStyles.css';
 import lolIcon from '../../assets/lol-logo.png';
 import ValorantIcon from '../../assets/valorant-logo.png';
+import alertIcon from '../../assets/warning.png';
+import { Alerta } from '../../interfaces/AlertInterface.tsx';
 
 interface UserProfiles {
     [key: string]: UserProfile;
@@ -31,11 +33,41 @@ const Navbar: React.FC = () => {
     const [loadingMessages, setLoadingMessages] = useState(true);
     const [loadingProfiles, setLoadingProfiles] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [alertas, setAlertas] = useState<Alerta[]>([]);
+    const [showAlertasModal, setShowAlertasModal] = useState(false);
+    const fetchUnreadAlertas = async (userId: string) => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/alertas/unread-by-user/${userId}`);
+            if (response.ok) {
+                const data = await response.json();
+                setAlertas(data);
+            } else {
+                throw new Error('Failed to fetch user unread alertas');
+            }
+        } catch (error) {
+            console.error('Error fetching user unread alertas:', error);
+        }
+    };
+
+    const markAlertasAsRead = async (userId: string) => {
+        try {
+            await fetch(`http://localhost:8080/api/alertas/mark-as-read/${userId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+        } catch (error) {
+            console.error('Error marking alertas as read:', error);
+        }
+    };
+
     const handleOpenMessage = (message: Message) => {
         setSelectedMessage(message);
         setShowModal(true);
         markMessageAsRead(message.id);
     };
+
 
     const handleMouseEnter = (messageId: number) => {
         setHoveredMessageId(messageId);
@@ -60,10 +92,23 @@ const Navbar: React.FC = () => {
                 }
             });
             fetchUnreadMessagesCount(currentUser.uid);
+            fetchUnreadAlertas(currentUser.uid);
         } else {
             navigate('/');
         }
     }, [currentUser, navigate]);
+
+    const handleAlertIconClick = () => {
+        setShowAlertasModal(true);
+    };
+
+    const handleAlertasModalClose = async () => {
+        setShowAlertasModal(false);
+        if (currentUser) {
+            await markAlertasAsRead(currentUser.uid);
+            fetchUnreadAlertas(currentUser.uid);
+        }
+    };
 
     const fetchUnreadMessagesCount = async (userId: string) => {
         console.log("Fetching unread messages for user ID:", userId);
@@ -224,8 +269,8 @@ const Navbar: React.FC = () => {
                 },
             });
             if (response.ok) {
-                const discordLink = await response.text(); // Aquí obtenemos el texto directamente ya que es un string
-                return discordLink;  // Devolvemos el enlace de Discord
+                const discordLink = await response.text();
+                return discordLink;
             } else {
                 throw new Error('Failed to fetch Discord link');
             }
@@ -316,6 +361,14 @@ const Navbar: React.FC = () => {
                                     <a className="nav-link" href="/admin-panel">Panel de administrador</a>
                                 </li>
                             )}
+                            {alertas.length > 0 && (
+                                <li className="nav-item" style={{marginRight: '20px', position: 'relative'}}>
+                                    <a className="nav-link" href="#" onClick={handleAlertIconClick}
+                                       style={{position: 'relative'}}>
+                                        <img src={alertIcon} alt="Alert Icon" style={{width: '30px'}}/>
+                                    </a>
+                                </li>
+                            )}
                             <li className="nav-item" style={{marginRight: '20px', position: 'relative'}}>
                                 <a className="nav-link" href="#" onClick={toggleSidebar} style={{position: 'relative'}}>
                                     <i className="bi bi-chat-left-dots-fill"
@@ -356,7 +409,7 @@ const Navbar: React.FC = () => {
                 backgroundColor: '#343a40',
                 transition: 'right 0.5s'
             }}>
-                {loadingMessages ? (
+            {loadingMessages ? (
                     <div>Cargando mensajes...</div>
                 ) : (
                     <ul style={{ marginTop: '100px', position: 'relative' }}>
@@ -482,6 +535,31 @@ const Navbar: React.FC = () => {
                     </Button>
                 </Modal.Footer>
             </Modal>
+
+            <Modal show={showAlertasModal} onHide={handleAlertasModalClose} dialogClassName="modal-dialog-centered custom-modal-centered">
+                <Modal.Header closeButton>
+                    <Modal.Title>Alertas</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {alertas.length > 0 ? (
+                        <ul>
+                            {alertas.map((alerta, index) => (
+                                <li key={index}>
+                                    {alerta.mensaje} - {new Date(alerta.createdAt).toLocaleString()}
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p>No hay alertas</p>
+                    )}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleAlertasModalClose}>
+                        Cerrar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
 
         </section>
     );

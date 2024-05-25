@@ -19,6 +19,9 @@ public class Alerta {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(name = "read", nullable = false)
+    private boolean read = false;  // Nuevo campo
+
     // Getters and setters
     public Long getId() {
         return id;
@@ -50,5 +53,13 @@ public class Alerta {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public boolean isRead() {
+        return read;
+    }
+
+    public void setRead(boolean read) {
+        this.read = read;
     }
 }

@@ -19,4 +19,20 @@ public class ReportService {
     public List<Report> getAllReports() {
         return reportRepository.findAll();
     }
+
+    public Report getReportById(Long id) {
+        return reportRepository.findById(id).orElse(null);
+    }
+
+    public Report updateReport(Report report) {
+        return reportRepository.save(report);
+    }
+
+    public void updateReportsStatusByAnuncioId(Long anuncioId, String status) {
+        List<Report> reports = reportRepository.findByAnuncioId(anuncioId);
+        for (Report report : reports) {
+            report.setStatus(status);
+            reportRepository.save(report);
+        }
+    }
 }

@@ -272,14 +272,21 @@ const Board: React.FC = () => {
         }
 
         try {
-            const response = await fetch(`http://localhost:8080/api/anuncios/${id}`, {
+            // Obtener el perfil del usuario para determinar si es admin
+            const response = await fetch(`http://localhost:8080/api/profiles/by-firebaseUid?firebaseUid=${currentUser.uid}`);
+            const profile = await response.json();
+            const isAdmin = profile.admin;
+
+            const deleteResponse = await fetch(`http://localhost:8080/api/anuncios/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
-                    'userId': currentUser.uid
+                    'userId': currentUser.uid,
+                    'isAdmin': isAdmin ? 'true' : 'false'
                 }
             });
-            if (response.ok) {
+
+            if (deleteResponse.ok) {
                 console.log('Anuncio borrado con éxito');
                 setAnuncios(anuncios.filter((anuncio) => anuncio.id !== id));
             } else {
