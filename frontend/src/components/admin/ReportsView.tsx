@@ -3,6 +3,7 @@ import { Modal, Button } from 'react-bootstrap';
 import { useAuth } from '../../contexts/AuthContext';
 import { Report } from '../../interfaces/ReportInterface';
 import { Anuncio } from '../../interfaces/AnuncioInterface';
+import { Link } from 'react-router-dom'; // Importa Link
 
 const ReportsView: React.FC = () => {
     const [reports, setReports] = useState<Report[]>([]);
@@ -65,8 +66,25 @@ const ReportsView: React.FC = () => {
         return anuncios.find(anuncio => anuncio.id === id);
     };
 
-    const handleIgnore = (reportId: number) => {
-        console.log(`Report ${reportId} ignored`);
+    const handleIgnore = async (reportId: number) => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/reports/${reportId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: 'revisado' }),
+            });
+
+            if (response.ok) {
+                console.log(`Report ${reportId} ignored and marked as reviewed`);
+                fetchReports(); // Refrescar la lista de reportes
+            } else {
+                throw new Error('Error al actualizar el reporte');
+            }
+        } catch (error) {
+            console.error('Error al actualizar el reporte', error);
+        }
     };
 
     const handleDeleteAnuncio = (anuncioId: number) => {
@@ -166,6 +184,7 @@ const ReportsView: React.FC = () => {
             console.error('Error al eliminar el anuncio', error);
         }
     };
+
     const handleModalSubmit = async (selectedMessageIndex: number) => {
         if (modalAction === "delete" && selectedAnuncioId !== null) {
             const anuncio = getAnuncioById(selectedAnuncioId);
@@ -178,11 +197,13 @@ const ReportsView: React.FC = () => {
         }
         setShowModal(false);
     };
+
     return (
-        <div className="container">
+        <div className="container" style={{ marginTop: '130px' }}>
+            <Link to="/admin-panel"><i className="bi bi-arrow-left-circle" style={{ fontSize: '1.5rem' }}></i> Volver</Link>
             <h1>Reportes de Anuncios</h1>
             <table className="table">
-                <thead>
+                <thead className="custom-dark-header">
                 <tr>
                     <th>Anuncio</th>
                     <th>Reporte</th>

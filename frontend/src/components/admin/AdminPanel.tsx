@@ -14,7 +14,7 @@ const AdminPanel: React.FC = () => {
                         <Card.Body>
                             <ListGroup variant="flush">
                                 <ListGroup.Item>
-                                    <Link to="/admin-panel/reports">Ver reportes</Link>
+                                    <Link to="/admin-panel/reports">Administrar reportes</Link>
                                 </ListGroup.Item>
                             </ListGroup>
                         </Card.Body>
