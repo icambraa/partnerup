@@ -9,14 +9,14 @@ const ReportsView: React.FC = () => {
     const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
     const { currentUser } = useAuth();
     const alertMessages = [
-        "Por favor, no insultes.",
-        "Por favor, no faltes al respeto en los comentarios.",
-        "No mientas con tu rango."
+        "Tu anuncio ha sido reportado por contener lenguaje inapropiado.",
+        "Tu anuncio ha sido reportado por comportamiento ofensivo.",
+        "Tu anuncio ha sido reportado por información engañosa.",
+        "Tu anuncio ha sido reportado por spam.",
     ];
     const [showModal, setShowModal] = useState(false);
     const [selectedAnuncioId, setSelectedAnuncioId] = useState<number | null>(null);
-    const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-    const [modalAction, setModalAction] = useState<"delete" | "ban" | null>(null);
+    const [modalAction, setModalAction] = useState<"delete" | null>(null);
 
     useEffect(() => {
         if (currentUser) {
@@ -65,7 +65,6 @@ const ReportsView: React.FC = () => {
     };
 
     const handleIgnore = (reportId: number) => {
-        // Implement logic to ignore the report
         console.log(`Report ${reportId} ignored`);
     };
 
@@ -73,34 +72,6 @@ const ReportsView: React.FC = () => {
         setSelectedAnuncioId(anuncioId);
         setModalAction("delete");
         setShowModal(true);
-    };
-
-    const handleBanUser = (userId: string | undefined) => {
-        if (userId) {
-            setSelectedUserId(userId);
-            setModalAction("ban");
-            setShowModal(true);
-        }
-    };
-
-    const banUser = async (userId: string, mensaje: string) => {
-        try {
-            const response = await fetch(`http://localhost:8080/api/users/ban/${userId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(mensaje),
-            });
-            if (response.ok) {
-                console.log('Usuario baneado con éxito');
-                // Aquí puedes agregar lógica adicional si es necesario, como actualizar el estado
-            } else {
-                throw new Error('Error al banear al usuario');
-            }
-        } catch (error) {
-            console.error('Error al banear al usuario', error);
-        }
     };
 
     const deleteAnuncio = async (anuncioId: number) => {
@@ -113,8 +84,9 @@ const ReportsView: React.FC = () => {
                 },
             });
             if (response.ok) {
-                setAnuncios(anuncios.filter(anuncio => anuncio.id !== anuncioId));
-                setReports(reports.filter(report => report.anuncioId !== anuncioId));
+                // Actualizar el estado local inmediatamente
+                setAnuncios(prevAnuncios => prevAnuncios.filter(anuncio => anuncio.id !== anuncioId));
+                setReports(prevReports => prevReports.filter(report => report.anuncioId !== anuncioId));
                 console.log('Anuncio borrado con éxito');
             } else {
                 throw new Error('Error al borrar el anuncio');
@@ -154,8 +126,6 @@ const ReportsView: React.FC = () => {
         if (modalAction === "delete" && selectedAnuncioId !== null) {
             createAlerta(selectedAnuncioId, alertMessages[selectedMessageIndex]);
             deleteAnuncio(selectedAnuncioId);
-        } else if (modalAction === "ban" && selectedUserId !== null) {
-            banUser(selectedUserId, alertMessages[selectedMessageIndex]);
         }
         setShowModal(false);
     };
@@ -189,8 +159,7 @@ const ReportsView: React.FC = () => {
                             </td>
                             <td>
                                 <button className="btn btn-secondary me-2" onClick={() => handleIgnore(report.id)}>Ignorar</button>
-                                <button className="btn btn-danger me-2" onClick={() => handleDeleteAnuncio(report.anuncioId)}>Eliminar anuncio</button>
-                                <button className="btn btn-warning" onClick={() => handleBanUser(anuncio?.userId)}>Banear usuario</button>
+                                <button className="btn btn-danger" onClick={() => handleDeleteAnuncio(report.anuncioId)}>Eliminar anuncio</button>
                             </td>
                         </tr>
                     );
