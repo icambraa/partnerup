@@ -11,7 +11,6 @@ import Modal from 'react-bootstrap/Modal';
 import { Button } from "react-bootstrap";
 import './NavbarStyles.css';
 import lolIcon from '../../assets/lol-logo.png';
-import ValorantIcon from '../../assets/valorant-logo.png';
 import alertIcon from '../../assets/warning.png';
 import { Alerta } from '../../interfaces/AlertInterface.tsx';
 import { Stomp } from '@stomp/stompjs';

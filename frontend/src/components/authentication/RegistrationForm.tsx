@@ -9,6 +9,7 @@ const RegistrationForm: React.FC = () => {
     const [password, setPassword] = useState<string>('');
     const [confirmPassword, setConfirmPassword] = useState<string>('');
     const [error, setError] = useState<string>('');
+
     const navigate = useNavigate();  // Hook para la navegación
 
     const handleRegister = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -77,8 +78,8 @@ const RegistrationForm: React.FC = () => {
 
 
     return (
-        <section className="vw-100 vh-100">
-            <div className="container-fluid h-custom">
+        <section className="vw-100 vh-100 d-flex flex-column">
+            <div className="container-fluid h-custom flex-grow-1">
                 <div className="row d-flex justify-content-center align-items-center h-100">
                     <div className="col-12 col-md-8 col-lg-6 col-xl-4">
                         <div className="text-center">
@@ -143,7 +144,7 @@ const RegistrationForm: React.FC = () => {
                                          style={{marginTop: '35px'}}>
                                         <p className="letraPeq">
                                             ¿Ya tienes una cuenta? <Link to="/login"
-                                                                             className="text-primary">Haz clic
+                                                                         className="text-primary">Haz clic
                                             aquí</Link> para logearte.
                                         </p>
                                     </div>
@@ -175,12 +176,11 @@ const RegistrationForm: React.FC = () => {
                     </div>
                 </div>
             </div>
-            <div
-                className="full-width d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 bg-custom">
-                <div className="text-white mb-3 mb-md-0">
+            <footer className="bg-custom text-white text-center py-4">
+                <div>
                     Copyright © 2024. Partner UP! - Todos los derechos reservados.
                 </div>
-            </div>
+            </footer>
         </section>
     );
 }

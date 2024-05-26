@@ -11,3 +11,43 @@
 .letraPeq{
     font-size: 12px;
 }
+
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+.vh-100 {
+    min-height: 100vh;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-grow-1 {
+    flex: 1;
+}
+
+.h-custom {
+    height: calc(100vh - 100px);
+}
+.header-with-shadow {
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Ajusta los valores según prefieras */
+}
+
+footer {
+    margin-top: auto;
+}
+.hidden-section {
+    display: none;
+}
+
+.large-text {
+    font-size: 22px;
+}
+
+.game-logo {
+    max-height: 100px;
+}

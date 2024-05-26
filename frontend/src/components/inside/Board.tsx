@@ -217,37 +217,39 @@ const Board: React.FC = () => {
                 if (response.ok) {
                     const anuncio = await response.json();
 
-                    try {
-                        const discordResponse = await fetch('http://localhost:8080/api/discord/create-channel', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify(anuncio)
-                        });
-
-                        if (discordResponse.ok) {
-                            const discordData = await discordResponse.json();
-                            console.log(`Channel created: ${discordData.channelLink}`);
-
-                            // Actualizar el anuncio con el enlace del canal de Discord
-                            await fetch(`http://localhost:8080/api/anuncios/${anuncio.id}`, {
-                                method: 'PUT',
+                    if (!isEditing) { // Solo crea el canal de Discord si es un nuevo anuncio
+                        try {
+                            const discordResponse = await fetch('http://localhost:8080/api/discord/create-channel', {
+                                method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json'
                                 },
-                                body: JSON.stringify({ ...anuncio, discordChannelLink: discordData.channelLink })
+                                body: JSON.stringify(anuncio)
                             });
 
-                            setChannelLink(discordData.channelLink);
-                            setShowModal(false); // Cerrar el formulario de creación de anuncio
-                            setShowSuccessModal(true); // Mostrar el modal de éxito
-                        } else {
-                            const discordError = await discordResponse.text();
-                            console.error('Error creating Discord channel:', discordError);
+                            if (discordResponse.ok) {
+                                const discordData = await discordResponse.json();
+                                console.log(`Channel created: ${discordData.channelLink}`);
+
+                                // Actualizar el anuncio con el enlace del canal de Discord
+                                await fetch(`http://localhost:8080/api/anuncios/${anuncio.id}`, {
+                                    method: 'PUT',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({ ...anuncio, discordChannelLink: discordData.channelLink })
+                                });
+
+                                setChannelLink(discordData.channelLink);
+                                setShowModal(false); // Cerrar el formulario de creación de anuncio
+                                setShowSuccessModal(true); // Mostrar el modal de éxito
+                            } else {
+                                const discordError = await discordResponse.text();
+                                console.error('Error creating Discord channel:', discordError);
+                            }
+                        } catch (error) {
+                            console.error('Error during Discord channel creation:', error);
                         }
-                    } catch (error) {
-                        console.error('Error during Discord channel creation:', error);
                     }
 
                     fetchAnuncios();
@@ -372,6 +374,14 @@ const Board: React.FC = () => {
             return;
         }
 
+        const lastMessageTime = localStorage.getItem(`lastMessageTime_${currentUser.uid}_${selectedAnuncio.userId}`);
+        const now = new Date().getTime();
+
+        if (lastMessageTime && now - parseInt(lastMessageTime) < 10 * 60 * 1000) {
+            alert('Debes esperar 10 minutos antes de enviar otro mensaje a este usuario.');
+            return;
+        }
+
         const messageData = {
             senderId: currentUser.uid,
             receiverId: selectedAnuncio.userId,
@@ -392,6 +402,7 @@ const Board: React.FC = () => {
                 console.log('Message sent successfully');
                 setMessageText('');
                 setShowMessageModal(false); // Cerrar el modal después de enviar el mensaje
+                localStorage.setItem(`lastMessageTime_${currentUser.uid}_${selectedAnuncio.userId}`, now.toString());
             } else {
                 throw new Error('Failed to send message');
             }
@@ -445,57 +456,20 @@ const Board: React.FC = () => {
                         </div>
                         <div className="col-auto">
                             <div className="mt-5">
-                                <div className="icon-container">
-                                    <img className={`range-icon hierro ${selectedRange === 'Hierro' ? 'selected' : ''}`}
-                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/iron.png"
-                                         alt="Hierro"
-                                         title="Hierro"
-                                         onClick={() => handleFilterChange('rango', 'Hierro')} />
-                                    <img className={`range-icon bronce ${selectedRange === 'Bronce' ? 'selected' : ''}`}
-                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/bronze.png"
-                                         alt="Bronce"
-                                         title="Bronce"
-                                         onClick={() => handleFilterChange('rango', 'Bronce')} />
-                                    <img className={`range-icon plata ${selectedRange === 'Plata' ? 'selected' : ''}`}
-                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/silver.png"
-                                         alt="Plata"
-                                         title="Plata"
-                                         onClick={() => handleFilterChange('rango', 'Plata')} />
-                                    <img className={`range-icon oro ${selectedRange === 'Oro' ? 'selected' : ''}`}
-                                         src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/gold.png"
-                                         alt="Oro"
-                                         title="Oro"
-                                         onClick={() => handleFilterChange('rango', 'Oro')} />
-                                    <img
-                                        className={`range-icon platino ${selectedRange === 'Platino' ? 'selected' : ''}`}
-                                        src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/platinum.png"
-                                        alt="Platino"
-                                        title="Platino"
-                                        onClick={() => handleFilterChange('rango', 'Platino')} />
-                                    <img
-                                        className={`range-icon diamante ${selectedRange === 'Diamante' ? 'selected' : ''}`}
-                                        src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/diamond.png"
-                                        alt="Diamante"
-                                        title="Diamante"
-                                        onClick={() => handleFilterChange('rango', 'Diamante')} />
-                                    <img
-                                        className={`range-icon ascendente ${selectedRange === 'Master' ? 'selected' : ''}`}
-                                        src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/master.png"
-                                        alt="Master"
-                                        title="Master"
-                                        onClick={() => handleFilterChange('rango', 'Master')} />
-                                    <img
-                                        className={`range-icon inmortal ${selectedRange === 'Grandmaster' ? 'selected' : ''}`}
-                                        src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/grandmaster.png"
-                                        alt="Grandmaster"
-                                        title="Grandmaster"
-                                        onClick={() => handleFilterChange('rango', 'Grandmaster')} />
-                                    <img
-                                        className={`range-icon radiante ${selectedRange === 'Challenger' ? 'selected' : ''}`}
-                                        src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/challenger.png"
-                                        alt="Challenger"
-                                        title="Challenger"
-                                        onClick={() => handleFilterChange('rango', 'Challenger')} />
+                                <div className="form-group">
+                                    <select className="form-select" id="rango" value={selectedRange || ''}
+                                            onChange={(e) => handleFilterChange('rango', e.target.value || null)}>
+                                        <option value="">Todos los rangos</option>
+                                        <option value="Hierro">Hierro</option>
+                                        <option value="Bronce">Bronce</option>
+                                        <option value="Plata">Plata</option>
+                                        <option value="Oro">Oro</option>
+                                        <option value="Platino">Platino</option>
+                                        <option value="Diamante">Diamante</option>
+                                        <option value="Master">Master</option>
+                                        <option value="Grandmaster">Grandmaster</option>
+                                        <option value="Challenger">Challenger</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>

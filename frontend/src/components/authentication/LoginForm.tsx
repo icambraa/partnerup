@@ -105,8 +105,8 @@ const LoginForm: React.FC = () => {
     };
 
     return (
-        <section className="vw-100 vh-100">
-            <div className="container-fluid h-custom">
+        <section className="vw-100 vh-100 d-flex flex-column">
+            <div className="container-fluid h-custom flex-grow-1">
                 <div className="row d-flex justify-content-center align-items-center h-100">
                     <div className="col-12 col-md-8 col-lg-6 col-xl-4">
                         <div className="text-center">
@@ -186,12 +186,11 @@ const LoginForm: React.FC = () => {
                     </div>
                 </div>
             </div>
-            <div
-                className="full-width d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 bg-custom">
-                <div className="text-white mb-3 mb-md-0">
+            <footer className="bg-custom text-white text-center py-4">
+                <div>
                     Copyright © 2024. Partner UP! - Todos los derechos reservados.
                 </div>
-            </div>
+            </footer>
         </section>
     );
 }

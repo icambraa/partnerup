@@ -13,7 +13,7 @@ const ProfileRegistration: React.FC = () => {
     const initialProfileState: UserProfileInterface = {
         nombreusuario: '',
         rolprincipal: '',
-        region: '',
+        region: 'Europa', // Set default region to "Europa"
         riotnickname: '',
         email: emailFromPreviousPage,
         firebaseUid: currentUser?.uid ?? ''
@@ -42,7 +42,7 @@ const ProfileRegistration: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        if (!profile.nombreusuario || !profile.rolprincipal || !profile.region || !profile.riotnickname) {
+        if (!profile.nombreusuario || !profile.rolprincipal || !profile.riotnickname) {
             setError("Todos los campos son obligatorios.");
             setLoading(false);
             return;
@@ -80,12 +80,12 @@ const ProfileRegistration: React.FC = () => {
     };
 
     return (
-        <section className="vw-100 vh-100">
-            <div className="container-fluid h-custom">
+        <section className="vw-100 vh-100 d-flex flex-column">
+            <div className="container-fluid h-custom flex-grow-1">
                 <div className="row d-flex justify-content-center align-items-center h-100">
                     <div className="col-12 col-md-8 col-lg-6 col-xl-4">
                         <div className="text-center">
-                            <img src={logo} className="img-fluid w-75" alt="Logo" />
+                            <img src={logo} className="img-fluid w-75" alt="Logo"/>
                         </div>
                         <div className="card shadow-2-strong border border-primary">
                             <div className="card-body p-5 text-center">
@@ -114,25 +114,6 @@ const ProfileRegistration: React.FC = () => {
                                             <option value="Jungle">Jungle</option>
                                             <option value="Mid">Mid</option>
                                             <option value="Adc">Adc</option>
-                                        </select>
-                                    </div>
-                                    <div className="form-outline mb-3">
-                                        <select
-                                            name="region"
-                                            className="form-select form-select-lg"
-                                            value={profile.region}
-                                            onChange={handleChange}
-                                        >
-                                            <option value="">Selecciona una región</option>
-                                            <option value="America del Norte">America del Norte</option>
-                                            <option value="America Latina">America Latina</option>
-                                            <option value="Europa">Europa</option>
-                                            <option value="Brasil">Brasil</option>
-                                            <option value="Corea del Sur">Corea del Sur</option>
-                                            <option value="Sudeste Asiático">Sudeste Asiático</option>
-                                            <option value="China">China</option>
-                                            <option value="Japón">Japón</option>
-                                            <option value="Oceanía">Oceanía</option>
                                         </select>
                                     </div>
                                     <div className="form-outline mb-3">
@@ -165,11 +146,11 @@ const ProfileRegistration: React.FC = () => {
                     </div>
                 </div>
             </div>
-            <div className="full-width d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 bg-custom">
-                <div className="text-white mb-3 mb-md-0">
+            <footer className="bg-custom text-white text-center py-4">
+                <div>
                     Copyright © 2024. Partner UP! - Todos los derechos reservados.
                 </div>
-            </div>
+            </footer>
         </section>
     );
 };
