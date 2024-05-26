@@ -60,6 +60,7 @@ const Navbar: React.FC = () => {
             stompClient.subscribe('/topic/messages', async (message) => {
                 const newMessage = JSON.parse(message.body);
                 if (newMessage.receiverId === currentUser?.uid) {
+                    // Update unread messages and count regardless of sidebar state
                     setUnreadMessages((prevMessages) => [...prevMessages, newMessage]);
                     setUnreadMessagesCount((prevCount) => prevCount + 1);
 
@@ -222,10 +223,6 @@ const Navbar: React.FC = () => {
         setSidebarOpen(!sidebarOpen);
         if (!sidebarOpen && currentUser) {
             fetchUnreadMessages(currentUser.uid);
-        }
-        if (sidebarOpen && currentUser) {
-            setUnreadMessages(realTimeMessages);
-            setRealTimeMessages([]);
         }
     };
 
