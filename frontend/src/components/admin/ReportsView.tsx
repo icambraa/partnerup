@@ -154,14 +154,14 @@ const ReportsView: React.FC = () => {
         }
     };
 
-    const deleteAnuncio = async (anuncioId: number) => {
+    const deleteAnuncio = async (anuncioId) => {
         try {
             const userProfile = await getUserProfile(currentUser?.uid || '');
             if (!userProfile) {
                 throw new Error('No se pudo obtener el perfil del usuario');
             }
 
-            const response = await fetch(`http://localhost:8080/api/anuncios/${anuncioId}`, {
+            const response = await fetch(`http://localhost:8080/api/anuncios/${anuncioId}?isReported=true`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -172,7 +172,6 @@ const ReportsView: React.FC = () => {
 
             if (response.ok) {
                 console.log('Anuncio eliminado con éxito');
-                // Actualizar los reportes relacionados
                 const relatedReports = reports.filter(report => report.anuncioId === anuncioId);
                 for (const report of relatedReports) {
                     await updateReportStatus(report.id);

@@ -34,7 +34,7 @@ public class AnuncioService {
     }
 
     @Transactional
-    public void deleteAnuncio(Long id, String userId, boolean isAdmin) throws Exception {
+    public void deleteAnuncio(Long id, String userId, boolean isAdmin, boolean isReported) throws Exception {
         Anuncio anuncio = anuncioRepository.findById(id)
                 .orElseThrow(() -> new Exception("Anuncio no encontrado"));
 
@@ -46,9 +46,11 @@ public class AnuncioService {
 
         UserProfile creatorProfile = userProfileRepository.findByFirebaseUid(anuncioCreatorId);
         if (creatorProfile != null) {
-            creatorProfile.setDeletedAdsCount(creatorProfile.getDeletedAdsCount() + 1);
-            if (creatorProfile.getDeletedAdsCount() > 10 && !creatorProfile.isAdmin()) {
-                creatorProfile.setBanned(true);
+            if (isReported) {
+                creatorProfile.setDeletedAdsCount(creatorProfile.getDeletedAdsCount() + 1);
+                if (creatorProfile.getDeletedAdsCount() > 10 && !creatorProfile.isAdmin()) {
+                    creatorProfile.setBanned(true);
+                }
             }
             userProfileRepository.save(creatorProfile);
         }

@@ -36,7 +36,7 @@ const Navbar: React.FC = () => {
     const [isAdmin, setIsAdmin] = useState(false);
     const [alertas, setAlertas] = useState<Alerta[]>([]);
     const [showAlertasModal, setShowAlertasModal] = useState(false);
-    const [realTimeMessages, setRealTimeMessages] = useState([]);
+    const [realTimeMessages, setRealTimeMessages] = useState<Message[]>([]);
 
     const fetchUnreadAlertas = async (userId: string) => {
         try {
@@ -57,11 +57,20 @@ const Navbar: React.FC = () => {
         const stompClient = Stomp.over(socket);
 
         stompClient.connect({}, () => {
-            stompClient.subscribe('/topic/messages', (message) => {
+            stompClient.subscribe('/topic/messages', async (message) => {
                 const newMessage = JSON.parse(message.body);
                 if (newMessage.receiverId === currentUser?.uid) {
                     setUnreadMessages((prevMessages) => [...prevMessages, newMessage]);
                     setUnreadMessagesCount((prevCount) => prevCount + 1);
+
+                    // Fetch the sender's profile
+                    const senderProfile = await fetchUserProfileByFirebaseUid(newMessage.senderId);
+                    if (senderProfile) {
+                        setUserProfiles((prevProfiles) => ({
+                            ...prevProfiles,
+                            [newMessage.senderId]: senderProfile,
+                        }));
+                    }
                 }
             });
         });
@@ -92,7 +101,6 @@ const Navbar: React.FC = () => {
         markMessageAsRead(message.id);
     };
 
-
     const handleMouseEnter = (messageId: number) => {
         setHoveredMessageId(messageId);
     };
@@ -117,7 +125,7 @@ const Navbar: React.FC = () => {
             });
             fetchUnreadMessagesCount(currentUser.uid);
             fetchUnreadAlertas(currentUser.uid);
-            fetchUnreadMessages(currentUser.uid); // Asegúrate de cargar los mensajes no leídos al montar el componente
+            fetchUnreadMessages(currentUser.uid);
         } else {
             navigate('/');
         }
@@ -271,7 +279,7 @@ const Navbar: React.FC = () => {
             setTimeout(() => {
                 const remainingMessages = unreadMessages.filter(message => message.id !== messageId);
                 setUnreadMessages(remainingMessages);
-                setUnreadMessagesCount(prevCount => prevCount - 1); // Reduce el contador de mensajes no leídos
+                setUnreadMessagesCount(prevCount => prevCount - 1);
             }, 500);
         } catch (error) {
             console.error('Error deleting message:', error);
@@ -340,7 +348,7 @@ const Navbar: React.FC = () => {
                 receiverId: selectedMessage.senderId,
                 messageText: `He aceptado tu solicitud! Puedes encontrarme en este canal de  <a href="${discordLink}" target="_blank">Discord</a>`,
                 anuncioId: anuncioId,
-                isAcceptanceMessage: true // Asegúrate de que este campo esté aquí
+                isAcceptanceMessage: true
             };
 
             const response = await fetch('http://localhost:8080/api/mensajes', {
@@ -348,7 +356,7 @@ const Navbar: React.FC = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(newMessage), // Asegúrate de convertir el objeto a JSON
+                body: JSON.stringify(newMessage),
             });
 
             if (response.ok) {
@@ -361,7 +369,6 @@ const Navbar: React.FC = () => {
             console.error('Error al enviar el mensaje:', error);
         }
     };
-
 
     return (
         <section className="vw-100">
@@ -382,15 +389,12 @@ const Navbar: React.FC = () => {
                         <button className="btn btn-outline-light" type="submit" style={{marginLeft: '10px'}}>
                             <i className="bi bi-search"></i>
                         </button>
-
                     </form>
                     <button className="navbar-toggler" type="button" data-bs-toggle="collapse"
                             data-bs-target="#mynavbar">
                         <span className="navbar-toggler-icon"></span>
                     </button>
-
                     <img src={lolIcon} alt="LoL Icon" style={{height: '30px', marginLeft: '60px'}}/>
-
                     <div className="collapse navbar-collapse" id="mynavbar">
                         <ul className="navbar-nav ms-auto d-flex align-items-center" style={{gap: '20px'}}>
                             {isAdmin && (
@@ -446,7 +450,7 @@ const Navbar: React.FC = () => {
                 backgroundColor: '#343a40',
                 transition: 'right 0.5s'
             }}>
-            {loadingMessages ? (
+                {loadingMessages ? (
                     <div>Cargando mensajes...</div>
                 ) : (
                     <ul style={{ marginTop: '100px', position: 'relative' }}>
@@ -572,7 +576,6 @@ const Navbar: React.FC = () => {
                     </Button>
                 </Modal.Footer>
             </Modal>
-
             <Modal show={showAlertasModal} onHide={handleAlertasModalClose} dialogClassName="modal-dialog-centered custom-modal-centered">
                 <Modal.Header closeButton>
                     <Modal.Title>Alertas</Modal.Title>
@@ -596,8 +599,6 @@ const Navbar: React.FC = () => {
                     </Button>
                 </Modal.Footer>
             </Modal>
-
-
         </section>
     );
 }

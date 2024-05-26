@@ -11,6 +11,7 @@ type IconProfileDisplayProps = {
 
 const IconProfileDisplay: React.FC<IconProfileDisplayProps> = ({ gameName, tagLine, width, height, borderRadius }) => {
     const [profileIconUrl, setProfileIconUrl] = useState<string>('');
+    const [imageLoaded, setImageLoaded] = useState<boolean>(true);
 
     useEffect(() => {
         const fetchProfileIconUrl = async () => {
@@ -20,20 +21,34 @@ const IconProfileDisplay: React.FC<IconProfileDisplayProps> = ({ gameName, tagLi
                 if (response.ok) {
                     const data = await response.text();
                     setProfileIconUrl(data);
+                    setImageLoaded(true); // Reset imageLoaded in case of retry
                 } else {
                     throw new Error('Failed to fetch profile icon URL');
                 }
             } catch (error) {
                 console.error('Error fetching profile icon URL:', error);
+                setImageLoaded(false);
             }
         };
 
         fetchProfileIconUrl();
     }, [gameName, tagLine]);
 
+    const handleImageError = () => {
+        setImageLoaded(false);
+    };
+
     return (
         <div className="icon-profile-container">
-            <img src={profileIconUrl} alt="Profile Icon" className="icon-profile-image" style={{ width, height, borderRadius }} />
+            {imageLoaded && (
+                <img
+                    src={profileIconUrl}
+                    alt="Profile Icon"
+                    className="icon-profile-image"
+                    style={{ width, height, borderRadius }}
+                    onError={handleImageError}
+                />
+            )}
         </div>
     );
 };

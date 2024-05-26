@@ -401,8 +401,8 @@ const Board: React.FC = () => {
             if (response.ok) {
                 console.log('Message sent successfully');
                 setMessageText('');
-                setShowMessageModal(false); // Cerrar el modal después de enviar el mensaje
-                localStorage.setItem(`lastMessageTime_${currentUser.uid}_${selectedAnuncio.userId}`, now.toString());
+                setShowMessageModal(false);
+               // localStorage.setItem(`lastMessageTime_${currentUser.uid}_${selectedAnuncio.userId}`, now.toString());
             } else {
                 throw new Error('Failed to send message');
             }

@@ -5,8 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -42,7 +44,6 @@ public class SummonerService {
         }
     }
 
-
     private String getPUUID(String gameName, String tagLine) {
         String url = String.format("https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/%s/%s?api_key=%s",
                 gameName, tagLine, apiKey);
@@ -59,8 +60,22 @@ public class SummonerService {
                 gameName, tagLine, apiKey);
         try {
             ResponseEntity<AccountDto> response = restTemplate.getForEntity(url, AccountDto.class);
-            return response.getStatusCode().is2xxSuccessful() && response.getBody() != null;
-        } catch (Exception e) {
+            if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+                return false;
+            }
+
+            String puuid = response.getBody().getPuuid();
+            SummonerDto summoner = getSummoner(puuid);
+            return summoner != null;
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+                return false;
+            }
+            return false;
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("User exists but is inactive")) {
+                return false;
+            }
             return false;
         }
     }
@@ -70,8 +85,12 @@ public class SummonerService {
         try {
             ResponseEntity<SummonerDto> response = restTemplate.getForEntity(url, SummonerDto.class);
             return response.getBody();
-        } catch (Exception e) {
-            throw new RuntimeException("Error fetching Summoner: " + e.getMessage());
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+                throw new RuntimeException("User exists but is inactive");
+            } else {
+                throw new RuntimeException("Error fetching Summoner: " + e.getMessage());
+            }
         }
     }
 

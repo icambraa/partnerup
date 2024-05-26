@@ -49,6 +49,16 @@ const ProfileRegistration: React.FC = () => {
         }
 
         try {
+            const [gameName, tagLine] = profile.riotnickname.split(" ");
+            const response = await fetch(`http://localhost:8080/summoner/validate?gameName=${gameName}&tagLine=${tagLine}`);
+            const isValid = await response.json();
+
+            if (!isValid) {
+                setError("El Nickname de Riot no es válido o el usuario está inactivo.");
+                setLoading(false);
+                return;
+            }
+
             const savedProfile = await saveProfile(profile);
             console.log("Perfil guardado exitosamente:", savedProfile);
             navigate('/board');

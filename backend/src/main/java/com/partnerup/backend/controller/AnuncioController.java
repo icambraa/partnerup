@@ -33,9 +33,10 @@ public class AnuncioController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteAnuncio(@PathVariable Long id,
                                            @RequestHeader("userId") String userId,
-                                           @RequestHeader("isAdmin") boolean isAdmin) {
+                                           @RequestHeader("isAdmin") boolean isAdmin,
+                                           @RequestParam(name = "isReported", defaultValue = "false") boolean isReported) {
         try {
-            anuncioService.deleteAnuncio(id, userId, isAdmin);
+            anuncioService.deleteAnuncio(id, userId, isAdmin, isReported);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());

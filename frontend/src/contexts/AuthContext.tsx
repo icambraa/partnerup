@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../firebase-auth';
-import { Spinner } from 'react-bootstrap';
+import loadingGif from '../assets/loading.gif';
 
 interface AuthContextType {
     currentUser: User | null;
@@ -38,9 +38,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (loading) {
         return (
             <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
-                <Spinner animation="border" role="status">
-                    <span className="sr-only">Cargando...</span>
-                </Spinner>
+                <img src={loadingGif} alt="Cargando..." />
             </div>
         );
     }

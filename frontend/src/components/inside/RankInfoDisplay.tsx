@@ -70,7 +70,7 @@ const RankInfoDisplay: React.FC<RankInfoDisplayProps> = ({ gameName, tagLine, ap
     };
 
     if (error) {
-        return <div>{error}</div>;
+        return <div> </div>;
     }
 
     if (!rankInfo || !rankInfo.tier || rankInfo.tier === "UNRANKED") {

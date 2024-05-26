@@ -14,7 +14,7 @@ type WinRateResponse = {
 
 const WinRateDisplayL: React.FC<WinRateDisplayLProps> = ({ gameName, tagLine }) => {
     const [winRateData, setWinRateData] = useState<WinRateResponse | null>(null);
-    const [error, setError] = useState<string | null>(null);
+    const [, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchWinRate = async () => {
@@ -66,8 +66,6 @@ const WinRateDisplayL: React.FC<WinRateDisplayLProps> = ({ gameName, tagLine }) 
         color: '#000'
     };
 
-
-
     const lStyle: CSSProperties = {
         fill: 'none',
         strokeWidth: '5'
@@ -83,12 +81,10 @@ const WinRateDisplayL: React.FC<WinRateDisplayLProps> = ({ gameName, tagLine }) 
         stroke: '#007bff',
     };
 
-
     const totalLength = 300;
     const firstLineLength = totalLength * 0.8;
     const secondLineLength = totalLength * 0.2;
     const lLength = firstLineLength + secondLineLength;
-
 
     const startX = 10;
     const startY = 150;
@@ -97,9 +93,7 @@ const WinRateDisplayL: React.FC<WinRateDisplayLProps> = ({ gameName, tagLine }) 
 
     return (
         <div style={containerStyle}>
-            {error ? (
-                <div>{error}</div>
-            ) : winRateData !== null ? (
+            {winRateData !== null ? (
                 <div style={lContainerStyle}>
                     <svg style={svgStyle}>
                         <path
@@ -122,7 +116,7 @@ const WinRateDisplayL: React.FC<WinRateDisplayLProps> = ({ gameName, tagLine }) 
                     </div>
                 </div>
             ) : (
-                <div>Cargando...</div>
+                <div></div>
             )}
         </div>
     );

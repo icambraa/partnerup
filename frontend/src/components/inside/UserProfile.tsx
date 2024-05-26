@@ -179,7 +179,7 @@ const UserProfileComponent: React.FC<UserProfileComponentProps> = ({ riotnicknam
                         </Col>
                         <Col lg={7}>
                             {matchStats.length === 0 ? (
-                                <Spinner animation="border" role="status"><span className="sr-only">Loading...</span></Spinner>
+                                <p></p>
                             ) : (
                                 <Table className="custom-table" bordered hover>
                                     <thead>
