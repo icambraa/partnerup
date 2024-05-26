@@ -14,6 +14,8 @@ import lolIcon from '../../assets/lol-logo.png';
 import ValorantIcon from '../../assets/valorant-logo.png';
 import alertIcon from '../../assets/warning.png';
 import { Alerta } from '../../interfaces/AlertInterface.tsx';
+import { Stomp } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 
 interface UserProfiles {
     [key: string]: UserProfile;
@@ -35,6 +37,8 @@ const Navbar: React.FC = () => {
     const [isAdmin, setIsAdmin] = useState(false);
     const [alertas, setAlertas] = useState<Alerta[]>([]);
     const [showAlertasModal, setShowAlertasModal] = useState(false);
+    const [realTimeMessages, setRealTimeMessages] = useState([]);
+
     const fetchUnreadAlertas = async (userId: string) => {
         try {
             const response = await fetch(`http://localhost:8080/api/alertas/unread-by-user/${userId}`);
@@ -48,6 +52,27 @@ const Navbar: React.FC = () => {
             console.error('Error fetching user unread alertas:', error);
         }
     };
+
+    useEffect(() => {
+        const socket = new SockJS('http://localhost:8080/ws');
+        const stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, () => {
+            stompClient.subscribe('/topic/messages', (message) => {
+                const newMessage = JSON.parse(message.body);
+                if (newMessage.receiverId === currentUser?.uid) {
+                    setUnreadMessages((prevMessages) => [...prevMessages, newMessage]);
+                    setUnreadMessagesCount((prevCount) => prevCount + 1);
+                }
+            });
+        });
+
+        return () => {
+            if (stompClient) {
+                stompClient.disconnect();
+            }
+        };
+    }, [currentUser]);
 
     const markAlertasAsRead = async (userId: string) => {
         try {
@@ -93,6 +118,7 @@ const Navbar: React.FC = () => {
             });
             fetchUnreadMessagesCount(currentUser.uid);
             fetchUnreadAlertas(currentUser.uid);
+            fetchUnreadMessages(currentUser.uid); // Asegúrate de cargar los mensajes no leídos al montar el componente
         } else {
             navigate('/');
         }
@@ -190,6 +216,10 @@ const Navbar: React.FC = () => {
         if (!sidebarOpen && currentUser) {
             fetchUnreadMessages(currentUser.uid);
         }
+        if (sidebarOpen && currentUser) {
+            setUnreadMessages(realTimeMessages);
+            setRealTimeMessages([]);
+        }
     };
 
     const markMessageAsRead = async (messageId: number) => {
@@ -214,6 +244,13 @@ const Navbar: React.FC = () => {
         }
     };
 
+    const handleReject = () => {
+        if (selectedMessage) {
+            handleDelete(selectedMessage.id);
+            handleCloseModal();
+        }
+    };
+
     const handleDelete = async (messageId: number) => {
         try {
             const response = await fetch(`http://localhost:8080/api/mensajes/${messageId}`, {
@@ -235,6 +272,7 @@ const Navbar: React.FC = () => {
             setTimeout(() => {
                 const remainingMessages = unreadMessages.filter(message => message.id !== messageId);
                 setUnreadMessages(remainingMessages);
+                setUnreadMessagesCount(prevCount => prevCount - 1); // Reduce el contador de mensajes no leídos
             }, 500);
         } catch (error) {
             console.error('Error deleting message:', error);
@@ -526,9 +564,9 @@ const Navbar: React.FC = () => {
                         </Button>
                     )}
                     {!selectedMessage?.isAcceptanceMessage && (
-                    <Button variant="danger">
-                        Rechazar
-                    </Button>
+                        <Button variant="danger" onClick={handleReject}>
+                            Rechazar
+                        </Button>
                     )}
                     <Button variant="secondary" onClick={handleCloseModal}>
                         Cerrar
