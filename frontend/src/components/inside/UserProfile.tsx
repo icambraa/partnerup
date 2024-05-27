@@ -166,8 +166,6 @@ const UserProfileComponent: React.FC<UserProfileComponentProps> = ({ riotnicknam
                             <Row className="mb-3 mt-4">
                                 <Col>
                                     {userProfile.email && <p><strong>Email:</strong> {userProfile.email}</p>}
-                                    {userProfile.rangoactual &&
-                                        <p><strong>Rango Actual:</strong> {userProfile.rangoactual}</p>}
                                     {userProfile.rolprincipal &&
                                         <p><strong>Rol Principal:</strong> {userProfile.rolprincipal}</p>}
                                     {userProfile.region && <p><strong>Región:</strong> {userProfile.region}</p>}
@@ -220,20 +218,29 @@ const UserProfileComponent: React.FC<UserProfileComponentProps> = ({ riotnicknam
                                                                 }}>
                                                                     {userParticipant.win ? 'Victoria' : 'Derrota'}
                                                                 </span>
-                                                                <div style={{ display: 'flex', alignItems: 'center', marginTop: '10px' }}>
+                                                                <div style={{
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    marginTop: '10px'
+                                                                }}>
                                                                     <img
-                                                                        src={getSummonerSpellIconUrl(userParticipant.summoner1Id || '')}
+                                                                        src={getSummonerSpellIconUrl(userParticipant.summoner1Id?.toString() || '')}
                                                                         alt={`Summoner Spell ${userParticipant.summoner1Id}`}
-                                                                        style={{ width: '30px', height: '30px', marginRight: '5px' }}
+                                                                        style={{
+                                                                            width: '30px',
+                                                                            height: '30px',
+                                                                            marginRight: '5px'
+                                                                        }}
                                                                     />
                                                                     <img
-                                                                        src={getSummonerSpellIconUrl(userParticipant.summoner2Id || '')}
+                                                                        src={getSummonerSpellIconUrl(userParticipant.summoner2Id?.toString() || '')}
                                                                         alt={`Summoner Spell ${userParticipant.summoner2Id}`}
-                                                                        style={{ width: '30px', height: '30px' }}
+                                                                        style={{width: '30px', height: '30px'}}
                                                                     />
                                                                 </div>
                                                             </div>
-                                                            <div className="kda-text kd-column" style={{ marginLeft: '75px' }}>
+                                                            <div className="kda-text kd-column"
+                                                                 style={{marginLeft: '75px'}}>
                                                                 {`${userParticipant.kills || 0}/${userParticipant.deaths || 0}/${userParticipant.assists || 0}`}
                                                                 <div className="kd-text kda-column">
                                                                     {`KD: ${userParticipant.kills && userParticipant.deaths !== 0 ? (userParticipant.kills / userParticipant.deaths).toFixed(2) : 'Infinity'}`}

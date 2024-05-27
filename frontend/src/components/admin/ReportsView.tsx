@@ -154,7 +154,7 @@ const ReportsView: React.FC = () => {
         }
     };
 
-    const deleteAnuncio = async (anuncioId) => {
+    const deleteAnuncio = async (anuncioId: number) => {
         try {
             const userProfile = await getUserProfile(currentUser?.uid || '');
             if (!userProfile) {

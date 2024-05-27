@@ -13,10 +13,11 @@ const ProfileRegistration: React.FC = () => {
     const initialProfileState: UserProfileInterface = {
         nombreusuario: '',
         rolprincipal: '',
-        region: 'Europa', // Set default region to "Europa"
+        region: 'Europa',
         riotnickname: '',
         email: emailFromPreviousPage,
-        firebaseUid: currentUser?.uid ?? ''
+        firebaseUid: currentUser?.uid ?? '',
+        admin: false
     };
 
     const [profile, setProfile] = useState<UserProfileInterface>(initialProfileState);

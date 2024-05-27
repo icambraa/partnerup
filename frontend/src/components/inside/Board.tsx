@@ -160,10 +160,16 @@ const Board: React.FC = () => {
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        const { id, value, type, checked } = e.target;
-        setFormData({ ...formData, [id]: type === 'checkbox' ? checked : value });
+        const { id, value, type } = e.target;
+        if (type === 'checkbox') {
+            const checked = (e.target as HTMLInputElement).checked;
+            setFormData({ ...formData, [id]: checked });
+        } else {
+            setFormData({ ...formData, [id]: value });
+        }
         setCurrentPage(0);
     };
+
 
     const handleFilterChange = (id: string, value: string | undefined | null) => {
         if (id === 'rol') {
