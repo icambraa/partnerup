@@ -1,31 +1,19 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { auth } from '../../firebase-auth';
-import { getAdditionalUserInfo, signInWithEmailAndPassword } from 'firebase/auth';
-import logo from '../../assets/logo2-rojo.png';
+import { auth } from '../../../firebase-auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import logo from '../../../assets/logo2-rojo.png';
 import "bootstrap-icons/font/bootstrap-icons.css";
-import { GoogleAuthProvider, signInWithPopup, GithubAuthProvider } from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';
+import AuthProviders from '../providers/AuthProviders';
+import useCheckBanStatus from '../hooks/useCheckBanStatus';
 
 const LoginForm: React.FC = () => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<string>('');
     const navigate = useNavigate();
-
-    const checkIfUserIsBanned = async (uid: string): Promise<boolean> => {
-        try {
-            const response = await fetch(`http://localhost:8080/api/profiles/is-banned?firebaseUid=${uid}`);
-            if (!response.ok) {
-                throw new Error('Failed to check ban status');
-            }
-            const isBanned = await response.json();
-            return isBanned;
-        } catch (error) {
-            console.error('Error checking ban status:', error);
-            return false;
-        }
-    };
+    const checkIfUserIsBanned = useCheckBanStatus();
 
     const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -51,56 +39,6 @@ const LoginForm: React.FC = () => {
                 console.error("Error al iniciar sesión:", error);
                 setError("Error desconocido al intentar iniciar sesión. Por favor, intente nuevamente.");
             }
-        }
-    };
-
-    const signInWithGoogle = async () => {
-        const provider = new GoogleAuthProvider();
-        try {
-            const result = await signInWithPopup(auth, provider);
-            const details = getAdditionalUserInfo(result);
-            const user = result.user;
-
-            const isBanned = await checkIfUserIsBanned(user.uid);
-            if (isBanned) {
-                setError('Tu cuenta está baneada.');
-                return;
-            }
-
-            if (details && details.isNewUser) {
-                console.log('nuevo usuario registrado con Google:', user);
-                navigate('/create-profile', { state: { email: user.email } });
-            } else {
-                console.log('usuario existente logueado con Google:', user);
-                navigate('/board');
-            }
-        } catch (error) {
-            console.error('error al iniciar sesión con Google:', error);
-        }
-    };
-
-    const signInWithGithub = async () => {
-        const provider = new GithubAuthProvider();
-        try {
-            const result = await signInWithPopup(auth, provider);
-            const details = getAdditionalUserInfo(result);
-            const user = result.user;
-
-            const isBanned = await checkIfUserIsBanned(user.uid);
-            if (isBanned) {
-                setError('Tu cuenta está baneada. Por favor, contacta con soporte.');
-                return;
-            }
-
-            if (details && details.isNewUser) {
-                console.log("nuevo usuario registrado con GitHub:", user);
-                navigate('/create-profile', { state: { email: user.email } });
-            } else {
-                console.log("usuario existente logueado con GitHub:", user);
-                navigate('/board');
-            }
-        } catch (error) {
-            console.error("error al iniciar sesión con GitHub:", error);
         }
     };
 
@@ -149,38 +87,16 @@ const LoginForm: React.FC = () => {
 
                                     {error && <p style={{color: 'red'}}>{error}</p>}
 
-                                    <div className="text-end mb-3 d-flex justify-content-center"
-                                         style={{marginTop: '35px'}}>
+                                    <div className="text-end mb-3 d-flex justify-content-center" style={{marginTop: '35px'}}>
                                         <p className="letraPeq">
-                                            ¿Aún no tienes una cuenta? <Link to="/registration"
-                                                                             className="text-primary">Haz clic
-                                            aquí</Link> para registrarte.
+                                            ¿Aún no tienes una cuenta? <Link to="/registration" className="text-primary">Haz clic aquí</Link> para registrarte.
                                         </p>
                                     </div>
-
                                 </form>
 
                                 <hr className="my-4"/>
 
-                                <div className="text-center">
-                                    <p>O prefieres iniciar sesión con...</p>
-
-                                    <button
-                                        type="button"
-                                        className="btn btn-link btn-floating mx-1"
-                                        onClick={signInWithGoogle}
-                                    >
-                                        <i className="bi bi-google"></i>
-                                    </button>
-
-                                    <button
-                                        type="button"
-                                        className="btn btn-link btn-floating mx-1"
-                                        onClick={signInWithGithub}
-                                    >
-                                        <i className="bi bi-github"></i>
-                                    </button>
-                                </div>
+                                <AuthProviders />
                             </div>
                         </div>
                     </div>
@@ -193,6 +109,6 @@ const LoginForm: React.FC = () => {
             </footer>
         </section>
     );
-}
+};
 
 export default LoginForm;

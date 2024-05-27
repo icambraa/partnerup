@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { auth } from '../../firebase-auth';
-import {createUserWithEmailAndPassword, GithubAuthProvider, GoogleAuthProvider, signInWithPopup, getAdditionalUserInfo} from 'firebase/auth';
-import logo from '../../assets/logo2-rojo.png';
-import {Link, useNavigate} from 'react-router-dom';
+import { auth } from '../../../firebase-auth.ts';
+import { createUserWithEmailAndPassword, GithubAuthProvider, GoogleAuthProvider, signInWithPopup, getAdditionalUserInfo } from 'firebase/auth';
+import logo from '../../../assets/logo2-rojo.png';
+import { Link, useNavigate } from 'react-router-dom';
+import AuthProviders from '../providers/AuthProviders.tsx';
 
 const RegistrationForm: React.FC = () => {
     const [email, setEmail] = useState<string>('');
@@ -10,7 +11,7 @@ const RegistrationForm: React.FC = () => {
     const [confirmPassword, setConfirmPassword] = useState<string>('');
     const [error, setError] = useState<string>('');
 
-    const navigate = useNavigate();  // Hook para la navegación
+    const navigate = useNavigate();
 
     const handleRegister = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -39,43 +40,6 @@ const RegistrationForm: React.FC = () => {
             }
         }
     };
-
-    const signInWithGoogle = async () => {
-        const provider = new GoogleAuthProvider();
-        try {
-            const result = await signInWithPopup(auth, provider);
-            const details = getAdditionalUserInfo(result);
-
-            if (details && details.isNewUser) {
-                console.log('nuevo usuario registrado con Google:', result.user);
-                navigate('/create-profile', { state: { email: result.user.email } });
-            } else {
-                console.log('usuario existente logueado con Google:', result.user);
-                navigate('/board');
-            }
-        } catch (error) {
-            console.error('error al iniciar sesión con Google:', error);
-        }
-    };
-
-    const signInWithGithub = async () => {
-        const provider = new GithubAuthProvider();
-        try {
-            const result = await signInWithPopup(auth, provider);
-            const details = getAdditionalUserInfo(result);
-
-            if (details && details.isNewUser) {
-                console.log("nuevo usuario registrado con GitHub:", result.user);
-                navigate('/create-profile', { state: { email: result.user.email } });
-            } else {
-                console.log("usuario existente logueado con GitHub:", result.user);
-                navigate('/board');
-            }
-        } catch (error) {
-            console.error("error al iniciar sesión con GitHub:", error);
-        }
-    };
-
 
     return (
         <section className="vw-100 vh-100 d-flex flex-column">
@@ -151,26 +115,7 @@ const RegistrationForm: React.FC = () => {
                                 </form>
                                 <hr className="my-4"/>
 
-                                <div className="text-center">
-                                    <p>O prefieres registrarte con...</p>
-
-                                    <button
-                                        type="button"
-                                        className="btn btn-link btn-floating mx-1"
-                                        onClick={signInWithGoogle}
-                                    >
-                                        <i className="bi bi-google"></i>
-                                    </button>
-
-                                    <button
-                                        type="button"
-                                        className="btn btn-link btn-floating mx-1"
-                                        onClick={signInWithGithub}
-                                    >
-                                        <i className="bi bi-github"></i>
-                                    </button>
-
-                                </div>
+                                <AuthProviders />
                             </div>
                         </div>
                     </div>

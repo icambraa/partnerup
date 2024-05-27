@@ -1,14 +1,14 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useParams } from 'react-router-dom';
 import Welcome from './components/welcome/Welcome';
-import Navbar from './components/layout/Navbar';
-import Board from './components/inside/Board';
-import UserProfile from './components/inside/UserProfile';
-import LoginForm from './components/authentication/LoginForm';
-import RegistrationForm from './components/authentication/RegistrationForm';
-import ProfileRegistration from './components/authentication/ProfileRegistration';
+import Navbar from './components/inside/navbar/Navbar';
+import Board from './components/inside/Board/Board.tsx';
+import UserProfile from './components/inside/UserProfile/UserProfile.tsx';
+import LoginForm from './components/authentication/forms/LoginForm.tsx';
+import RegistrationForm from './components/authentication/forms/RegistrationForm.tsx';
+import ProfileRegistration from './components/authentication/forms/ProfileRegistration.tsx';
 import AdminPanel from './components/admin/AdminPanel';
-import ReportsView from './components/admin/ReportsView'; // Importa el nuevo componente
+import ReportsView from './components/admin/ReportsView';
 import { AuthProvider } from './contexts/AuthContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 

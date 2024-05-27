@@ -1,18 +1,18 @@
 import React, { useEffect, useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import logo from '../../assets/logo2-rojo-blanco.png';
-import { auth } from '../../firebase-auth.ts';
-import { useAuth } from '../../contexts/AuthContext';
-import { Message } from '../../interfaces/MessageInterface.tsx';
-import { UserProfile } from '../../interfaces/UserProfileInterface.ts';
-import IconProfileDisplay from "../inside/IconProfileDisplay.tsx";
-import RankInfoDisplay from '../inside/RankInfoDisplay';
+import logo from '../../../assets/logo2-rojo-blanco.png';
+import { auth } from '../../../firebase-auth.ts';
+import { useAuth } from '../../../contexts/AuthContext.tsx';
+import { Message } from '../../../interfaces/MessageInterface.tsx';
+import { UserProfile } from '../../../interfaces/UserProfileInterface.ts';
+import IconProfileDisplay from "../SummonerDisplays/IconProfileDisplay.tsx";
+import RankInfoDisplay from '../SummonerDisplays/RankInfoDisplay.tsx';
 import Modal from 'react-bootstrap/Modal';
 import { Button } from "react-bootstrap";
 import './NavbarStyles.css';
-import lolIcon from '../../assets/lol-logo.png';
-import alertIcon from '../../assets/warning.png';
-import { Alerta } from '../../interfaces/AlertInterface.tsx';
+import lolIcon from '../../../assets/lol-logo.png';
+import alertIcon from '../../../assets/warning.png';
+import { Alerta } from '../../../interfaces/AlertInterface.tsx';
 import { Stomp } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { UserProfile as UserProfileInterface } from '../../interfaces/UserProfileInterface';
-import logo from "../../assets/logo2-rojo.png";
-import { useAuth } from '../../contexts/AuthContext';
+import { UserProfile as UserProfileInterface } from '../../../interfaces/UserProfileInterface.ts';
+import logo from "../../../assets/logo2-rojo.png";
+import { useAuth } from '../../../contexts/AuthContext.tsx';
 
 const ProfileRegistration: React.FC = () => {
     const navigate = useNavigate();
