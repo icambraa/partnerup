@@ -94,8 +94,8 @@ const Welcome: React.FC = () => {
                     <p className="large-text mb-5"
                        style={{fontSize: '1.2em', color: '#333', lineHeight: '1.5'}}>
                         Partner UP! es la plataforma ideal para encontrar compañeros de juego para tus partidas
-                        competitivas. Ya sea que juegues a Valorant, League of Legends, Counter Strike 2 o Brawl Stars,
-                        aquí encontrarás a los mejores compañeros para formar un equipo imbatible.
+                        competitivas. Ya sea que juegues a Valorant o League of Legends,
+                        aquí encontrarás a los mejores compañeros para formar un duo imbatible.
                     </p>
                     <div className="d-flex justify-content-center mb-5">
                         <img src={lolLogo} alt="League of Legends" className="game-logo mx-2 rounded"/>
