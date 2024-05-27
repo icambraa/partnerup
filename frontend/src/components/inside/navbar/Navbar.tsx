@@ -1,100 +1,63 @@
-import React, { useEffect, useState, FormEvent } from 'react';
+import React, { useState, useEffect, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../../assets/logo2-rojo-blanco.png';
 import { auth } from '../../../firebase-auth.ts';
-import { useAuth } from '../../../contexts/AuthContext.tsx';
-import { Message } from '../../../interfaces/MessageInterface.tsx';
-import { UserProfile } from '../../../interfaces/UserProfileInterface.ts';
+import { useAuth } from '../../../contexts/AuthContext';
 import IconProfileDisplay from "../SummonerDisplays/IconProfileDisplay.tsx";
-import RankInfoDisplay from '../SummonerDisplays/RankInfoDisplay.tsx';
-import Modal from 'react-bootstrap/Modal';
-import { Button } from "react-bootstrap";
+import RankInfoDisplay from '../SummonerDisplays/RankInfoDisplay';
 import './NavbarStyles.css';
 import lolIcon from '../../../assets/lol-logo.png';
 import alertIcon from '../../../assets/warning.png';
-import { Alerta } from '../../../interfaces/AlertInterface.tsx';
-import { Stomp } from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
-
-interface UserProfiles {
-    [key: string]: UserProfile;
-}
+import MessageModal from './modals/MessageModal';
+import AlertModal from './modals/AlertModal';
+import useAlertas from './hooks/useAlertas';
+import useMessages from './hooks/useMessages';
+import { Message } from '../../../interfaces/MessageInterface.tsx';
+import { UserProfile } from '../../../interfaces/UserProfileInterface.ts';
 
 const Navbar: React.FC = () => {
     const navigate = useNavigate();
-    const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
     const { currentUser } = useAuth();
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [unreadMessages, setUnreadMessages] = useState<Message[]>([]);
-    const [userProfiles, setUserProfiles] = useState<UserProfiles>({});
     const [showModal, setShowModal] = useState(false);
     const [hoveredMessageId, setHoveredMessageId] = useState<number | null>(null);
     const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
-    const [loadingMessages, setLoadingMessages] = useState(true);
-    const [loadingProfiles, setLoadingProfiles] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
-    const [alertas, setAlertas] = useState<Alerta[]>([]);
-    const [showAlertasModal, setShowAlertasModal] = useState(false);
-    const [realTimeMessages, setRealTimeMessages] = useState<Message[]>([]);
 
-    const fetchUnreadAlertas = async (userId: string) => {
-        try {
-            const response = await fetch(`http://localhost:8080/api/alertas/unread-by-user/${userId}`);
-            if (response.ok) {
-                const data = await response.json();
-                setAlertas(data);
-            } else {
-                throw new Error('Failed to fetch user unread alertas');
-            }
-        } catch (error) {
-            console.error('Error fetching user unread alertas:', error);
-        }
-    };
+    const {
+        alertas,
+        showAlertasModal,
+        handleAlertIconClick,
+        handleAlertasModalClose
+    } = useAlertas();
+
+    const {
+        unreadMessagesCount,
+        unreadMessages,
+        userProfiles,
+        loadingMessages,
+        setUnreadMessages,
+        setUnreadMessagesCount,
+        markMessageAsRead,
+        fetchUnreadMessagesCount,
+        fetchUnreadMessages,
+        fetchUserProfileByFirebaseUid
+    } = useMessages();
 
     useEffect(() => {
-        const socket = new SockJS('http://localhost:8080/ws');
-        const stompClient = Stomp.over(socket);
-
-        stompClient.connect({}, () => {
-            stompClient.subscribe('/topic/messages', async (message) => {
-                const newMessage = JSON.parse(message.body);
-                if (newMessage.receiverId === currentUser?.uid) {
-                    // Update unread messages and count regardless of sidebar state
-                    setUnreadMessages((prevMessages) => [...prevMessages, newMessage]);
-                    setUnreadMessagesCount((prevCount) => prevCount + 1);
-
-                    // Fetch the sender's profile
-                    const senderProfile = await fetchUserProfileByFirebaseUid(newMessage.senderId);
-                    if (senderProfile) {
-                        setUserProfiles((prevProfiles) => ({
-                            ...prevProfiles,
-                            [newMessage.senderId]: senderProfile,
-                        }));
-                    }
+        if (currentUser) {
+            fetchUserProfileByFirebaseUid(currentUser.uid).then((userProfile: UserProfile | undefined) => {
+                if (userProfile) {
+                    setIsAdmin(userProfile.admin);
                 }
             });
-        });
-
-        return () => {
-            if (stompClient) {
-                stompClient.disconnect();
-            }
-        };
-    }, [currentUser]);
-
-    const markAlertasAsRead = async (userId: string) => {
-        try {
-            await fetch(`http://localhost:8080/api/alertas/mark-as-read/${userId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-        } catch (error) {
-            console.error('Error marking alertas as read:', error);
+            fetchUnreadMessagesCount(currentUser.uid);
+            fetchUnreadMessages(currentUser.uid);
+        } else {
+            navigate('/');
         }
-    };
+    }, [currentUser, navigate]);
 
     const handleOpenMessage = (message: Message) => {
         setSelectedMessage(message);
@@ -117,99 +80,6 @@ const Navbar: React.FC = () => {
         }
     };
 
-    useEffect(() => {
-        if (currentUser) {
-            fetchUserProfileByFirebaseUid(currentUser.uid).then(userProfile => {
-                if (userProfile) {
-                    setIsAdmin(userProfile.admin);
-                }
-            });
-            fetchUnreadMessagesCount(currentUser.uid);
-            fetchUnreadAlertas(currentUser.uid);
-            fetchUnreadMessages(currentUser.uid);
-        } else {
-            navigate('/');
-        }
-    }, [currentUser, navigate]);
-
-    const handleAlertIconClick = () => {
-        setShowAlertasModal(true);
-    };
-
-    const handleAlertasModalClose = async () => {
-        setShowAlertasModal(false);
-        if (currentUser) {
-            await markAlertasAsRead(currentUser.uid);
-            fetchUnreadAlertas(currentUser.uid);
-        }
-    };
-
-    const fetchUnreadMessagesCount = async (userId: string) => {
-        console.log("Fetching unread messages for user ID:", userId);
-        setLoadingMessages(true);
-        try {
-            const response = await fetch(`http://localhost:8080/api/mensajes/unread-count?userId=${userId}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-            if (response.ok) {
-                const data = await response.json();
-                setUnreadMessagesCount(data);
-                console.log("Unread messages count:", data);
-            } else {
-                throw new Error('Failed to fetch unread messages count');
-            }
-        } catch (error) {
-            console.error('Error fetching unread messages count:', error);
-        } finally {
-            setLoadingMessages(false);
-        }
-    };
-
-    const fetchUnreadMessages = async (userId: string) => {
-        try {
-            const response = await fetch(`http://localhost:8080/api/mensajes/unread?userId=${userId}`);
-            if (response.ok) {
-                const data = await response.json();
-                const sortedMessages = data.sort((a: Message, b: Message) => {
-                    const dateA = new Date(a.createdAt).getTime();
-                    const dateB = new Date(b.createdAt).getTime();
-                    return dateB - dateA;
-                });
-                setUnreadMessages(sortedMessages);
-                const profileFetches = data.map((message: Message) => fetchUserProfileByFirebaseUid(message.senderId));
-                const profiles = await Promise.all(profileFetches);
-                const newProfiles = profiles.reduce((acc, profile, index) => {
-                    acc[data[index].senderId] = profile;
-                    return acc;
-                }, {});
-                setUserProfiles(prev => ({ ...prev, ...newProfiles }));
-            } else {
-                throw new Error('Failed to fetch unread messages');
-            }
-        } catch (error) {
-            console.error('Error fetching unread messages:', error);
-        }
-    };
-
-    const fetchUserProfileByFirebaseUid = async (firebaseUid: string): Promise<UserProfile | undefined> => {
-        setLoadingProfiles(true);
-        try {
-            const response = await fetch(`http://localhost:8080/api/profiles/by-firebaseUid?firebaseUid=${firebaseUid}`);
-            if (response.ok) {
-                return await response.json();
-            } else {
-                throw new Error('Failed to fetch user profile');
-            }
-        } catch (error) {
-            console.error('Error fetching user profile:', error);
-        } finally {
-            setLoadingProfiles(false);
-        }
-    };
-
     const handleLogout = async () => {
         try {
             await auth.signOut();
@@ -226,26 +96,23 @@ const Navbar: React.FC = () => {
         }
     };
 
-    const markMessageAsRead = async (messageId: number) => {
-        try {
-            const response = await fetch(`http://localhost:8080/api/mensajes/mark-as-read/${messageId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-            if (!response.ok) {
-                throw new Error('Failed to mark message as read');
-            }
-            setUnreadMessages(prevMessages =>
-                prevMessages.map(message =>
-                    message.id === messageId ? { ...message, read: true } : message
-                )
-            );
-            console.log("Mensaje marcado como leído");
-        } catch (error) {
-            console.error('Error marking message as read:', error);
-        }
+    const getSortedMessages = () => {
+        const unread = unreadMessages.filter(message => !message.read);
+        const read = unreadMessages.filter(message => message.read);
+
+        return [
+            ...unread.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
+            ...read.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        ];
+    };
+
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(event.target.value);
+    };
+
+    const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        navigate(`/profile/${encodeURIComponent(searchTerm)}`);
     };
 
     const handleReject = () => {
@@ -281,25 +148,6 @@ const Navbar: React.FC = () => {
         } catch (error) {
             console.error('Error deleting message:', error);
         }
-    };
-
-    const getSortedMessages = () => {
-        const unread = unreadMessages.filter(message => !message.read);
-        const read = unreadMessages.filter(message => message.read);
-
-        return [
-            ...unread.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
-            ...read.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-        ];
-    };
-
-    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(event.target.value);
-    };
-
-    const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        navigate(`/profile/${encodeURIComponent(searchTerm)}`);
     };
 
     const obtenerEnlaceDiscord = async (anuncioId: number) => {
@@ -525,77 +373,20 @@ const Navbar: React.FC = () => {
                         })}
                     </ul>
                 )}
-                <ul style={{ marginTop: '100px', position: 'relative' }}>
-                </ul>
             </div>
-            <Modal show={showModal} onHide={handleCloseModal} dialogClassName="modal-dialog-centered custom-modal-centered">
-                <Modal.Header closeButton>
-                    {selectedMessage && selectedMessage.senderId && userProfiles[selectedMessage.senderId] && (
-                        <a href={`/profile/${encodeURIComponent(userProfiles[selectedMessage.senderId].riotnickname)}`} className="d-inline-flex align-items-center">
-                            <IconProfileDisplay
-                                gameName={userProfiles[selectedMessage.senderId].riotnickname.split('#')[0]}
-                                tagLine={userProfiles[selectedMessage.senderId].riotnickname.split('#')[1]}
-                                width="80px"
-                                height="80px"
-                                borderRadius="10%"
-                            />
-                            <div className="ms-2">
-                                <strong>{userProfiles[selectedMessage.senderId].riotnickname}</strong>
-                                <RankInfoDisplay
-                                    gameName={userProfiles[selectedMessage.senderId].riotnickname.split('#')[0]}
-                                    tagLine={userProfiles[selectedMessage.senderId].riotnickname.split('#')[1]}
-                                    applyColor={true}
-                                />
-                            </div>
-                        </a>
-                    )}
-                </Modal.Header>
-                <Modal.Body>
-                    {selectedMessage && (
-                        <>
-                            <p dangerouslySetInnerHTML={{ __html: selectedMessage.messageText }}></p>
-                        </>
-                    )}
-                </Modal.Body>
-                <Modal.Footer>
-                    {!selectedMessage?.isAcceptanceMessage && (
-                        <Button variant="success" onClick={handleAccept}>
-                            Aceptar
-                        </Button>
-                    )}
-                    {!selectedMessage?.isAcceptanceMessage && (
-                        <Button variant="danger" onClick={handleReject}>
-                            Rechazar
-                        </Button>
-                    )}
-                    <Button variant="secondary" onClick={handleCloseModal}>
-                        Cerrar
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-            <Modal show={showAlertasModal} onHide={handleAlertasModalClose} dialogClassName="modal-dialog-centered custom-modal-centered">
-                <Modal.Header closeButton>
-                    <Modal.Title>Alertas</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    {alertas.length > 0 ? (
-                        <ul>
-                            {alertas.map((alerta, index) => (
-                                <li key={index}>
-                                    {alerta.mensaje} - {new Date(alerta.createdAt).toLocaleString()}
-                                </li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <p>No hay alertas</p>
-                    )}
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleAlertasModalClose}>
-                        Cerrar
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+            <MessageModal
+                showModal={showModal}
+                handleCloseModal={handleCloseModal}
+                selectedMessage={selectedMessage}
+                userProfiles={userProfiles}
+                handleAccept={handleAccept}
+                handleReject={handleReject}
+            />
+            <AlertModal
+                showAlertasModal={showAlertasModal}
+                handleAlertasModalClose={handleAlertasModalClose}
+                alertas={alertas}
+            />
         </section>
     );
 }
