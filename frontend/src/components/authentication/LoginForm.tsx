@@ -37,7 +37,7 @@ const LoginForm: React.FC = () => {
 
             const isBanned = await checkIfUserIsBanned(user.uid);
             if (isBanned) {
-                setError('Tu cuenta está baneada. Por favor, contacta con soporte.');
+                setError('Tu cuenta está baneada.');
                 return;
             }
 

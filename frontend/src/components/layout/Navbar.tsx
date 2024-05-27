@@ -1,4 +1,4 @@
-import React, { useEffect, useState, FormEvent } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo2-rojo-blanco.png';
 import { auth } from '../../firebase-auth.ts';
@@ -37,6 +37,7 @@ const Navbar: React.FC = () => {
     const [alertas, setAlertas] = useState<Alerta[]>([]);
     const [showAlertasModal, setShowAlertasModal] = useState(false);
     const [realTimeMessages, setRealTimeMessages] = useState<Message[]>([]);
+    const [onlineUsers, setOnlineUsers] = useState(0); // Nuevo estado para los usuarios en línea
 
     const fetchUnreadAlertas = async (userId: string) => {
         try {
@@ -73,6 +74,10 @@ const Navbar: React.FC = () => {
                         }));
                     }
                 }
+            });
+
+            stompClient.subscribe('/topic/online-users', (message) => {
+                setOnlineUsers(JSON.parse(message.body)); // Actualiza el número de usuarios en línea
             });
         });
 
@@ -231,7 +236,7 @@ const Navbar: React.FC = () => {
             const response = await fetch(`http://localhost:8080/api/mensajes/mark-as-read/${messageId}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 }
             });
             if (!response.ok) {
@@ -297,7 +302,7 @@ const Navbar: React.FC = () => {
         setSearchTerm(event.target.value);
     };
 
-    const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
+    const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         navigate(`/profile/${encodeURIComponent(searchTerm)}`);
     };
@@ -418,6 +423,9 @@ const Navbar: React.FC = () => {
                                             right: '0'
                                         }}>{unreadMessagesCount}</span>}
                                 </a>
+                            </li>
+                            <li className="nav-item d-flex align-items-center">
+                                <span className="text-light">Usuarios en línea: {onlineUsers}</span> {/* Mostrar usuarios en línea */}
                             </li>
                             <li className="nav-item dropdown">
                                 <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"

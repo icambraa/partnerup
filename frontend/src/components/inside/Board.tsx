@@ -402,7 +402,7 @@ const Board: React.FC = () => {
                 console.log('Message sent successfully');
                 setMessageText('');
                 setShowMessageModal(false);
-               // localStorage.setItem(`lastMessageTime_${currentUser.uid}_${selectedAnuncio.userId}`, now.toString());
+                localStorage.setItem(`lastMessageTime_${currentUser.uid}_${selectedAnuncio.userId}`, now.toString());
             } else {
                 throw new Error('Failed to send message');
             }

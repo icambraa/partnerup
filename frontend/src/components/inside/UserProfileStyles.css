@@ -1,12 +1,12 @@
+/* Contenedor principal */
 .custom-margin-top {
+    position: relative; /* o fixed, absolute según tus necesidades */
+    z-index: 1; /* Un valor bajo para asegurarse de que esté detrás de otros elementos */
     margin-top: 120px;
 }
 
+/* Estilos adicionales existentes */
 .align-items-center {
-    align-items: center !important;
-}
-
-align-items-center {
     align-items: center !important;
 }
 
@@ -19,8 +19,6 @@ align-items-center {
     margin: 0;
     padding-top: 0;
 }
-
-
 
 .table .victory-cell {
     background-color: #ccd9e5 !important;
@@ -41,8 +39,8 @@ align-items-center {
 .table .row-shadow td {
     padding: 10px;
     border-top: 10px solid white;
-
 }
+
 .stat-cell {
     font-size: 30px;
 }
@@ -62,7 +60,7 @@ align-items-center {
     color: gray;
 }
 
-.kda-text{
+.kda-text {
     margin-left: 2em;
     font-size: 1.5em;
     text-align: center;
