@@ -5,6 +5,7 @@ import RankInfoDisplay, { RankInfo } from '../../SummonerDisplays/RankInfoDispla
 import WinRateDisplayCircle from '../../SummonerDisplays/WinRateDisplayCircle';
 import { UserProfile as UserProfileInterface } from '../../../../interfaces/UserProfileInterface';
 import { getRankIconUrl } from '../../../../utils/rankUtils';
+import '../UserProfileStyles.css';
 
 interface UserInfoSectionProps {
     userProfile: UserProfileInterface;
@@ -16,6 +17,9 @@ interface UserInfoSectionProps {
 
 const UserInfoSection: React.FC<UserInfoSectionProps> = ({ userProfile, gameName, tagLine, rankInfo, setRankInfo }) => {
     const rankIconUrl = rankInfo ? getRankIconUrl(rankInfo.tier) : '';
+
+    // Verificar si se debe mostrar la tarjeta con detalles adicionales
+    const showAdditionalInfo = userProfile.email || userProfile.rolprincipal || userProfile.region;
 
     return (
         <Col lg={5}>
@@ -57,14 +61,18 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({ userProfile, gameName
                     </Col>
                 </Row>
             </div>
-            <Row className="mb-3 mt-4">
-                <Col>
-                    {userProfile.email && <p><strong>Email:</strong> {userProfile.email}</p>}
-                    {userProfile.rolprincipal &&
-                        <p><strong>Rol Principal:</strong> {userProfile.rolprincipal}</p>}
-                    {userProfile.region && <p><strong>Región:</strong> {userProfile.region}</p>}
-                </Col>
-            </Row>
+            {showAdditionalInfo && (
+                <div className="profile-info-container mt-4 mb-3">
+                    <Row>
+                        <Col className="profile-details">
+                            {userProfile.email && <p><strong>Email:</strong> {userProfile.email}</p>}
+                            {userProfile.rolprincipal &&
+                                <p><strong>Rol Principal:</strong> {userProfile.rolprincipal}</p>}
+                            {userProfile.region && <p><strong>Región:</strong> {userProfile.region}</p>}
+                        </Col>
+                    </Row>
+                </div>
+            )}
         </Col>
     );
 };

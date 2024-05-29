@@ -28,6 +28,16 @@ const CreateEditAnuncioModal: React.FC<CreateEditAnuncioModalProps> = ({
                                                                        }) => {
     if (!showModal) return null;
 
+    const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        // Validación adicional por si se desea agregar
+        if (!formData.riotNickname || !formData.rol || !formData.buscaRol || !formData.rango || !formData.comentario) {
+            alert('Todos los campos son obligatorios.');
+            return;
+        }
+        handleSubmit(e);
+    };
+
     return (
         <div className="custom-modal">
             <div className="modal-content">
@@ -36,14 +46,14 @@ const CreateEditAnuncioModal: React.FC<CreateEditAnuncioModalProps> = ({
                     <button type="button" className="btn-close" onClick={() => setShowModal(false)} aria-label="Close"></button>
                 </div>
                 <div className="modal-body">
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={handleFormSubmit}>
                         <div className="mb-3">
                             <label htmlFor="riotNickname" className="form-label">Riot Nickname</label>
-                            <input type="text" className="form-control" id="riotNickname" value={formData.riotNickname} disabled />
+                            <input type="text" className="form-control" id="riotNickname" value={formData.riotNickname} required disabled={isEditing} />
                         </div>
                         <div className="mb-3">
                             <label htmlFor="rol" className="form-label">Rol</label>
-                            <select className="form-select" id="rol" value={formData.rol} onChange={handleChange}>
+                            <select className="form-select" id="rol" value={formData.rol} onChange={handleChange} required>
                                 <option value="">Seleccione un rol</option>
                                 <option value="Top">Top</option>
                                 <option value="Mid">Mid</option>
@@ -54,7 +64,7 @@ const CreateEditAnuncioModal: React.FC<CreateEditAnuncioModalProps> = ({
                         </div>
                         <div className="mb-3">
                             <label htmlFor="buscaRol" className="form-label">Busco rol</label>
-                            <select className="form-select" id="buscaRol" value={formData.buscaRol} onChange={handleChange}>
+                            <select className="form-select" id="buscaRol" value={formData.buscaRol} onChange={handleChange} required>
                                 <option value="">Seleccione un rol</option>
                                 <option value="Top">Top</option>
                                 <option value="Mid">Mid</option>
@@ -65,7 +75,7 @@ const CreateEditAnuncioModal: React.FC<CreateEditAnuncioModalProps> = ({
                         </div>
                         <div className="mb-3">
                             <label htmlFor="rango" className="form-label">Rango</label>
-                            <select className="form-select" id="rango" value={formData.rango} onChange={handleChange}>
+                            <select className="form-select" id="rango" value={formData.rango} onChange={handleChange} required>
                                 <option value="">Seleccione un rango</option>
                                 <option value="Hierro">Hierro</option>
                                 <option value="Bronce">Bronce</option>
@@ -80,7 +90,7 @@ const CreateEditAnuncioModal: React.FC<CreateEditAnuncioModalProps> = ({
                         </div>
                         <div className="mb-3">
                             <label htmlFor="comentario" className="form-label">Comentario</label>
-                            <textarea className="form-control" id="comentario" rows={3} value={formData.comentario} onChange={handleChange}></textarea>
+                            <textarea className="form-control" id="comentario" rows={3} value={formData.comentario} onChange={handleChange} required></textarea>
                         </div>
                         <div className="mb-2" style={{ textAlign: 'center', marginTop: '40px' }}>
                             <div style={{ display: 'inline-block' }}>
