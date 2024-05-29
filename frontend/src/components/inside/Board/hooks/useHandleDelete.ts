@@ -3,7 +3,7 @@ import { useAuth } from '../../../../contexts/AuthContext.tsx';
 const useHandleDelete = (setAnuncios: React.Dispatch<React.SetStateAction<any>>, fetchAnuncios: () => void) => {
     const { currentUser } = useAuth();
 
-    return async (id: number, anuncios: any[]) => {
+    return async (id: number) => {
         if (!currentUser || !currentUser.uid) {
             console.error('Error: No hay usuario autenticado.');
             return;

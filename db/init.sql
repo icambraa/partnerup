@@ -1,0 +1,2 @@
+INSERT INTO perfiles (admin, banned, deleted_ads_count, email, firebase_uid, nombreusuario, region, riotnickname, rolprincipal)
+VALUES (true, false, 0, 'admin@uoc.edu', 'VT4nhO0T4XNr6nhmKil2Rx9Buir2', 'Admin', 'EUW', 'Erubin#Fenix', 'Adc');

@@ -1,4 +1,5 @@
 import React from 'react';
+import discordLogo from '/src/assets/discord-logo-blue.png';
 
 interface CreateEditAnuncioModalProps {
     isEditing: boolean;
@@ -83,7 +84,7 @@ const CreateEditAnuncioModal: React.FC<CreateEditAnuncioModalProps> = ({
                         </div>
                         <div className="mb-2" style={{ textAlign: 'center', marginTop: '40px' }}>
                             <div style={{ display: 'inline-block' }}>
-                                <img src="/src/assets/discord-logo-blue.png" alt="Discord Logo" style={{ width: '300px', marginBottom: '10px' }} />
+                                <img src={discordLogo} alt="Discord Logo" style={{ width: '300px', marginBottom: '10px' }} />
                             </div>
                         </div>
                         <div className="mb-4" style={{ padding: '20px', backgroundColor: '#f0f0f0', borderRadius: '10px' }}>
