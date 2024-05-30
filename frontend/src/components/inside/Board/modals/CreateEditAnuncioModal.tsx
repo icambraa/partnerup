@@ -90,7 +90,15 @@ const CreateEditAnuncioModal: React.FC<CreateEditAnuncioModalProps> = ({
                         </div>
                         <div className="mb-3">
                             <label htmlFor="comentario" className="form-label">Comentario</label>
-                            <textarea className="form-control" id="comentario" rows={3} value={formData.comentario} onChange={handleChange} required></textarea>
+                            <textarea
+                                className="form-control"
+                                id="comentario"
+                                rows={3}
+                                value={formData.comentario}
+                                onChange={handleChange}
+                                required
+                                maxLength={80}
+                            ></textarea>
                         </div>
                         <div className="mb-2" style={{ textAlign: 'center', marginTop: '40px' }}>
                             <div style={{ display: 'inline-block' }}>

@@ -33,7 +33,7 @@ const AnuncioItem: React.FC<AnuncioItemProps> = ({
             <td className="align-middle text-center">
                 {currentUser && currentUser.uid === anuncio.userId ? (
                     <a href={anuncio.discordChannelLink} target="_blank" rel="noopener noreferrer">
-                        <i className="bi bi-discord" style={{ fontSize: '24px', color: '#7289da' }}></i>
+                        <i className="bi bi-discord" style={{fontSize: '24px', color: '#7289da'}}></i>
                     </a>
                 ) : (
                     <button
@@ -73,40 +73,44 @@ const AnuncioItem: React.FC<AnuncioItemProps> = ({
             </td>
             <td className="align-middle text-center">
                 <img src={getRoleIconUrl(anuncio.rol)} alt={anuncio.rol} title={anuncio.rol}
-                     style={{ width: '30px', height: 'auto' }} />
+                     style={{width: '30px', height: 'auto'}}/>
             </td>
             <td className="align-middle text-center">
                 <img
                     src={getRoleIconUrl(anuncio.buscaRol)}
                     alt={anuncio.buscaRol}
                     title={anuncio.buscaRol}
-                    style={{ width: '30px', height: 'auto', filter: 'grayscale(100%)' }}
+                    style={{width: '30px', height: 'auto', filter: 'grayscale(100%)'}}
                 />
             </td>
             <td className="align-middle text-center">
                 {anuncio.rango && (
-                    <div style={{ textAlign: 'center' }}>
+                    <div style={{textAlign: 'center'}}>
                         <img
                             src={getRankIconUrl(anuncio.rango)}
                             alt={anuncio.rango}
                             title={anuncio.rango}
-                            style={{ width: '30px', height: 'auto' }}
+                            style={{width: '30px', height: 'auto'}}
                         />
                         <div>{anuncio.rango}</div>
                     </div>
                 )}
             </td>
-            <td className="align-middle text-center">{anuncio.comentario}</td>
+            <td className="align-middle text-center" style={{wordBreak: 'break-word', maxWidth: '320px'}}>
+                {anuncio.comentario}
+            </td>
             <td className="align-middle text-center">
                 {timeSince(new Date(anuncio.createdAt))}
             </td>
-            <td style={{ backgroundColor: 'transparent' }}>
+            <td style={{backgroundColor: 'transparent'}}>
                 {currentUser && currentUser.uid === anuncio.userId ? (
                     <div className="dropdown">
-                        <a className="text-muted" href="#" role="button" id={`dropdownMenuLink${anuncio.id}`} data-bs-toggle="dropdown" aria-expanded="false">
+                        <a className="text-muted" href="#" role="button" id={`dropdownMenuLink${anuncio.id}`}
+                           data-bs-toggle="dropdown" aria-expanded="false">
                             <i className="bi bi-three-dots-vertical"></i>
                         </a>
-                        <ul className="dropdown-menu dropdown-menu-end" aria-labelledby={`dropdownMenuLink${anuncio.id}`}>
+                        <ul className="dropdown-menu dropdown-menu-end"
+                            aria-labelledby={`dropdownMenuLink${anuncio.id}`}>
                             <li>
                                 <a className="dropdown-item" href="#" onClick={(e) => {
                                     e.preventDefault();
@@ -127,10 +131,12 @@ const AnuncioItem: React.FC<AnuncioItemProps> = ({
                     </div>
                 ) : (
                     <div className="dropdown">
-                        <a className="text-muted" href="#" role="button" id={`dropdownMenuLink${anuncio.id}`} data-bs-toggle="dropdown" aria-expanded="false">
+                        <a className="text-muted" href="#" role="button" id={`dropdownMenuLink${anuncio.id}`}
+                           data-bs-toggle="dropdown" aria-expanded="false">
                             <i className="bi bi-three-dots-vertical"></i>
                         </a>
-                        <ul className="dropdown-menu dropdown-menu-end" aria-labelledby={`dropdownMenuLink${anuncio.id}`}>
+                        <ul className="dropdown-menu dropdown-menu-end"
+                            aria-labelledby={`dropdownMenuLink${anuncio.id}`}>
                             <li>
                                 <a className="dropdown-item" href="#" onClick={(e) => {
                                     e.preventDefault();
