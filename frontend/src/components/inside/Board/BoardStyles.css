@@ -1,0 +1,95 @@
+.content {
+    padding: 20px;
+}
+
+
+.container > div {
+    flex: 1;
+}
+
+.custom-modal .modal-content {
+    margin: auto;
+    border-radius: 10px;
+    max-width: 600px;
+    padding: 20px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-title {
+    margin: 0;
+}
+
+.btn-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+}
+
+.mb-2 {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.mb-2 img {
+    width: 300px;
+    margin-bottom: 10px;
+}
+
+.mb-4 {
+    padding: 20px;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+}
+
+.form-text {
+    text-align: left;
+    margin: 0;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.modal-footer .modal-button {
+    margin-right: 10px;
+}
+
+.modal-footer .modal-button:last-child {
+    margin-right: 0;
+}
+
+.modal-footer {
+    margin-top: 20px;
+}
+
+.modal-footer .modal-button {
+    margin-right: 10px;
+}
+
+.modal-footer .modal-button:last-child {
+    margin-right: 0;
+}
+
+.btn-close {
+    margin-bottom: 10px;
+}
+
+.modal-body {
+    margin-top: 20px;
+}
+
+.modal-footer {
+    margin-top: 20px;
+}
+
+.modal-body .center-text {
+    text-align: center;
+}
+
+

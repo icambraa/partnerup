@@ -1,5 +1,6 @@
 import React from 'react';
 import discordLogo from '/src/assets/discord-logo-blue.png';
+import '../BoardStyles.css';
 
 interface CreateEditAnuncioModalProps {
     isEditing: boolean;
@@ -49,7 +50,7 @@ const CreateEditAnuncioModal: React.FC<CreateEditAnuncioModalProps> = ({
                     <form onSubmit={handleFormSubmit}>
                         <div className="mb-3">
                             <label htmlFor="riotNickname" className="form-label">Riot Nickname</label>
-                            <input type="text" className="form-control" id="riotNickname" value={formData.riotNickname} required disabled={isEditing} />
+                            <input type="text" className="form-control" id="riotNickname" value={formData.riotNickname} required disabled={isEditing} onChange={handleChange} />
                         </div>
                         <div className="mb-3">
                             <label htmlFor="rol" className="form-label">Rol</label>
@@ -100,21 +101,21 @@ const CreateEditAnuncioModal: React.FC<CreateEditAnuncioModalProps> = ({
                                 maxLength={80}
                             ></textarea>
                         </div>
-                        <div className="mb-2" style={{ textAlign: 'center', marginTop: '40px' }}>
-                            <div style={{ display: 'inline-block' }}>
-                                <img src={discordLogo} alt="Discord Logo" style={{ width: '300px', marginBottom: '10px' }} />
+                        <div className="mb-2">
+                            <div>
+                                <img src={discordLogo} alt="Discord Logo" />
                             </div>
                         </div>
-                        <div className="mb-4" style={{ padding: '20px', backgroundColor: '#f0f0f0', borderRadius: '10px' }}>
-                            <p className="form-text" style={{ textAlign: 'left', margin: '0' }}>
+                        <div className="mb-4">
+                            <p className="form-text">
                                 ¡Anúnciate en PartnerUP y únete a la comunidad de jugadores! Al crear un anuncio, se generará automáticamente un canal privado en nuestro servidor de Discord, exclusivo para ti y tu futuro compañero.
                             </p>
                         </div>
                         <div className="modal-footer">
-                            <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)} style={{ marginRight: '10px' }}>
+                            <button type="button" className="btn btn-secondary modal-button" onClick={() => setShowModal(false)}>
                                 Cerrar
                             </button>
-                            <button type="submit" className="btn btn-primary">Enviar</button>
+                            <button type="submit" className="btn btn-primary modal-button">Enviar</button>
                         </div>
                     </form>
                 </div>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Anuncio } from '../../../../interfaces/AnuncioInterface.tsx';
+import '../BoardStyles.css';
 
 interface MessageModalProps {
     showMessageModal: boolean;
@@ -43,18 +44,17 @@ const MessageModal: React.FC<MessageModalProps> = ({
                                 data-testid="message-textarea"
                             ></textarea>
                         </div>
-                        <div className="modal-footer" style={{ marginTop: '20px' }}>
+                        <div className="modal-footer">
                             <button
                                 type="button"
-                                className="btn btn-secondary"
+                                className="btn btn-secondary modal-button"
                                 onClick={() => setShowMessageModal(false)}
-                                style={{ marginRight: '10px' }}
                             >
                                 Cerrar
                             </button>
                             <button
                                 type="submit"
-                                className="btn btn-primary"
+                                className="btn btn-primary modal-button"
                                 data-testid="send-message-button"
                             >
                                 Enviar

@@ -44,7 +44,7 @@ public class SummonerService {
         }
     }
 
-    private String getPUUID(String gameName, String tagLine) {
+    public String getPUUID(String gameName, String tagLine) {
         String url = String.format("https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/%s/%s?api_key=%s",
                 gameName, tagLine, apiKey);
         try {

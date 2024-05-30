@@ -34,7 +34,7 @@ html, body {
     height: calc(100vh - 100px);
 }
 .header-with-shadow {
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Ajusta los valores según prefieras */
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 footer {

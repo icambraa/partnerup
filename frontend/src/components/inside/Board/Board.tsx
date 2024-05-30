@@ -13,6 +13,7 @@ import useFetchAnuncios from './hooks/useFetchAnuncios';
 import useHandleChange from './hooks/useHandleChange';
 import useHandleSubmit from './hooks/useHandleSubmit';
 import useHandleDelete from './hooks/useHandleDelete';
+import './BoardStyles.css';
 
 const Board: React.FC = () => {
     const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
@@ -235,8 +236,8 @@ const Board: React.FC = () => {
 
     return (
         <section className="content">
-            <div className="container" style={{ display: 'flex', alignItems: 'start' }}>
-                <div style={{ flex: 1 }}>
+            <div className="container">
+                <div>
                     <FilterSection
                         selectedRole={selectedRole}
                         selectedRange={selectedRange}

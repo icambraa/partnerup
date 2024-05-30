@@ -1,4 +1,5 @@
 import React from 'react';
+import '../BoardStyles.css'; // Importa el archivo CSS
 
 interface ReportModalProps {
     showReportModal: boolean;
@@ -30,11 +31,29 @@ const ReportModal: React.FC<ReportModalProps> = ({
                     <form onSubmit={handleReportSubmit}>
                         <div className="mb-3">
                             <label htmlFor="reportMessage" className="form-label">Motivo del Reporte</label>
-                            <textarea className="form-control" id="reportMessage" rows={3} required value={reportMessage} onChange={(e) => setReportMessage(e.target.value)}></textarea>
+                            <textarea
+                                className="form-control"
+                                id="reportMessage"
+                                rows={3}
+                                required
+                                value={reportMessage}
+                                onChange={(e) => setReportMessage(e.target.value)}
+                            ></textarea>
                         </div>
-                        <div className="modal-footer" style={{ marginTop: '20px' }}>
-                            <button type="button" className="btn btn-secondary" onClick={() => setShowReportModal(false)} style={{ marginRight: '10px' }}>Cerrar</button>
-                            <button type="submit" className="btn btn-primary">Enviar Reporte</button>
+                        <div className="modal-footer">
+                            <button
+                                type="button"
+                                className="btn btn-secondary modal-button"
+                                onClick={() => setShowReportModal(false)}
+                            >
+                                Cerrar
+                            </button>
+                            <button
+                                type="submit"
+                                className="btn btn-primary modal-button"
+                            >
+                                Enviar Reporte
+                            </button>
                         </div>
                     </form>
                 </div>

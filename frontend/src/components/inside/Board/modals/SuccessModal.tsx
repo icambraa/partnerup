@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
+import '../BoardStyles.css'; // Importa el archivo CSS
 
 interface SuccessModalProps {
     showSuccessModal: boolean;
@@ -24,14 +25,13 @@ const SuccessModal: React.FC<SuccessModalProps> = ({
                         className="btn-close"
                         onClick={() => setShowSuccessModal(false)}
                         aria-label="Close"
-                        style={{ marginBottom: '10px' }}
                     ></button>
                 </div>
-                <div className="modal-body" style={{ marginTop: '20px' }}>
+                <div className="modal-body">
                     ¡Tu anuncio ha sido publicado con éxito! 🎉<br /><br />
                     Se ha creado automáticamente un canal en nuestro servidor de Discord PartnerUP!<br /><br />
                     Puedes acceder al canal utilizando el siguiente enlace:<br /><br />
-                    <div style={{ textAlign: 'center' }}>
+                    <div className="center-text">
                         <a href={channelLink} target="_blank" rel="noopener noreferrer">
                             Enlace al canal de Discord
                         </a>
@@ -39,7 +39,7 @@ const SuccessModal: React.FC<SuccessModalProps> = ({
                     <br />
                     Por favor, espera a que alguien esté interesado en tu anuncio, acepta su petición y espera a que se una a tu canal de Discord.
                 </div>
-                <div className="modal-footer" style={{ marginTop: '20px' }}>
+                <div className="modal-footer">
                     <Button variant="secondary" onClick={() => setShowSuccessModal(false)}>
                         Cerrar
                     </Button>
