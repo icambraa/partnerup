@@ -34,7 +34,6 @@ public class Mensaje {
     @Column(name = "acceptance_message", nullable = false)
     private boolean acceptanceMessage = false;
 
-    // Getters y setters...
 
     public Long getAnuncioId() {
         return anuncioId;

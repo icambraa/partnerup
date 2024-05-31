@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
-import { Anuncio } from '../../../interfaces/AnuncioInterface';
+import { Anuncio } from '../../../interfaces/AnuncioInterface.ts';
 import CreateEditAnuncioModal from './modals/CreateEditAnuncioModal';
 import SuccessModal from './modals/SuccessModal';
 import MessageModal from './modals/MessageModal';
@@ -14,6 +14,9 @@ import useHandleChange from './hooks/useHandleChange';
 import useHandleSubmit from './hooks/useHandleSubmit';
 import useHandleDelete from './hooks/useHandleDelete';
 import './BoardStyles.css';
+import { timeSince } from '../../../utils/timeUtils';
+import { getRoleIconUrl } from '../../../utils/roleUtils';
+import { getRankIconUrl } from '../../../utils/rankUtils';
 
 const Board: React.FC = () => {
     const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
@@ -122,73 +125,7 @@ const Board: React.FC = () => {
         setCurrentPage(prevPage => prevPage + 1);
     };
 
-    const getRoleIconUrl = (role: string) => {
-        switch (role) {
-            case 'Top':
-                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-top.png';
-            case 'Mid':
-                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-middle.png';
-            case 'Jungle':
-                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-jungle.png';
-            case 'ADC':
-                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-bottom.png';
-            case 'Support':
-                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-utility.png';
-            default:
-                return '';
-        }
-    };
 
-    const getRankIconUrl = (range: string) => {
-        switch (range) {
-            case 'Hierro':
-                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/iron.png';
-            case 'Bronce':
-                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/bronze.png';
-            case 'Plata':
-                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/silver.png';
-            case 'Oro':
-                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/gold.png';
-            case 'Platino':
-                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/platinum.png';
-            case 'Diamante':
-                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/diamond.png';
-            case 'Master':
-                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/master.png';
-            case 'Grandmaster':
-                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/grandmaster.png';
-            case 'Challenger':
-                return 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/challenger.png';
-            default:
-                return '';
-        }
-    };
-
-    function timeSince(date: number | Date) {
-        const seconds = Math.floor((new Date().getTime() - new Date(date).getTime()) / 1000);
-
-        let interval = Math.floor(seconds / 31536000);
-        if (interval >= 1) {
-            return `hace ${interval} año${interval === 1 ? '' : 's'}`;
-        }
-        interval = Math.floor(seconds / 2592000);
-        if (interval >= 1) {
-            return `hace ${interval} mes${interval === 1 ? '' : 'es'}`;
-        }
-        interval = Math.floor(seconds / 86400);
-        if (interval >= 1) {
-            return `hace ${interval} día${interval === 1 ? '' : 's'}`;
-        }
-        interval = Math.floor(seconds / 3600);
-        if (interval >= 1) {
-            return `hace ${interval} hora${interval === 1 ? '' : 's'}`;
-        }
-        interval = Math.floor(seconds / 60);
-        if (interval >= 1) {
-            return `hace ${interval} minuto${interval === 1 ? '' : 's'}`;
-        }
-        return `hace ${Math.floor(seconds)} segundo${Math.floor(seconds) === 1 ? '' : 's'}`;
-    }
 
     const handleMessageSubmit = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();

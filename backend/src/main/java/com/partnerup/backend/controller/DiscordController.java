@@ -81,7 +81,6 @@ public class DiscordController {
             this.channelLink = channelLink;
         }
 
-        // Getters y setters
         public String getChannelId() {
             return channelId;
         }

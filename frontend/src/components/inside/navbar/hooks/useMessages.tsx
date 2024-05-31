@@ -1,6 +1,5 @@
-// src/hooks/useMessages.ts
 import { useState, useEffect } from 'react';
-import { Message } from '../../../../interfaces/MessageInterface';
+import { Message } from '../../../../interfaces/MessageInterface.ts';
 import { UserProfile } from '../../../../interfaces/UserProfileInterface';
 import { useAuth } from '../../../../contexts/AuthContext';
 import { Stomp } from '@stomp/stompjs';

@@ -25,7 +25,6 @@ public class Report {
     @Column(nullable = false)
     private String status = "pendiente";
 
-    // Getters and setters
     public Long getId() {
         return id;
     }

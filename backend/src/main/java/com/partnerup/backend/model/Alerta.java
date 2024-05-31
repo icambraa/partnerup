@@ -22,7 +22,6 @@ public class Alerta {
     @Column(name = "read", nullable = false)
     private boolean read = false;  // Nuevo campo
 
-    // Getters and setters
     public Long getId() {
         return id;
     }

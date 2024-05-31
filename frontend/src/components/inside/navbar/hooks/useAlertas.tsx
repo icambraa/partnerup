@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Alerta } from '../../../../interfaces/AlertInterface';
+import { Alerta } from '../../../../interfaces/AlertInterface.ts';
 import { useAuth } from '../../../../contexts/AuthContext';
 
 const useAlertas = () => {

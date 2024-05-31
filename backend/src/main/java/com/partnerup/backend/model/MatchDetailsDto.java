@@ -12,12 +12,10 @@ public class MatchDetailsDto {
     private Metadata metadata;
     private Info info;
 
-    // Getters y Setters
 
     @Setter
     @Getter
     public static class Metadata {
-        // Getters y Setters
         private String matchId;
         private List<String> participants;
     }
@@ -25,14 +23,12 @@ public class MatchDetailsDto {
     @Setter
     @Getter
     public static class Info {
-        // Getters y Setters
         private long gameDuration;
         private List<Participant> participants;
 
         @Setter
         @Getter
         public static class Participant {
-            // Getters y Setters
             private String puuid;
             private String championName;
             private int kills;

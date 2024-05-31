@@ -50,27 +50,21 @@ describe('Board Component', () => {
     cy.visit('http://localhost:3000/board');
     cy.get('button').contains('Anunciarse').click();
 
-    // Asegúrate de que el modal esté completamente visible
     cy.get('.modal-content').should('be.visible');
 
     cy.get('.modal-content').within(() => {
-      // El riotNickname ya está asignado a la cuenta, por lo que no lo ingresamos
       cy.get('select#rol').select(newAnuncio.rol);
       cy.get('select#buscaRol').select(newAnuncio.buscaRol);
       cy.get('select#rango').select(newAnuncio.rango, { force: true });
       cy.get('textarea#comentario').type(newAnuncio.comentario);
-
-      // Verifica que el botón "Enviar" esté visible antes de hacer clic en él
       cy.get('button').contains('Enviar').should('be.visible').click();
     });
 
-    // Esperar a que aparezca el modal de éxito y luego cerrarlo
     cy.get('.modal-content').contains('Canal del Anuncio').should('be.visible');
     cy.get('.modal-content').within(() => {
       cy.get('button').contains('Cerrar').click();
     });
 
-    // Verificar la presencia de la imagen del rol
     cy.get('.custom-table').within(() => {
       cy.get(`img[src="${roleImageUrls[newAnuncio.rol]}"]`, { timeout: 10000 }).should('be.visible');
     });
@@ -84,7 +78,6 @@ describe('Board Component', () => {
   it('should filter anuncios by role', () => {
     const topAnuncio = generateUniqueAnuncio('Top');
 
-    // Crear un anuncio con el rol "Top"
     cy.visit('http://localhost:3000/board');
     cy.get('button').contains('Anunciarse').click();
     cy.get('.modal-content').should('be.visible');
@@ -100,7 +93,6 @@ describe('Board Component', () => {
       cy.get('button').contains('Cerrar').click();
     });
 
-    // Filtrar anuncios por el rol "Top"
     cy.get('.top-icon').click();
     cy.get('.custom-table').within(() => {
       cy.get(`img[src="${roleImageUrls.Top}"]`, { timeout: 10000 }).should('be.visible');
@@ -115,21 +107,13 @@ describe('Board Component', () => {
 
   it('should send a message to an announcement', () => {
     const testMessage = 'Quiero jugar contigo';
-
-    // Primero, navega al board y asegúrate de que haya anuncios
     cy.visit('http://localhost:3000/board');
-    cy.wait(2000); // Espera a que los elementos se rendericen
-
-    // Abre el modal de mensaje para el primer anuncio
+    cy.wait(2000);
     cy.get('.custom-table')
         .find('button .bi-envelope-fill')
         .first()
         .click();
-
-    // Asegúrate de que el modal de mensaje esté visible
     cy.get('[data-testid="message-modal"]').should('be.visible');
-
-    // Escribe y envía el mensaje
     cy.get('[data-testid="message-modal"]').within(() => {
       cy.get('[data-testid="message-textarea"]').type(testMessage);
       cy.get('[data-testid="send-message-button"]').should('be.visible').click();
@@ -138,29 +122,19 @@ describe('Board Component', () => {
 
   it('should submit a report for an announcement', () => {
     const testReportReason = 'Inappropriate content';
-
-    // Primero, navega al board y asegúrate de que haya anuncios
     cy.visit('http://localhost:3000/board');
-    cy.wait(2000); // Espera a que los elementos se rendericen
-
-    // Encuentra un anuncio que no pertenezca al usuario actual
+    cy.wait(2000);
     cy.get('.custom-table tbody tr').not(':contains("Minuts#104")').first().within(() => {
       // Abre el dropdown de opciones
       cy.get('.dropdown').click();
       // Haz clic en el botón de reportar
       cy.get('.dropdown-menu').contains('Reportar').click();
     });
-
-    // Asegúrate de que el modal de reporte esté visible
     cy.get('.custom-modal').should('be.visible');
-
-    // Escribe y envía el reporte
     cy.get('.custom-modal').within(() => {
       cy.get('textarea#reportMessage').type(testReportReason);
       cy.get('button').contains('Enviar Reporte').should('be.visible').click();
     });
-
-    // Verificar que el modal se haya cerrado después de enviar el reporte
     cy.get('.custom-modal').should('not.exist');
   });
 });

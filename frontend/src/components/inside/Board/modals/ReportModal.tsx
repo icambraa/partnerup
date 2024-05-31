@@ -1,13 +1,6 @@
 import React from 'react';
-import '../BoardStyles.css'; // Importa el archivo CSS
-
-interface ReportModalProps {
-    showReportModal: boolean;
-    setShowReportModal: (show: boolean) => void;
-    reportMessage: string;
-    setReportMessage: (message: string) => void;
-    handleReportSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-}
+import '../BoardStyles.css';
+import { ReportModalProps } from '../../../../interfaces/ReportModalProps';
 
 const ReportModal: React.FC<ReportModalProps> = ({
                                                      showReportModal,

@@ -11,7 +11,6 @@ public class RankInfo {
         this.leaguePoints = leaguePoints;
     }
 
-    // Getters y setters
     public String getTier() {
         return tier;
     }

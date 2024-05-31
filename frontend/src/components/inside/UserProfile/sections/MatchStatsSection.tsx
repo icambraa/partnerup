@@ -1,26 +1,10 @@
 import React from 'react';
 import { Table, Alert, Spinner } from 'react-bootstrap';
-import { MatchDetails, Participant } from '../../../../interfaces/MatchDetailsInterface';
+import { Participant } from '../../../../interfaces/MatchDetailsInterface';
 import { Link } from "react-router-dom";
+import { getChampionImageUrl, getSummonerSpellIconUrl } from '../../../../utils/imageUtils.tsx';
+import { MatchStatsSectionProps } from '../../../../interfaces/props/MatchStatsSectionProps.ts';
 
-const getChampionImageUrl = (championName: string) => {
-    if (championName === "FiddleSticks") {
-        return `https://ddragon.leagueoflegends.com/cdn/14.10.1/img/champion/Fiddlesticks.png`;
-    }
-    return `https://ddragon.leagueoflegends.com/cdn/14.10.1/img/champion/${championName}.png`;
-};
-
-const getSummonerSpellIconUrl = (spellId: string) => {
-    return `https://lolcdn.darkintaqt.com/cdn/spells/${spellId}`;
-};
-
-interface MatchStatsSectionProps {
-    matchStats: MatchDetails[];
-    error: string;
-    loading: boolean;
-    gameName: string;
-    tagLine: string;
-}
 
 const MatchStatsSection: React.FC<MatchStatsSectionProps> = ({ matchStats, error, loading, gameName, tagLine }) => {
     if (error) {
@@ -38,11 +22,6 @@ const MatchStatsSection: React.FC<MatchStatsSectionProps> = ({ matchStats, error
     return (
         <div className="table-responsive">
             <Table className="custom-table" bordered hover>
-                <thead>
-                <tr>
-                    {/* Añadir encabezados de columna aquí */}
-                </tr>
-                </thead>
                 <tbody>
                 {matchStats.map((match) => {
                     const userParticipant = match.info.participants.find(

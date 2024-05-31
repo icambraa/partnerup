@@ -1,22 +1,7 @@
 import React from 'react';
 import discordLogo from '/src/assets/discord-logo-blue.png';
 import '../BoardStyles.css';
-
-interface CreateEditAnuncioModalProps {
-    isEditing: boolean;
-    showModal: boolean;
-    setShowModal: (show: boolean) => void;
-    formData: {
-        riotNickname: string;
-        rol: string;
-        buscaRol: string;
-        rango: string;
-        comentario: string;
-    };
-    setFormData: (formData: any) => void;
-    handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
-    handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-}
+import { CreateEditAnuncioModalProps } from '../../../../interfaces/props/CreateEditAnuncioModalProps.ts';
 
 const CreateEditAnuncioModal: React.FC<CreateEditAnuncioModalProps> = ({
                                                                            isEditing,
@@ -31,7 +16,6 @@ const CreateEditAnuncioModal: React.FC<CreateEditAnuncioModalProps> = ({
 
     const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // Validación adicional por si se desea agregar
         if (!formData.riotNickname || !formData.rol || !formData.buscaRol || !formData.rango || !formData.comentario) {
             alert('Todos los campos son obligatorios.');
             return;

@@ -1,15 +1,7 @@
 import React from 'react';
-import { Anuncio } from '../../../../interfaces/AnuncioInterface.tsx';
 import '../BoardStyles.css';
+import { MessageModalProps } from '../../../../interfaces/props/MessageModalProps.ts';
 
-interface MessageModalProps {
-    showMessageModal: boolean;
-    setShowMessageModal: (show: boolean) => void;
-    selectedAnuncio: Anuncio | null;
-    messageText: string;
-    setMessageText: (message: string) => void;
-    handleMessageSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-}
 
 const MessageModal: React.FC<MessageModalProps> = ({
                                                        showMessageModal,

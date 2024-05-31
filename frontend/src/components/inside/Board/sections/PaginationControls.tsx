@@ -1,8 +1,5 @@
 import React from 'react';
-
-interface PaginationControlsProps {
-    handleNextPage: () => void;
-}
+import { PaginationControlsProps } from '../../../../interfaces/PaginationControlsProps';
 
 const PaginationControls: React.FC<PaginationControlsProps> = ({ handleNextPage }) => {
     return (

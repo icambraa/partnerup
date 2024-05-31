@@ -21,7 +21,7 @@ const IconProfileDisplay: React.FC<IconProfileDisplayProps> = ({ gameName, tagLi
                 if (response.ok) {
                     const data = await response.text();
                     setProfileIconUrl(data);
-                    setImageLoaded(true); // Reset imageLoaded in case of retry
+                    setImageLoaded(true);
                 } else {
                     throw new Error('Failed to fetch profile icon URL');
                 }

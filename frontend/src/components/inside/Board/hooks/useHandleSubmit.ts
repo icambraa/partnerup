@@ -1,5 +1,5 @@
 import { useAuth } from '../../../../contexts/AuthContext.tsx';
-import { Anuncio } from '../../../../interfaces/AnuncioInterface.tsx';
+import { Anuncio } from '../../../../interfaces/AnuncioInterface.ts';
 
 const useHandleSubmit = (
     setShowModal: React.Dispatch<React.SetStateAction<boolean>>,

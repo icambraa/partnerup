@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import { useAuth } from '../../contexts/AuthContext';
-import { Report } from '../../interfaces/ReportInterface';
-import { Anuncio } from '../../interfaces/AnuncioInterface';
+import { Report } from '../../interfaces/ReportInterface.ts';
+import { Anuncio } from '../../interfaces/AnuncioInterface.ts';
 import { Link } from 'react-router-dom'; // Importa Link
 
 const ReportsView: React.FC = () => {
@@ -78,7 +78,7 @@ const ReportsView: React.FC = () => {
 
             if (response.ok) {
                 console.log(`Report ${reportId} ignored and marked as reviewed`);
-                fetchReports(); // Refrescar la lista de reportes
+                fetchReports();
             } else {
                 throw new Error('Error al actualizar el reporte');
             }
@@ -131,7 +131,7 @@ const ReportsView: React.FC = () => {
 
             if (response.ok) {
                 console.log('Reporte actualizado a revisado');
-                fetchReports(); // Refrescar la lista de reportes
+                fetchReports();
             } else {
                 throw new Error('Error al actualizar el reporte');
             }

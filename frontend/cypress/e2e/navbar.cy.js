@@ -1,4 +1,3 @@
-// cypress/e2e/navbar.cy.ts
 
 describe('Navbar Component', () => {
   const testUser = {

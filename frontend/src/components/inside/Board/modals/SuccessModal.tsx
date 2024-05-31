@@ -1,12 +1,7 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
-import '../BoardStyles.css'; // Importa el archivo CSS
-
-interface SuccessModalProps {
-    showSuccessModal: boolean;
-    setShowSuccessModal: (show: boolean) => void;
-    channelLink: string;
-}
+import '../BoardStyles.css';
+import { SuccessModalProps } from '../../../../interfaces/SuccessModalProps';
 
 const SuccessModal: React.FC<SuccessModalProps> = ({
                                                        showSuccessModal,

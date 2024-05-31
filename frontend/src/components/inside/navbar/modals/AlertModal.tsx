@@ -1,14 +1,7 @@
 import React from 'react';
 import Modal from 'react-bootstrap/Modal';
 import { Button } from "react-bootstrap";
-import { Alerta } from '../../../../interfaces/AlertInterface.tsx';
-
-interface AlertModalProps {
-    showAlertasModal: boolean;
-    handleAlertasModalClose: () => void;
-    alertas: Alerta[];
-}
-
+import { AlertModalProps } from '../../../../interfaces/props/AlertModalProps.ts';
 const AlertModal: React.FC<AlertModalProps> = ({
                                                    showAlertasModal,
                                                    handleAlertasModalClose,

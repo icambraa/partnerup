@@ -1,21 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Anuncio } from '../../../../interfaces/AnuncioInterface.tsx';
+import { AnuncioItemProps } from '../../../../interfaces/props/AnuncioItemProps.ts';
 import WinRateDisplay from '../../SummonerDisplays/WinRateDisplay.tsx';
 import IconProfileDisplay from '../../SummonerDisplays/IconProfileDisplay.tsx';
 import RankInfoDisplay from '../../SummonerDisplays/RankInfoDisplay.tsx';
-
-interface AnuncioItemProps {
-    anuncio: Anuncio;
-    currentUser: any;
-    handleOpenMessageModal: (anuncio: Anuncio) => void;
-    handleDelete: (id: number) => void;
-    handleEdit: (anuncio: Anuncio) => void;
-    handleOpenReportModal: (anuncio: Anuncio) => void;
-    getRoleIconUrl: (role: string) => string;
-    getRankIconUrl: (range: string) => string;
-    timeSince: (date: number | Date) => string;
-}
 
 const AnuncioItem: React.FC<AnuncioItemProps> = ({
                                                      anuncio,

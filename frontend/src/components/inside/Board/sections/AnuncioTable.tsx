@@ -1,18 +1,7 @@
 import React from 'react';
-import { Anuncio } from '../../../../interfaces/AnuncioInterface.tsx';
+import { AnuncioTableProps } from '../../../../interfaces/props/AnuncioTableProps.ts';
 import AnuncioItem from './AnuncioItem.tsx';
-
-interface AnuncioTableProps {
-    anuncios: Anuncio[];
-    currentUser: any;
-    handleOpenMessageModal: (anuncio: Anuncio) => void;
-    handleDelete: (id: number) => void;
-    handleEdit: (anuncio: Anuncio) => void;
-    handleOpenReportModal: (anuncio: Anuncio) => void;
-    getRoleIconUrl: (role: string) => string;
-    getRankIconUrl: (range: string) => string;
-    timeSince: (date: number | Date) => string;
-}
+import {Anuncio} from "../../../../interfaces/AnuncioInterface.ts";
 
 const AnuncioTable: React.FC<AnuncioTableProps> = ({
                                                        anuncios,

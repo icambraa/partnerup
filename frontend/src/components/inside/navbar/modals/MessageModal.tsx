@@ -3,17 +3,7 @@ import Modal from 'react-bootstrap/Modal';
 import { Button } from "react-bootstrap";
 import IconProfileDisplay from "../../SummonerDisplays/IconProfileDisplay.tsx";
 import RankInfoDisplay from '../../SummonerDisplays/RankInfoDisplay';
-import { UserProfile } from '../../../../interfaces/UserProfileInterface.ts';
-import { Message } from '../../../../interfaces/MessageInterface.tsx';
-
-interface MessageModalProps {
-    showModal: boolean;
-    handleCloseModal: () => void;
-    selectedMessage: Message | null;
-    userProfiles: { [key: string]: UserProfile };
-    handleAccept: () => void;
-    handleReject: () => void;
-}
+import { MessageModalProps } from '../../../../interfaces/props/MessageModalProps.ts';
 
 const MessageModal: React.FC<MessageModalProps> = ({
                                                        showModal,

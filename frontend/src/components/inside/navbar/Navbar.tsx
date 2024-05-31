@@ -12,7 +12,7 @@ import MessageModal from './modals/MessageModal';
 import AlertModal from './modals/AlertModal';
 import useAlertas from './hooks/useAlertas';
 import useMessages from './hooks/useMessages';
-import { Message } from '../../../interfaces/MessageInterface.tsx';
+import { Message } from '../../../interfaces/MessageInterface.ts';
 import { UserProfile } from '../../../interfaces/UserProfileInterface.ts';
 
 const Navbar: React.FC = () => {

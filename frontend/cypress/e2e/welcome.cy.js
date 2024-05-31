@@ -1,8 +1,7 @@
-// cypress/e2e/welcome.cy.ts
 
 describe('Welcome Page', () => {
   beforeEach(() => {
-    cy.visit('http://localhost:3000'); // Asegúrate de que esta URL es correcta
+    cy.visit('http://localhost:3000');
   });
 
   it('should display the welcome logo', () => {

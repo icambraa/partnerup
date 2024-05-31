@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { Anuncio } from '../../../../interfaces/AnuncioInterface.tsx';
+import { Anuncio } from '../../../../interfaces/AnuncioInterface.ts';
 
 const useFetchAnuncios = (
     setAnuncios: React.Dispatch<React.SetStateAction<Anuncio[]>>,
