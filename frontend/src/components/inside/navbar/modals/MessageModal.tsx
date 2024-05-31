@@ -3,7 +3,7 @@ import Modal from 'react-bootstrap/Modal';
 import { Button } from "react-bootstrap";
 import IconProfileDisplay from "../../SummonerDisplays/IconProfileDisplay.tsx";
 import RankInfoDisplay from '../../SummonerDisplays/RankInfoDisplay';
-import { MessageModalProps } from '../../../../interfaces/props/MessageModalProps.ts';
+import { MessageModalProps } from '../../../../interfaces/props/NavbarMessageModalProps.ts';
 
 const MessageModal: React.FC<MessageModalProps> = ({
                                                        showModal,
