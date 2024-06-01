@@ -4,6 +4,7 @@ import { UserProfile } from '../../../../interfaces/UserProfileInterface';
 import { useAuth } from '../../../../contexts/AuthContext';
 import { Stomp } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
+import useDiscordLink from './useDiscordLink';
 
 interface UserProfiles {
     [key: string]: UserProfile;
@@ -11,10 +12,14 @@ interface UserProfiles {
 
 const useMessages = () => {
     const { currentUser } = useAuth();
+    const { obtenerEnlaceDiscord } = useDiscordLink();
     const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
     const [unreadMessages, setUnreadMessages] = useState<Message[]>([]);
     const [userProfiles, setUserProfiles] = useState<UserProfiles>({});
     const [loadingMessages, setLoadingMessages] = useState(true);
+    const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
+    const [showModal, setShowModal] = useState(false);
+    const [hoveredMessageId, setHoveredMessageId] = useState<number | null>(null);
 
     const fetchUnreadMessagesCount = async (userId: string) => {
         console.log("Fetching unread messages for user ID:", userId);
@@ -101,6 +106,89 @@ const useMessages = () => {
         }
     };
 
+    const handleDelete = async (messageId: number) => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/mensajes/${messageId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            if (!response.ok) {
+                throw new Error('Failed to delete message');
+            }
+            const updatedMessages = unreadMessages.map(message => {
+                if (message.id === messageId) {
+                    return { ...message, slideOut: true };
+                }
+                return message;
+            });
+            setUnreadMessages(updatedMessages);
+            setTimeout(() => {
+                const remainingMessages = unreadMessages.filter(message => message.id !== messageId);
+                setUnreadMessages(remainingMessages);
+                setUnreadMessagesCount(prevCount => prevCount - 1);
+            }, 500);
+        } catch (error) {
+            console.error('Error deleting message:', error);
+        }
+    };
+
+    const handleAccept = async () => {
+        if (!selectedMessage || !selectedMessage.anuncioId || !currentUser?.uid) {
+            console.error('Mensaje seleccionado o usuario actual no válido.');
+            handleCloseModal();
+            return;
+        }
+
+        const anuncioId = selectedMessage.anuncioId;
+
+        try {
+            const discordLink = await obtenerEnlaceDiscord(anuncioId);
+
+            if (!discordLink) {
+                console.error('El enlace de Discord no está definido.');
+                handleCloseModal();
+                return;
+            }
+
+            const newMessage = {
+                senderId: currentUser.uid,
+                receiverId: selectedMessage.senderId,
+                messageText: `He aceptado tu solicitud! Puedes encontrarme en este canal de  <a href="${discordLink}" target="_blank">Discord</a>`,
+                anuncioId: anuncioId,
+                isAcceptanceMessage: true
+            };
+
+            const response = await fetch('http://localhost:8080/api/mensajes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newMessage),
+            });
+
+            if (response.ok) {
+                console.log('Mensaje enviado correctamente');
+                handleCloseModal();
+            } else {
+                console.error('Error al enviar el mensaje de aceptación');
+            }
+        } catch (error) {
+            console.error('Error al enviar el mensaje:', error);
+        }
+    };
+
+    const getSortedMessages = () => {
+        const unread = unreadMessages.filter(message => !message.read);
+        const read = unreadMessages.filter(message => message.read);
+
+        return [
+            ...unread.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
+            ...read.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        ];
+    };
+
     useEffect(() => {
         if (currentUser) {
             fetchUnreadMessagesCount(currentUser.uid);
@@ -135,6 +223,34 @@ const useMessages = () => {
         }
     }, [currentUser]);
 
+    const handleOpenMessage = (message: Message) => {
+        setSelectedMessage(message);
+        setShowModal(true);
+        markMessageAsRead(message.id);
+    };
+
+    const handleMouseEnter = (messageId: number) => {
+        setHoveredMessageId(messageId);
+    };
+
+    const handleMouseLeave = () => {
+        setHoveredMessageId(null);
+    };
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+        if (selectedMessage && currentUser?.uid) {
+            fetchUnreadMessagesCount(currentUser.uid);
+        }
+    };
+
+    const handleReject = () => {
+        if (selectedMessage) {
+            handleDelete(selectedMessage.id);
+            handleCloseModal();
+        }
+    };
+
     return {
         unreadMessagesCount,
         unreadMessages,
@@ -145,7 +261,18 @@ const useMessages = () => {
         markMessageAsRead,
         fetchUnreadMessagesCount,
         fetchUnreadMessages,
-        fetchUserProfileByFirebaseUid
+        fetchUserProfileByFirebaseUid,
+        handleDelete,
+        handleAccept,
+        getSortedMessages,
+        handleOpenMessage,
+        handleMouseEnter,
+        handleMouseLeave,
+        handleCloseModal,
+        handleReject,
+        selectedMessage,
+        showModal,
+        hoveredMessageId,
     };
 };
 
