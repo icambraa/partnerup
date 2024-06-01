@@ -1,8 +1,8 @@
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
-import IconProfileDisplay from '../../SummonerDisplays/IconProfileDisplay.tsx';
-import RankInfoDisplay from '../../SummonerDisplays/RankInfoDisplay';
-import WinRateDisplayCircle from '../../SummonerDisplays/WinRateDisplayLShape.tsx';
+import IconProfileDisplay from '../../../../utils/SummonerDisplays/IconProfileDisplay.tsx';
+import RankInfoDisplay from '../../../../utils/SummonerDisplays/RankInfoDisplay';
+import WinRateDisplayCircle from '../../../../utils/SummonerDisplays/WinRateDisplayLShape.tsx';
 import { getRankIconUrl } from '../../../../utils/rankUtils';
 import '../UserProfileStyles.css';
 import { UserInfoSectionProps } from '../../../../interfaces/UserInfoSectionProps';

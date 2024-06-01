@@ -1,8 +1,8 @@
 import React from 'react';
 import Modal from 'react-bootstrap/Modal';
 import { Button } from "react-bootstrap";
-import IconProfileDisplay from "../../SummonerDisplays/IconProfileDisplay.tsx";
-import RankInfoDisplay from '../../SummonerDisplays/RankInfoDisplay';
+import IconProfileDisplay from "../../../../utils/SummonerDisplays/IconProfileDisplay.tsx";
+import RankInfoDisplay from '../../../../utils/SummonerDisplays/RankInfoDisplay';
 import { MessageModalProps } from '../../../../interfaces/props/NavbarMessageModalProps.ts';
 
 const MessageModal: React.FC<MessageModalProps> = ({

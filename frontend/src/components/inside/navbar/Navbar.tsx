@@ -1,10 +1,9 @@
-import React, { useState, useEffect, FormEvent } from 'react';
+import React, {useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../../assets/logo2-rojo-blanco.png';
-import { auth } from '../../../firebase-auth.ts';
 import { useAuth } from '../../../contexts/AuthContext';
-import IconProfileDisplay from "../SummonerDisplays/IconProfileDisplay.tsx";
-import RankInfoDisplay from '../SummonerDisplays/RankInfoDisplay';
+import IconProfileDisplay from "../../../utils/SummonerDisplays/IconProfileDisplay.tsx";
+import RankInfoDisplay from '../../../utils/SummonerDisplays/RankInfoDisplay';
 import './NavbarStyles.css';
 import lolIcon from '../../../assets/lol-logo.png';
 import alertIcon from '../../../assets/warning.png';
@@ -12,18 +11,23 @@ import MessageModal from './modals/MessageModal';
 import AlertModal from './modals/AlertModal';
 import useAlertas from './hooks/useAlertas';
 import useMessages from './hooks/useMessages';
+import useAdminCheck from './hooks/useAdminCheck';
+import useSidebar from './hooks/useSidebar';
+import useLogout from './hooks/useLogout';
+import useSearch from './hooks/useSearch';
 import { Message } from '../../../interfaces/MessageInterface.ts';
-import { UserProfile } from '../../../interfaces/UserProfileInterface.ts';
 
 const Navbar: React.FC = () => {
     const navigate = useNavigate();
     const { currentUser } = useAuth();
-    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const { isAdmin } = useAdminCheck();
+    const { sidebarOpen, toggleSidebar } = useSidebar(currentUser);
+    const { handleLogout } = useLogout();
+    const { searchTerm, handleSearchChange, handleSearchSubmit } = useSearch();
+
     const [showModal, setShowModal] = useState(false);
     const [hoveredMessageId, setHoveredMessageId] = useState<number | null>(null);
     const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [isAdmin, setIsAdmin] = useState(false);
 
     const {
         alertas,
@@ -47,11 +51,6 @@ const Navbar: React.FC = () => {
 
     useEffect(() => {
         if (currentUser) {
-            fetchUserProfileByFirebaseUid(currentUser.uid).then((userProfile: UserProfile | undefined) => {
-                if (userProfile) {
-                    setIsAdmin(userProfile.admin);
-                }
-            });
             fetchUnreadMessagesCount(currentUser.uid);
             fetchUnreadMessages(currentUser.uid);
         } else {
@@ -78,41 +77,6 @@ const Navbar: React.FC = () => {
         if (selectedMessage && currentUser?.uid) {
             fetchUnreadMessagesCount(currentUser.uid);
         }
-    };
-
-    const handleLogout = async () => {
-        try {
-            await auth.signOut();
-            navigate('/');
-        } catch (error) {
-            console.error('Error al cerrar sesión:', error);
-        }
-    };
-
-    const toggleSidebar = () => {
-        setSidebarOpen(!sidebarOpen);
-        if (!sidebarOpen && currentUser) {
-            fetchUnreadMessages(currentUser.uid);
-        }
-    };
-
-    const getSortedMessages = () => {
-        const unread = unreadMessages.filter(message => !message.read);
-        const read = unreadMessages.filter(message => message.read);
-
-        return [
-            ...unread.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
-            ...read.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-        ];
-    };
-
-    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(event.target.value);
-    };
-
-    const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        navigate(`/profile/${encodeURIComponent(searchTerm)}`);
     };
 
     const handleReject = () => {
@@ -213,6 +177,16 @@ const Navbar: React.FC = () => {
         } catch (error) {
             console.error('Error al enviar el mensaje:', error);
         }
+    };
+
+    const getSortedMessages = () => {
+        const unread = unreadMessages.filter(message => !message.read);
+        const read = unreadMessages.filter(message => message.read);
+
+        return [
+            ...unread.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
+            ...read.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        ];
     };
 
     return (

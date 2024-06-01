@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { AnuncioItemProps } from '../../../../interfaces/props/AnuncioItemProps.ts';
-import WinRateDisplay from '../../SummonerDisplays/WinRateDisplay.tsx';
-import IconProfileDisplay from '../../SummonerDisplays/IconProfileDisplay.tsx';
-import RankInfoDisplay from '../../SummonerDisplays/RankInfoDisplay.tsx';
+import WinRateDisplay from '../../../../utils/SummonerDisplays/WinRateDisplay.tsx';
+import IconProfileDisplay from '../../../../utils/SummonerDisplays/IconProfileDisplay.tsx';
+import RankInfoDisplay from '../../../../utils/SummonerDisplays/RankInfoDisplay.tsx';
 
 const AnuncioItem: React.FC<AnuncioItemProps> = ({
                                                      anuncio,

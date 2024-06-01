@@ -6,7 +6,7 @@ import { useFetchUserProfile } from './hooks/useFetchUserProfile';
 import { useFetchMatchStats } from './hooks/useFetchMatchStats';
 import UserInfoSection from './sections/UserInfoSection';
 import MatchStatsSection from './sections/MatchStatsSection';
-import {RankInfo} from "../SummonerDisplays/RankInfoDisplay.tsx";
+import {RankInfo} from "../../../utils/SummonerDisplays/RankInfoDisplay.tsx";
 
 interface UserProfileComponentProps {
     riotnickname?: string;

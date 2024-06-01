@@ -13,38 +13,67 @@ import useFetchAnuncios from './hooks/useFetchAnuncios';
 import useHandleChange from './hooks/useHandleChange';
 import useHandleSubmit from './hooks/useHandleSubmit';
 import useHandleDelete from './hooks/useHandleDelete';
+import usePagination from './hooks/usePagination';
+import useModals from './hooks/useModals';
+import useFilters from './hooks/useFilters';
+import useAnuncioForm from './hooks/useAnuncioForm';
 import './BoardStyles.css';
 import { timeSince } from '../../../utils/timeUtils';
 import { getRoleIconUrl } from '../../../utils/roleUtils';
 import { getRankIconUrl } from '../../../utils/rankUtils';
 
 const Board: React.FC = () => {
-    const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
     const { currentUser } = useAuth();
-    const [formData, setFormData] = useState({
+    const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
+    const initialFormData = {
         riotNickname: '',
         rol: '',
         buscaRol: '',
         rango: '',
         comentario: '',
-    });
+    };
 
-    const [messageText, setMessageText] = useState('');
-    const [filterData, setFilterData] = useState<{ rol?: string; rango?: string }>({});
-    const [currentPage, setCurrentPage] = useState(0);
-    const [, setTotalPages] = useState(0);
-    const [pageSize] = useState(10);
-    const [selectedRole, setSelectedRole] = useState<string | null | undefined>(null);
-    const [selectedRange, setSelectedRange] = useState<string | null | undefined>(null);
-    const [selectedAnuncio, setSelectedAnuncio] = useState<Anuncio | null>(null);
-    const [isEditing, setIsEditing] = useState(false);
+    const {
+        currentPage,
+        setCurrentPage,
+        setTotalPages,
+        pageSize,
+        handleNextPage,
+    } = usePagination(0, 10);
 
-    const [showModal, setShowModal] = useState(false);
-    const [channelLink, setChannelLink] = useState('');
-    const [showSuccessModal, setShowSuccessModal] = useState(false);
-    const [showMessageModal, setShowMessageModal] = useState(false);
-    const [showReportModal, setShowReportModal] = useState(false);
-    const [reportMessage, setReportMessage] = useState('');
+    const {
+        showModal,
+        setShowModal,
+        showSuccessModal,
+        setShowSuccessModal,
+        showMessageModal,
+        setShowMessageModal,
+        showReportModal,
+        setShowReportModal,
+        channelLink,
+        setChannelLink,
+        reportMessage,
+        setReportMessage,
+        messageText,
+        setMessageText
+    } = useModals();
+
+    const {
+        selectedRole,
+        selectedRange,
+        filterData,
+        handleFilterChange
+    } = useFilters();
+
+    const {
+        formData,
+        setFormData,
+        selectedAnuncio,
+        setSelectedAnuncio,
+        isEditing,
+        setIsEditing,
+        handleEdit
+    } = useAnuncioForm(initialFormData);
 
     useFetchUserProfile(setFormData);
     const fetchAnuncios = useFetchAnuncios(setAnuncios, currentPage, filterData, pageSize, setTotalPages);
@@ -92,40 +121,10 @@ const Board: React.FC = () => {
         }
     };
 
-    const handleEdit = (anuncio: Anuncio) => {
-        setFormData({
-            riotNickname: anuncio.riotNickname,
-            rol: anuncio.rol,
-            buscaRol: anuncio.buscaRol,
-            rango: anuncio.rango,
-            comentario: anuncio.comentario,
-        });
-        setSelectedAnuncio(anuncio);
-        setIsEditing(true);
-        setShowModal(true);
-    };
-
     const handleOpenMessageModal = (anuncio: Anuncio) => {
         setSelectedAnuncio(anuncio);
         setShowMessageModal(true);
     };
-
-    const handleFilterChange = (id: string, value: string | undefined | null) => {
-        if (id === 'rol') {
-            setSelectedRole(value);
-            setFilterData({ ...filterData, rol: value ?? undefined });
-        } else if (id === 'rango') {
-            setSelectedRange(value);
-            setFilterData({ ...filterData, rango: value ?? undefined });
-        }
-        setCurrentPage(0);
-    };
-
-    const handleNextPage = () => {
-        setCurrentPage(prevPage => prevPage + 1);
-    };
-
-
 
     const handleMessageSubmit = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();

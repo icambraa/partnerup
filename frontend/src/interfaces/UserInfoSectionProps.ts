@@ -1,5 +1,5 @@
 import { UserProfile } from './UserProfileInterface';
-import { RankInfo } from '../components/inside/SummonerDisplays/RankInfoDisplay';
+import { RankInfo } from '../utils/SummonerDisplays/RankInfoDisplay';
 
 export interface UserInfoSectionProps {
     userProfile: UserProfile;
