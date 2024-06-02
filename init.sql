@@ -1,4 +1,3 @@
--- Crear la tabla perfiles si no existe
 CREATE TABLE IF NOT EXISTS perfiles (
   id SERIAL PRIMARY KEY,
   admin BOOLEAN NOT NULL,
@@ -12,6 +11,5 @@ CREATE TABLE IF NOT EXISTS perfiles (
   rolprincipal VARCHAR(50) NOT NULL
 );
 
--- Insertar el registro en la tabla perfiles
 INSERT INTO perfiles (admin, banned, deleted_ads_count, email, firebase_uid, nombreusuario, region, riotnickname, rolprincipal)
 VALUES (true, false, 0, 'admin@uoc.edu', 'VT4nhO0T4XNr6nhmKil2Rx9Buir2', 'Admin', 'EUW', 'Erubin#Fenix', 'Adc');
