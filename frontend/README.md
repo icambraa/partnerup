@@ -1,16 +1,10 @@
-Para ejecutar o lanzar el proyecto, simplemente sigue los siguientes pasos:
+La estructura de archivos y carpetas del frontend es la siguiente:
 
-  1. Asegurate de tener instalado Docker.
-     
-  2. Clona o descarga el repositorio del proyecto de github
-     
-  3. Abre una terminal y dirígete al directorio principal del proyecto, donde se encuentra el 
-  archivo docker-compose.yml
-  
-  4. Ejecuta el siguiente comando: docker-compose up –build
-   
-Con esto, se construirán las imágenes de Docker para el frontend, el backend, se inciará la base 
-de datos postgresql y configurará el adminer para su administración.
+Cada uno de los módulos (components, pero tengo problemas con el refactor de intellij) representa una parte específica de la web. Por ejemplo, el módulo "admin" contiene el panel de 
+administrador, mientras que el módulo de "autenticación" incluye la parte correspondiente al 
+inicio de sesión y registro. 
 
-Una vez completados estos pasos, se podrá acceder al contenido de la web accediendo a la url 
-http://localhost:3000, admineer se encuentra en http://localhost:8081
+El módulo "welcome" abarca lo relacionado con la página de bienvenida, y el módulo más 
+importante, "inside", agrupa todas las páginas o componentes que se muestran una vez el usuario ha iniciado sesión.
+
+Dentro del módulo "inside", podemos encontrar los submódulos de "board", "navbar" y "userProfile"
