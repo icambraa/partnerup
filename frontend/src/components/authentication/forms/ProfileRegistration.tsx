@@ -124,7 +124,8 @@ const ProfileRegistration: React.FC = () => {
                                             <option value="Top">Top</option>
                                             <option value="Jungle">Jungle</option>
                                             <option value="Mid">Mid</option>
-                                            <option value="Adc">Adc</option>
+                                            <option value="ADC">ADC</option>
+                                            <option value="Support">Support</option>
                                         </select>
                                     </div>
                                     <div className="form-outline mb-3">
