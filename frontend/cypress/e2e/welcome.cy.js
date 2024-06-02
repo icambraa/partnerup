@@ -20,7 +20,7 @@ describe('Welcome Page', () => {
   });
 
   it('should display game logos', () => {
-    cy.contains('¿Qué es Partner UP!?').click(); // Ensure section is visible
+    cy.contains('¿Qué es Partner UP!?').click();
     cy.get('img[alt="League of Legends"]').should('be.visible');
     cy.get('img[alt="Valorant"]').should('be.visible');
   });

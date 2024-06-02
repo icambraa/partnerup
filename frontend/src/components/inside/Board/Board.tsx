@@ -73,7 +73,7 @@ const Board: React.FC = () => {
         isEditing,
         setIsEditing,
         handleEdit
-    } = useAnuncioForm(initialFormData);
+    } = useAnuncioForm(initialFormData, setShowModal);
 
     useFetchUserProfile(setFormData);
     const fetchAnuncios = useFetchAnuncios(setAnuncios, currentPage, filterData, pageSize, setTotalPages);

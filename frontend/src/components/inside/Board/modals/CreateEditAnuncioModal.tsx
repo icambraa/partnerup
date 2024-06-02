@@ -34,7 +34,15 @@ const CreateEditAnuncioModal: React.FC<CreateEditAnuncioModalProps> = ({
                     <form onSubmit={handleFormSubmit}>
                         <div className="mb-3">
                             <label htmlFor="riotNickname" className="form-label">Riot Nickname</label>
-                            <input type="text" className="form-control" id="riotNickname" value={formData.riotNickname} required disabled={isEditing} onChange={handleChange} />
+                            <input
+                                type="text"
+                                className="form-control"
+                                id="riotNickname"
+                                value={formData.riotNickname}
+                                required
+                                disabled={!isEditing} // Deshabilitado si no está editando
+                                onChange={handleChange}
+                            />
                         </div>
                         <div className="mb-3">
                             <label htmlFor="rol" className="form-label">Rol</label>

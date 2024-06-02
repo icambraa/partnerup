@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { Anuncio } from '../../../../interfaces/AnuncioInterface';
 
-const useAnuncioForm = (initialFormData: any) => {
+const useAnuncioForm = (initialFormData: any, setShowModal: React.Dispatch<React.SetStateAction<boolean>>) => {
     const [formData, setFormData] = useState(initialFormData);
     const [selectedAnuncio, setSelectedAnuncio] = useState<Anuncio | null>(null);
     const [isEditing, setIsEditing] = useState(false);
@@ -16,7 +16,8 @@ const useAnuncioForm = (initialFormData: any) => {
         });
         setSelectedAnuncio(anuncio);
         setIsEditing(true);
-    }, []);
+        setShowModal(true);
+    }, [setShowModal]);
 
     return {
         formData,

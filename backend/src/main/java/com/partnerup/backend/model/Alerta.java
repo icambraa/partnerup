@@ -20,7 +20,7 @@ public class Alerta {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "read", nullable = false)
-    private boolean read = false;  // Nuevo campo
+    private boolean read = false;
 
     public Long getId() {
         return id;

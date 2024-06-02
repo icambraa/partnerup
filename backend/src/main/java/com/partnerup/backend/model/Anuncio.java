@@ -22,7 +22,7 @@ public class Anuncio {
     @Column(nullable = false)
     private String rango;
 
-    @Column(length = 1024)  // Ajusta según tus necesidades
+    @Column(length = 1024)
     private String comentario;
 
     @Column(nullable = false)
@@ -31,8 +31,8 @@ public class Anuncio {
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Column(nullable = true)  // Permite que el enlace pueda ser nulo
-    private String discordChannelLink;  // Nuevo campo para el enlace del canal de Discord
+    @Column(nullable = true)
+    private String discordChannelLink;
 
     public Long getId() {
         return id;
