@@ -1,30 +1,16 @@
-# React + TypeScript + Vite
+Para ejecutar o lanzar el proyecto, simplemente sigue los siguientes pasos:
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+  1. Asegurate de tener instalado Docker.
+     
+  2. Clona o descarga el repositorio del proyecto de github
+     
+  3. Abre una terminal y dirígete al directorio principal del proyecto, donde se encuentra el 
+  archivo docker-compose.yml
+  
+  4. Ejecuta el siguiente comando: docker-compose up –build
+   
+Con esto, se construirán las imágenes de Docker para el frontend, el backend, se inciará la base 
+de datos postgresql y configurará el adminer para su administración.
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
-
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+Una vez completados estos pasos, se podrá acceder al contenido de la web accediendo a la url 
+http://localhost:3000, admineer se encuentra en http://localhost:8081
