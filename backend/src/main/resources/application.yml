@@ -16,7 +16,7 @@ server:
 
 riot:
   api:
-    key: RGAPI-6eab6e88-8858-4da2-9332-7e3f96236ce3
+    key: RGAPI-e00b82b4-0db2-4ed2-8292-994aff22e091
   profile:
     icon:
       base:
@@ -24,6 +24,6 @@ riot:
 
 discord:
   bot:
-    token: MTI0MDM2ODAzMzk5NDY0MTQ3MQ.GgD_Yz.y3B8Ql976ozetlt7pNbT92bvCgHUQHGVqVdDJw
+    token: MTI0MDM2ODAzMzk5NDY0MTQ3MQ.GRLFSF.fMpT1e-I5PlRKQnhmfs3TkwE1WMjm3m-MbmGiQ
   guild:
     id: 1242122335931076608
