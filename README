@@ -1,0 +1,21 @@
+Instrucciones de ejecución:
+
+Para ejecutar o lanzar el proyecto, simplemente sigue los siguientes pasos:
+
+  1. Asegurate de tener instalado Docker. 
+  2. Clona o descarga el repositorio del proyecto de github
+  3. Abre una terminal y dirígete al directorio principal del proyecto, donde se encuentra el 
+  archivo docker-compose.yml
+  4. Ejecuta el siguiente comando: docker-compose up –build
+
+Con esto, se construirán las imágenes de Docker para el frontend, el backend, se inciará la base 
+de datos postgresql y configurará el adminer para su administración.
+
+Una vez completados estos pasos, se podrá acceder al contenido de la web accediendo a la url 
+http://localhost:3000, admineer se encuentra en http://localhost:8081
+
+• Actualización de la API de Riot: Hay que actualizar manualmente la API de Riot cada 
+24 horas. Para ello, hay que poner la nueva API key en el archivo application.yml diariamente.
+
+• Acceso como usuario administrador: Para entrar como usuario administrador, hay que 
+acceder con el usuario admin@uoc.edu y la contraseña 12341234

@@ -1,0 +1,10 @@
+La estructura de archivos y carpetas del backend está organizada para mantener una separación clara de responsabilidades, haciendo que cada paquete tenga una función en específico mejorando la legibilidad 
+del código.
+
+El paquete config contiene las clases de configuración de la aplicación, abarcando configuraciones generales, caché, integración con Discord y WebSocket.Los controladores gestionan las solicitudes HTTP y 
+devuelven las respuestas adecuadas, actuando como intermediarios entre el frontend y el backend.Los modelos representan los datos y objetos, facilitando la gestión y manipulación de la base de datos.
+Los servicios contienen toda la lógica, procesando datos y ejecutando operaciones necesarias.y junto al contexto “AuthContext” proporcionan un contexto global para acceder al estado de 
+autenticación en toda la web.
+
+El módulo de administración proporciona unicamente (por ahora) una interfaz para que los administradores gestionen reportes de anuncios. Este módulo permite a los administradores ver 
+los reportes pendientes, ignorar reportes, eliminar anuncios reportados y enviar alertas a los usuarios sobre la eliminación de sus anuncios. 
