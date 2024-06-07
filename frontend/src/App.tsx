@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useParams } from 'react-router-dom';
-import Welcome from './components/welcome/Welcome';
+import Welcome from './components/Welcome/Welcome';
 import Navbar from './components/inside/navbar/Navbar';
 import Board from './components/inside/Board/Board.tsx';
 import UserProfile from './components/inside/UserProfile/UserProfile.tsx';
