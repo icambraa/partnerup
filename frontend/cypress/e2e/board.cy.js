@@ -30,7 +30,7 @@ describe('Board Component', () => {
     cy.url().should('include', '/board');
   });
 
-  it('should display the board with filters and anuncios', () => {
+  it('mostrar el tablón con los filtros y anuncios', () => {
     cy.visit('http://localhost:3000/board');
     cy.wait(2000); // Esperar un poco para que los elementos se rendericen
     cy.get('.container').should('be.visible');
@@ -38,13 +38,13 @@ describe('Board Component', () => {
     cy.get('.pagination-controls').should('be.visible');
   });
 
-  it('should open the create anuncio modal', () => {
+  it('debe abrir el modal de crear anuncio', () => {
     cy.visit('http://localhost:3000/board');
     cy.get('button').contains('Anunciarse').click();
     cy.get('.modal-content').should('be.visible');
   });
 
-  it('should create a new anuncio', () => {
+  it('crear anuncio correctamente', () => {
     const newAnuncio = generateUniqueAnuncio();
 
     cy.visit('http://localhost:3000/board');
@@ -75,7 +75,7 @@ describe('Board Component', () => {
     cy.get('.custom-table').should('contain', newAnuncio.comentario);
   });
 
-  it('should filter anuncios by role', () => {
+  it('filtrar por rol', () => {
     const topAnuncio = generateUniqueAnuncio('Top');
 
     cy.visit('http://localhost:3000/board');
@@ -99,13 +99,13 @@ describe('Board Component', () => {
     });
   });
 
-  it('should handle pagination controls', () => {
+  it('debería funcionar la paginacion', () => {
     cy.visit('http://localhost:3000/board');
     cy.get('.pagination-controls button').click();
     cy.get('.custom-table').should('not.be.empty');
   });
 
-  it('should send a message to an announcement', () => {
+  it('deberia mandar un mensaje', () => {
     const testMessage = 'Quiero jugar contigo';
     cy.visit('http://localhost:3000/board');
     cy.wait(2000);
@@ -120,7 +120,7 @@ describe('Board Component', () => {
     });
   });
 
-  it('should submit a report for an announcement', () => {
+  it('test de los reportes', () => {
     const testReportReason = 'Inappropriate content';
     cy.visit('http://localhost:3000/board');
     cy.wait(2000);

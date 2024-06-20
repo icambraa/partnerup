@@ -40,14 +40,14 @@ describe('Navbar Component', () => {
     }).as('getUserProfile');
   });
 
-  it('should render the navbar correctly', () => {
+  it('renderiza navbar', () => {
     cy.get('nav.navbar').should('be.visible');
     cy.get('nav.navbar img[alt="Logo"]').should('be.visible');
     cy.get('input[placeholder="Nickname#Tag"]').should('be.visible');
     cy.get('img[alt="LoL Icon"]').should('be.visible');
   });
 
-  it('should search for a user profile', () => {
+  it('buscar perfil de usuario', () => {
     const searchTerm = 'noo#peru';
 
     cy.get('input[placeholder="Nickname#Tag"]').type(searchTerm);
@@ -55,7 +55,7 @@ describe('Navbar Component', () => {
     cy.url().should('include', `/profile/${encodeURIComponent(searchTerm)}`);
   });
 
-  it('should open and close the sidebar', () => {
+  it('abrir y cerrar sidebar', () => {
     cy.get('i.bi-chat-left-dots-fill').click();
     cy.get('#sidebar').should('have.css', 'right', '0px');
 
@@ -63,7 +63,7 @@ describe('Navbar Component', () => {
     cy.get('#sidebar').should('have.css', 'right', '-275px');
   });
 
-  it('should open the message modal and mark message as read', () => {
+  it('abrir mensaje y marcar como leido', () => {
     cy.get('i.bi-chat-left-dots-fill').click();
     cy.wait('@getUnreadMessages');
     cy.get('#sidebar li.message').first().click();
@@ -72,7 +72,7 @@ describe('Navbar Component', () => {
     cy.get('.modal-content').should('not.exist');
   });
 
-  it('should send an acceptance message', () => {
+  it('mandar mesnaje de aceptacion', () => {
     cy.get('i.bi-chat-left-dots-fill').click();
     cy.wait('@getUnreadMessages');
     cy.get('#sidebar li.message').first().click();
@@ -81,7 +81,7 @@ describe('Navbar Component', () => {
     cy.get('.modal-content').should('not.exist');
   });
 
-  it('should reject a message', () => {
+  it('rechazar mensaje', () => {
     cy.get('i.bi-chat-left-dots-fill').click();
     cy.wait('@getUnreadMessages');
     cy.get('#sidebar li.message').first().click();
