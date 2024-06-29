@@ -16,7 +16,7 @@ server:
 
 riot:
   api:
-    key: RGAPI-f7026c22-62b8-43fd-a5c0-7122037b7f78
+    key: RGAPI-d864346d-28d4-4b29-a7fe-da861c5eea61
   profile:
     icon:
       base:
